@@ -1,0 +1,4 @@
+Localizar puntos por coordenadas
+Añadir puntos al mapa
+preparar presentación
+Histograma de información por puntos

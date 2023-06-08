@@ -1,0 +1,118 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        
+        {
+            "name": "Python: help",
+            "type": "python",
+            "request": "launch",
+            "program": "descarga.py",
+            "console": "integratedTerminal",
+            "args": ["-a", "descargar","-i","20230101","-f","20230405","-p", "p1.xml","-d","3beb5887-663e-4d77-8fd9-a10cc5eba23a"]
+        },
+        {
+            "name": "Python: help",
+            "type": "python",
+            "request": "launch",
+            "program": "descarga.py",
+            "console": "integratedTerminal",
+            "args": ["-a", "listar","-i","20230101","-f","20230405","-p", "p1.xml"]
+        },
+        {
+            "name": "Python: help",
+            "type": "python",
+            "request": "launch",
+            "program": "descarga.py",
+            "console": "integratedTerminal",
+            "args": ["-a", "coord"]
+        },
+        {
+            "name": "Python: help",
+            "type": "python",
+            "request": "launch",
+            "program": "descarga.py",
+            "console": "integratedTerminal",
+            "args": ["-a", "procesar_gdal"]
+        },
+        {
+            "name": "Python: help",
+            "type": "python",
+            "request": "launch",
+            "program": "descarga.py",
+            "console": "integratedTerminal",
+            "args": ["-a", "procesar_gdal"]
+        },
+
+
+        {
+            "name": "Python: help",
+            "type": "python",
+            "request": "launch",
+            "program": "descarga.py",
+            "console": "integratedTerminal",
+            "args": ["-a", "procesar_stiky","-p", "p1.xml"]
+        },
+        {
+            "name": "Python: help",
+            "type": "python",
+            "request": "launch",
+            "program": "descarga.py",
+            "console": "integratedTerminal",
+            "args": ["-a", "descomprimir"]
+        },
+
+
+
+        {
+            "name": "Python: help",
+            "type": "python",
+            "request": "launch",
+            "program": "descarga.py",
+            "console": "integratedTerminal",
+            "args": ["-a", "listar","-i","20230101","-f","20230405","-p", "p1.xml"]
+        },
+        {
+            "name": "Python: help",
+            "type": "python",
+            "request": "launch",
+            "program": "descarga.py",
+            "console": "integratedTerminal",
+            "args": ["-a","polygon","-p", "p1.xml"]
+        },
+
+        {
+            "name": "Python: help",
+            "type": "python",
+            "request": "launch",
+            "program": "descarga.py",
+            "console": "integratedTerminal",
+            "args": ["-a", "coord"]
+        },
+        {
+            "name": "Python: help",
+            "type": "python",
+            "request": "launch",
+            "program": "descarga.py",
+            "console": "integratedTerminal",
+            "args": ["-a", "descomprimir"]
+        },
+
+
+        {
+            "name": "Python: help",
+            "type": "python",
+            "request": "launch",
+            "program": "descarga.py",
+            "console": "integratedTerminal",
+            "args": ["-a", "listar","-i","20230101","-f","20230405","-p", "p1.xml"]
+        },
+        {
+            "name": "Python: help",
+            "type": "python",
+            "request": "launch",
+            "program": "descarga.py",
+            "console": "integratedTerminal",
+            "args": ["-h"]
+        }
+    ]
+}

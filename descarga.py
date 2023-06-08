@@ -12,6 +12,7 @@ import sys
 import os
 import glob
 import pyproj
+from  pyproj import Transformer
 from osgeo import gdal,ogr
 from shapely.ops import transform
 from rasterio.io import MemoryFile
@@ -25,9 +26,8 @@ import math
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from pathlib import Path
-from osgeo import gdal,ogr
+from osgeo import gdal,ogr,osr
 from osgeo.gdalconst import *
-import PIL
 from PIL import Image
 import rasterio
 from rasterio.mask import mask
@@ -38,13 +38,13 @@ from rasterio import windows
 from rasterio import warp
 from rasterio import mask
 import rasterio.plot as plot
-import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 from rasterio.plot import show_hist
 import folium
 import webbrowser
 import numpy as np
+import affine 
 
 def get_tallinn_polygon(swap_coordinates=False):
     tln_points = [
@@ -64,7 +64,7 @@ def get_tallinn_polygon(swap_coordinates=False):
 
 def get_tallinn_polygon_ge(swap_coordinates=False):
     print("polygon")
-    src_root_kml_path = "./src_data_kml"
+    src_root_kml_path = "../files/src_data_kml"
     filenamefullpath = src_root_kml_path + "/" + options.polygonfile
     i=0
     for p in readPoly(filenamefullpath):
@@ -135,6 +135,7 @@ def reproject(polygons, proj_from, proj_to):
     projection = pyproj.Transformer.from_proj(proj_from, proj_to)
     return [transform(projection.transform, p) for p in polygons]
 
+#TRANS_32630_TO_4326 = pyproj.Transformer.from_crs("ESPG:32630","ESPG:4326")
 
 def crop_memory_tiff_file(mem_file, polygons, crop):
     polygons = reproject(polygons, "EPSG:4326", mem_file.crs)
@@ -455,18 +456,44 @@ def sampleRaster(r,pts,band=1):
     row = ((originY - inPts[:, 1]) / cellSize).astype(int)
     res = ras[row,col]
     return(inPts,res)
+def retrieve_pixel_value(x,y, data_source):
+    '''
+    https://gis.stackexchange.com/questions/221292/retrieve-pixel-value-with-geographic-coordinate-as-input-with-gdal
+    Here is the function I came up with, using a function I found in another stack post 
+    (that I unfortunately cannot remember the title of). It was originally written to be 
+    used with a point vector file instead of manually inputting the points like I am doing.
+      Below is the simplified function, using affine and gdal, where data_source is an 
+      opened gdal object of a GeoTIFF and coord is a tuple of a geo-coordinate. 
+      This tuple must be in the same coordinate system as the GeoTIFF
+    '''
+    """Return floating-point value that corresponds to given point."""
+    forward_transform =  \
+        affine.Affine.from_gdal(*data_source.GetGeoTransform())
+    reverse_transform = ~forward_transform
+    px, py = reverse_transform * (x, y)
+    px, py = int(px + 0.5), int(py + 0.5)
+    pixel_coord = px, py
 
+    data_array = np.array(data_source.GetRasterBand(1).ReadAsArray())
+    val = 0
+    try:
+        val = data_array[pixel_coord[0]][pixel_coord[1]]
+    except IndexError as e:
+        val = -1
+    except:
+        raise
+    return val
 def main(options):
     print ("[DEBUG] sys.argv[1:] = {}\n".format(sys.argv[1:]))
     #usuario y password
     username = "jmafernandez"
     password = "EneasDuna2805.."
     #rutas internas
-    src_root_data_dir = "./src_data"
-    src_root_data_dir_proc = "./src_data_proc"
-    src_root_data_dir_processs = "./src_data_process"
-    src_root_data_dir_processs_gdal = "./src_data_process_gdal"
-    src_root_data_safe = "./src_data_safe"
+    src_root_data_dir = "../files/src_data"
+    src_root_data_dir_proc = "../files/src_data_proc"
+    src_root_data_dir_processs = "../files/src_data_process"
+    src_root_data_dir_processs_gdal = "../files/src_data_process_gdal"
+    src_root_data_safe = "../files/src_data_safe"
 
 
     if options.action:
@@ -699,6 +726,7 @@ def main(options):
             lyr.SetFeature(feat)
 
         elif options.action == "coord_values":
+            #https://opensourceoptions.com/blog/gdal-python-tutorial-reading-and-writing-raster-datasets/?utm_content=cmp-true
             basename = ""
             for file in os.listdir(src_root_data_dir):
                 if os.path.isfile(os.path.join(src_root_data_dir, file)):
@@ -706,6 +734,13 @@ def main(options):
                     basename =  os.path.basename( zipfilestr)
             productName = os.path.basename(zipfilestr)[:-4]
             outputPathSubdirectory = src_root_data_dir_processs_gdal+"/" + productName + "_PROCESSED/IMAGE_DATA"
+            band_coord_values_df = pd.DataFrame()
+            band =[]
+            long_arr = []
+            lat_arr = []
+            read_val = []
+            map_val = []
+            map_val_reescaled = []
             for tiff_file in os.listdir(outputPathSubdirectory):
                 # check only text files
                 if tiff_file.endswith('.tiff'):
@@ -721,13 +756,61 @@ def main(options):
                     print ("r.shape")
                     print(r.shape)
 
+
                     #open raster layer
+                    driver = gdal.GetDriverByName('GTiff')
                     src_ds=gdal.Open(outputPathSubdirectory + "/" + tiff_file)
+                    #Get espg from tiff
+                    proj = osr.SpatialReference(src_ds.GetProjection())
+                    print("SpatialReference")
+                    print(proj.GetAttrValue('AUTHORITY',1))
+
                     gt=src_ds.GetGeoTransform()
                     print("gt=src_ds.GetGeoTransform()")
                     print(gt)
-                    rb=src_ds.GetRasterBand(1)
-                    gdal.UseExceptions() #so it doesn
+                    Band =src_ds.GetRasterBand(1)
+
+
+                    NoData = Band.GetNoDataValue()  # this might be important later
+
+                    nBands = src_ds.RasterCount      # how many bands, to help you loop
+                    nRows  = src_ds.RasterYSize      # how many rows
+                    nCols  = src_ds.RasterXSize      # how many columns
+                    dType  = Band.DataType          # the datatype for this band
+                    print("Projection: ", src_ds.GetProjection())  # get projection
+                    print("Columns:", src_ds.RasterXSize)  # number of columns
+                    print("Rows:", src_ds.RasterYSize)  # number of rows
+                    print("Band count:", src_ds.RasterCount)  # number of bands
+                    print("Band dtype:", dType)  # number of bands
+
+                    transform = src_ds.GetGeoTransform()
+                    xOrigin = transform[0]
+                    yOrigin = transform[3]
+                    pixelWidth = transform[1]
+                    pixelHeight = -transform[5]
+                    #Read raster data
+                    data_array = src_ds.GetRasterBand(1).ReadAsArray(0,0,nCols,nRows)
+
+                    print("data_array.shape:", data_array.shape)
+                    print("data_array[0]", data_array[0])
+
+                    #Geting no data values
+                    ndv = data_array = src_ds.GetRasterBand(1).GetNoDataValue()
+                    print('No data value:', ndv)
+
+                    data_array = src_ds.GetRasterBand(1).ReadAsArray()  # read band data from the existing raster
+                    #data_nan = np.where(data_array == ndv, np.nan, data_array)  # set all the no data values to np.nan so we can easily calculate the minimum elevation
+                    #data_min = np.min(data_nan)  # get the minimum elevation value (excluding nan)
+                    #data_stretch = np.where(data_array == ndv, ndv, (data_array - data_min) * 1.5)  # now apply the strech algorithm
+                    #print('Min:', np.min(data_nan))
+                    #print('Max:', np.min(data_nan))
+
+
+                    print("test de trans")
+                    wgs_proj = "EPSG:4326"
+                    utm_proj = "EPSG:32630"
+                    transformer = Transformer.from_crs(wgs_proj,  utm_proj)
+                    #print(pyproj.transform(utm_proj,wgs_proj,399960,4700040))
                     '''
                     Rescaling
                     Rescaling and calculating indices (see Calculating indices) are examples of operations that are applied on each pixel, separately, to compose a new raster with the results. This type of operations are collectively known as raster algebra.
@@ -736,261 +819,44 @@ def main(options):
 
                     To get the reflectance values, we need to rescale all values dividing the entire array by 10000:
                     '''
-                    r = r / 10000
-                    print(r)
-
-                    # the original crs code
-                    print ("geo_tiff.crs_code: ")
-                    print (geo_tiff.crs_code)
-                    # the current crs code
-                    print ("geo_tiff.as_crs: ")
-                    print( geo_tiff.as_crs)
-                    # the shape of the tiff
-                    print ("geo_tiff.tif_shape: ")
-                    print(geo_tiff.tif_shape)
-                    # the bounding box in the as_crs CRS
-                    print ("geo_tiff.tif_bBox: ")
-                    print(geo_tiff.tif_bBox)
-                    # the bounding box as WGS 84
-                    print ("geo_tiff.tif_bBox_wgs_84: ")
-                    print(geo_tiff.tif_bBox_wgs_84)
-                    print("valores de las primeras 20 coordenadas")
-                    points = [
-                    #[-4.27254326,	42.08352779],
-                    #[-4.27217104,	42.08376982] ,
-                    #[-4.2727401,	42.08221765] ,
-                    #[-4.27296015,	42.08213388] ,
-                    #[-4.27268713,	42.08182134],
-                    [-4.21574342,	42.44570320 ]
-                    ]
-                    nparr_points = np.array(points)
-                    for x in points:
-                        print(x[0])
-                        num_dec_x = decimal(x[0])
-                        print(num_dec_x)
-                        num_dec_y = decimal(x[1])
-                        print(x[1])
-                        xr = 0
-                        while xr < 5:
-                            yr = 0
-                            while yr < 5:
-                                print (geo_tiff.get_coords(xr, yr))
-
-                                if isclose1(x[0],geo_tiff.get_coords(xr, yr)[0],1e-08) and  isclose1(x[1],geo_tiff.get_coords(xr, yr)[1],1e-08):
-                                    print ("Coordenadas encontradas")
-                                    print(geo_tiff.get_coords(xr, yr))
-                                    print(sampleRaster(src,nparr_points))
-                                    try: #in case raster isnt full extent
-                                        structval=rb.ReadRaster(xr,yr,1,1,buf_type=gdal.GDT_Float16) #Assumes 32 bit int- 'float'
-                                        intval = struct.unpack('f' , structval) #assume float
-                                        val=intval[0]
-                                        print ("Valor de la reflectancia")
-                                        print(val)
-                                    except:
-                                        val=-9999 #or some value to indicate a fail
-                                        print ("Valor de la reflectancia KO")
-                                        print(val)
-                                yr += 1
-
-                            xr += 1
-                sys.exit()
-
+                    r = 1 / 10000
+                    #leemos el csv con los datos
+                    datos_coords = pd.read_csv('./csv/test1.csv', usecols= ['Longuitud','Latitud','Materiaorganica'])
+                    #print(datos_coords)
+                    for ind  in datos_coords.index:
                         
-
-
-
-
-        elif options.action == "coord":
-            basename = ""
-            for file in os.listdir(src_root_data_dir):
-                if os.path.isfile(os.path.join(src_root_data_dir, file)):
-                    zipfilestr = src_root_data_dir + "/" +  file
-                    basename =  os.path.basename( zipfilestr)
-            productName = os.path.basename(zipfilestr)[:-4]
-            outputPathSubdirectory = src_root_data_dir_processs_gdal+"/" + productName + "_PROCESSED/IMAGE_DATA"
-            for tiff_file in os.listdir(outputPathSubdirectory):
-                # check only text files
-                if tiff_file.endswith('.tiff'):
-                    print(tiff_file)
-                    geo_tiff = GeoTiff(outputPathSubdirectory + "/" + tiff_file)
-                    # the original crs code
-                    print ("geo_tiff.crs_code: ")
-                    print (geo_tiff.crs_code)
-                    # the current crs code
-                    print ("geo_tiff.as_crs: ")
-                    print( geo_tiff.as_crs)
-                    # the shape of the tiff
-                    print ("geo_tiff.tif_shape: ")
-                    print(geo_tiff.tif_shape)
-                    # the bounding box in the as_crs CRS
-                    print ("geo_tiff.tif_bBox: ")
-                    print(geo_tiff.tif_bBox)
-                    # the bounding box as WGS 84
-                    print ("geo_tiff.tif_bBox_wgs_84: ")
-                    print(geo_tiff.tif_bBox_wgs_84)
-                    i=5
-                    j=6
-                    # in the as_crs coords
-                    print("geo_tiff.get_coords(i, j)")
-                    print(geo_tiff.get_coords(i, j))
-                    # in WGS 84 coords
-                    print("geo_tiff.get_wgs_84_coords(i, j)")
-                    print(geo_tiff.get_wgs_84_coords(i, j))
-                                #Leamos el .tiff
-                    im = Image.open(outputPathSubdirectory + "/" + tiff_file)
-                    print(im)
+                        long = datos_coords['Longuitud'][ind]
+                        lat = datos_coords['Latitud'][ind]
+                        value = datos_coords['Materiaorganica'][ind]
+                        #print ('long,lat')
+                        #print (long,lat)
+                        #point = pyproj.transform(wgs_proj,utm_proj,lat,long)
+                        point = transformer.transform(lat,long)
+                        valmap  =  retrieve_pixel_value(point[0], point[1],src_ds)
+                        valmap_res = valmap * r
+                        print (tiff_file , tiff_file[1:3] )
+                        bandstr = str(tiff_file[1:3])
+                        '''print ('long,lat')
+                        print (long,lat)
+                        print ('Read csv value')
+                        print (value)
+                        print ('Read map value')
+                        print (valmap)'''
+                        if valmap > 0:
+                            band.append(bandstr)
+                            long_arr.append(long)
+                            lat_arr.append(lat)
+                            read_val.append(value)
+                            map_val.append(valmap)
+                            map_val_reescaled.append(valmap_res)
+            band_coord_values_df['band'] = band
+            band_coord_values_df['long'] = long_arr
+            band_coord_values_df['lat'] = lat_arr
+            band_coord_values_df['read'] = read_val
+            band_coord_values_df['map'] =  map_val
+            band_coord_values_df["map_rescaled"] = map_val_reescaled
+            print(band_coord_values_df)
                     
-                    print("im.getpixel((0,0))")
-                    print(im.getpixel((i,j)))
-                    im2 = im.convert('I')
-                    print("im2.getpixel((0,0))")
-                    print(im2.getpixel((i,j)))
-                    im3 = im2.convert('I;16')
-                    print("im3.getpixel((0,0))")
-                    print(im3.getpixel((i,j)))            
-                    print("sacamos la grafica")
-                    #Leamos la informacion con rasterio
-                    #https://www.uv.es/gonmagar/blog/2018/11/11/RasterioExample
-                    print("Caracteristicas del archivo")
-                    src = rasterio.open(outputPathSubdirectory + "/" + tiff_file)
-                    print(src.height,src.width,src.transform,src.crs)
-                    print("check the crs of the data")
-                    print(src.crs)
-                    print("check the bounding-box of the data")
-                    print(src.bounds)
-                    print("check size")
-                    print(src.read().shape)
-                    z = src.read()[0]
-                    #Read a Window of data
-                    print("Read a Window of data")
-                    slice_ = (slice(2000,src.height),slice(0,2500))
-                    window_slice = windows.Window.from_slices(*slice_)
-                    print(window_slice)
-                    #veamos la ventana
-                    datos_b1 = src.read(1)
-                    plt.imshow(datos_b1)
-                    ax = plt.gca()
-                    ax.add_patch(Rectangle((window_slice.col_off,window_slice.row_off),
-                                        width=window_slice.width,
-                                        height=window_slice.height,fill=True,alpha=.2,
-                                    color="red"))
-                    plt.show()
-                    #Read a Window from the raster object
-                    # find specific transform, necessary to show the coordinates appropiately
-                    transform_window = windows.transform(window_slice,src.transform)
-
-                    # Read img and convert to rgb
-                    img = np.stack(src.read(1, window=window_slice),
-                                axis=-1)
-                    img = np.clip(img,0,2200)/2200
-
-                    print(img.shape)
-                    plt.imshow(src.read(1, window=window_slice))
-                    plt.title = "band 4"
-                    plt.show()
-
-
-                    print("Window to list of index (row,col)")
-                    pol_index = to_index(window_slice)
-                    print(pol_index)
-
-                    print("Convert list of index (row,col) to list of coordinates")
-                    print("[list(src.transform*p) for p in reverse_coordinates(pol_index)]")
-                    print([list(src.transform*p) for p in reverse_coordinates(pol_index)])
-                    
-                    print("[list(src.xy(*p,offset=\"center\")) for p in pol_index]")
-                    print([list(src.xy(*p,offset="center")) for p in pol_index])
-
-                    print("[list(src.xy(*p,offset=\"ul\")) for p in pol_index]")
-                    print([list(src.xy(*p,offset="ul")) for p in pol_index])
-
-                    print("Convert Window to BoundingBox")
-                    bbox = windows.bounds(window_slice,src.transform)
-                    print(bbox)
-
-                    print("Convert BoundingBox to Window")
-                    window_same = windows.from_bounds(*bbox,src.transform)
-                    print(window_same)
-
-                    print("BoundingBox to list of coordinates (closed)")
-                    pol = generate_polygon(bbox)
-                    print(pol)
-                    
-                    print("list of coordinates to BoundingBox")
-                    pol_to_bounding_box(pol)
-                    print(pol_to_bounding_box(pol))
-
-                    '''Change of Refence System (CRS) using rasterio.warp
-                    We will change the reference system from the different types of objects we have generated so far. 
-                    The source reference system of our raster is UTM epsg:32630. The target reference system we will 
-                    use is epsg:4326 which corresponds to standard (longitude,latitude) coordinates. 
-                    Transformations are done using the rasterio.warp module. There are different functions depending 
-                    on the objects we want to transform to.'''
-
-                    print("transform list of coordinates")
-                    pol_np = np.array(pol)
-                    coords_transformed = warp.transform(src.crs,{'init': 'epsg:4326'},pol_np[:,0],pol_np[:,1])
-                    coords_transformed = [[r,c] for r,c in zip(coords_transformed[0],coords_transformed[1])]
-                    print(coords_transformed)
-
-                    print("transform BoundingBox")
-                    bounds_trans = warp.transform_bounds(src.crs,{'init': 'epsg:4326'},*bbox)
-                    print(bounds_trans)
-                    pol_bounds_trans = generate_polygon(bounds_trans)
-                    print(pol_bounds_trans)
-
-                    ''' transform GeoJSON like dictionary
-                    A GeoJSON like dictionary in its simplest form is a dictionary with 
-                    a a field type set to Polygon and a field coordinates as a list of 
-                    list of coordinates. The function warp.transform_geom use this structure
-                    to transform geometries between different coordinate reference systems (CRS).
-                    '''
-                    print("transform GeoJSON like dictionary")
-                    pol_trans = warp.transform_geom(src.crs,{'init': 'epsg:4326'},
-                                {"type":"Polygon","coordinates":[pol]})
-                    print(pol_trans)
-                    print("pol_to_bounding_box(pol_trans[\"coordinates\"][0])")
-                    print(pol_to_bounding_box(pol_trans["coordinates"][0]))
-
-                    '''Show polygons with folium
-                    Now we will show all the polygons we have defined using folium.
-                    In particular we will show the bounds of the original image, 
-                    the polygons of the transformed coordinates (and we will see they are both the same)
-                    and the bounds of the transformed window. With the functions folium.Polygon and 
-                    folium.Polyline we can easily plot in an OpenStreetMap map our list of coordinates. 
-                    However we should reverse the coordinates in such lists because
-                    folium works with (lat,lng) coordinates instead of (lng,lat).'''
-
-                    # original bounds of the image
-                    bounds_trans_original = warp.transform_bounds(src.crs,{'init': 'epsg:4326'},
-                                                                *src.bounds)
-                    polygon_trans_original = generate_polygon(bounds_trans_original)
-
-                    polyline_polygon_trans_original = folium.PolyLine(reverse_coordinates(polygon_trans_original),
-                                                                    popup="polygon_trans_original",
-                                                                    color="#2ca02c")
-
-                    polyline_pol_trans = folium.Polygon(reverse_coordinates(pol_trans["coordinates"][0]),
-                                                        popup="pol_trans",color="red",fill=True)
-
-                    polyline_coords_transformed = folium.PolyLine(reverse_coordinates(coords_transformed),
-                                                                popup="coords_transformed")
-
-                    # transformed bounds which should be different than the previous two
-                    polyline_pol_bounds_trans = folium.PolyLine(reverse_coordinates(pol_bounds_trans),
-                                                                popup="pol_bounds_trans",color="orange")
-
-                    mean_lat = (bounds_trans[1] + bounds_trans[3]) / 2.0
-                    mean_lng = (bounds_trans[0] + bounds_trans[2]) / 2.0
-                    map_bb = folium.Map(location=[mean_lat,mean_lng],
-                                    zoom_start=6)
-                    map_bb.add_child(polyline_pol_trans)
-                    map_bb.add_child(polyline_coords_transformed)
-                    map_bb.add_child(polyline_pol_bounds_trans)
-                    map_bb.add_child(polyline_polygon_trans_original)
-                    map_bb
-                    sys.exit()
-
         elif options.action == "coord_todas":
             basename = ""
             for file in os.listdir(src_root_data_dir):
@@ -1020,80 +886,7 @@ def main(options):
                     # the bounding box as WGS 84
                     print ("geo_tiff.tif_bBox_wgs_84: ")
                     print(geo_tiff.tif_bBox_wgs_84)
-        elif options.action == "coord_folium":
-            basename = ""
-            print("coord_folium")
-            for file in os.listdir(src_root_data_dir):
-                if os.path.isfile(os.path.join(src_root_data_dir, file)):
-                    zipfilestr = src_root_data_dir + "/" +  file
-                    basename =  os.path.basename( zipfilestr)
-            productName = os.path.basename(zipfilestr)[:-4]
-            outputPathSubdirectory = src_root_data_dir_processs_gdal+"/" + productName + "_PROCESSED/IMAGE_DATA"
-            for tiff_file in os.listdir(outputPathSubdirectory):
-                # check only text files
-                if tiff_file.endswith('.tiff'):
-                    print("Show polygons with folium")
-                    print(tiff_file)
-                    
-                    #Leamos la informacion con rasterio
-                    #https://www.uv.es/gonmagar/blog/2018/11/11/RasterioExample
-                    print("Caracteristicas del archivo")
-                    src = rasterio.open(outputPathSubdirectory + "/" + tiff_file)
-                    slice_ = (slice(2000,src.height),slice(0,2500))
-                    window_slice = windows.Window.from_slices(*slice_)
-                    bbox = windows.bounds(window_slice,src.transform)
-                    pol = generate_polygon(bbox)
-                    pol_trans = warp.transform_geom(src.crs,{'init': 'epsg:4326'},
-                                {"type":"Polygon","coordinates":[pol]})
-                    print("transform list of coordinates")
-                    pol_np = np.array(pol)
-                    coords_transformed = warp.transform(src.crs,{'init': 'epsg:4326'},pol_np[:,0],pol_np[:,1])
-                    coords_transformed = [[r,c] for r,c in zip(coords_transformed[0],coords_transformed[1])]
-                    print("transform BoundingBox")
-                    bounds_trans = warp.transform_bounds(src.crs,{'init': 'epsg:4326'},*bbox)
-                    print(bounds_trans)
-                    pol_bounds_trans = generate_polygon(bounds_trans)
-                    '''Show polygons with folium
-                    Now we will show all the polygons we have defined using folium.
-                    In particular we will show the bounds of the original image, 
-                    the polygons of the transformed coordinates (and we will see they are both the same)
-                    and the bounds of the transformed window. With the functions folium.Polygon and 
-                    folium.Polyline we can easily plot in an OpenStreetMap map our list of coordinates. 
-                    However we should reverse the coordinates in such lists because
-                    folium works with (lat,lng) coordinates instead of (lng,lat).'''
 
-                    # original bounds of the image
-                    bounds_trans_original = warp.transform_bounds(src.crs,{'init': 'epsg:4326'},
-                                                                *src.bounds)
-                    polygon_trans_original = generate_polygon(bounds_trans_original)
-
-                    polyline_polygon_trans_original = folium.PolyLine(reverse_coordinates(polygon_trans_original),
-                                                                    popup="polygon_trans_original",
-                                                                    color="#2ca02c")
-
-                    polyline_pol_trans = folium.Polygon(reverse_coordinates(pol_trans["coordinates"][0]),
-                                                        popup="pol_trans",color="red",fill=True)
-
-                    polyline_coords_transformed = folium.PolyLine(reverse_coordinates(coords_transformed),
-                                                                popup="coords_transformed")
-
-                    # transformed bounds which should be different than the previous two
-                    polyline_pol_bounds_trans = folium.PolyLine(reverse_coordinates(pol_bounds_trans),
-                                                                popup="pol_bounds_trans",color="orange")
-
-                    mean_lat = (bounds_trans[1] + bounds_trans[3]) / 2.0
-                    mean_lng = (bounds_trans[0] + bounds_trans[2]) / 2.0
-                    map_bb = folium.Map(location=[mean_lat,mean_lng],
-                                    zoom_start=6)
-                    map_bb.add_child(polyline_pol_trans)
-                    map_bb.add_child(polyline_coords_transformed)
-                    map_bb.add_child(polyline_pol_bounds_trans)
-                    map_bb.add_child(polyline_polygon_trans_original)
-                    #mostramos el mapa
-                    map_bb.save("map.html")
-                    webbrowser.open("map.html")
-                    
-                    sys.exit()
         elif options.action == "coord_polygon":
             basename = ""
             print("coord_folium")
@@ -1168,73 +961,7 @@ def main(options):
                     webbrowser.open("map.html")
                     
                     sys.exit()
-        elif options.action == "exprlore":
-            #https://hatarilabs.com/ih-en/sentinel2-images-explotarion-and-processing-with-python-and-rasterio
-            print("explore")
-        elif options.action == "coord1":
-            #https://rasterio.readthedocs.io/en/stable/topics/plotting.html
-            basename = ""
-            for file in os.listdir(src_root_data_dir):
-                if os.path.isfile(os.path.join(src_root_data_dir, file)):
-                    zipfilestr = src_root_data_dir + "/" +  file
-                    basename =  os.path.basename( zipfilestr)
-            productName = os.path.basename(zipfilestr)[:-4]
-            outputPathSubdirectory = src_root_data_dir_processs_gdal+"/" + productName + "_PROCESSED/IMAGE_DATA"
-            outputPathSubdirectoryfile02 = src_root_data_dir_processs_gdal+"/" + productName + "_PROCESSED/IMAGE_DATA/B02.tiff"
-            outputPathSubdirectoryfile03 = src_root_data_dir_processs_gdal+"/" + productName + "_PROCESSED/IMAGE_DATA/B03.tiff"
-            outputPathSubdirectoryfile04 = src_root_data_dir_processs_gdal+"/" + productName + "_PROCESSED/IMAGE_DATA/B04.tiff"
-            outputPathSubdirectoryfile05 = src_root_data_dir_processs_gdal+"/" + productName + "_PROCESSED/IMAGE_DATA/B05.tiff"
-            outputPathSubdirectoryfile06 = src_root_data_dir_processs_gdal+"/" + productName + "_PROCESSED/IMAGE_DATA/B06.tiff"
-            outputPathSubdirectoryfile07 = src_root_data_dir_processs_gdal+"/" + productName + "_PROCESSED/IMAGE_DATA/B07.tiff"
-            outputPathSubdirectoryfile08 = src_root_data_dir_processs_gdal+"/" + productName + "_PROCESSED/IMAGE_DATA/B08.tiff"
-            outputPathSubdirectoryfiletodas = src_root_data_dir_processs_gdal+"/" + productName + "_PROCESSED/IMAGE_DATA/TODAS/L2A_T30TVM_A040031_20230220T16Bit-AllBands.tiff"
-            '''
-            #generate histogram
-            src02 = rasterio.open(outputPathSubdirectoryfile02)
-            plt.imshow(src02.read(1), cmap='pink')
-            plt.title = "band 2"
-            plt.show()
-            #generate histogram
-            src03 = rasterio.open(outputPathSubdirectoryfile03)
-            plt.imshow(src03.read(1), cmap='pink')
-            plt.title = "band 3"
-            plt.show()
-            #generate histogram
-            src04 = rasterio.open(outputPathSubdirectoryfile04)
-            plt.imshow(src04.read(1), cmap='pink')
-            plt.title = "band 4"
-            plt.show()
-
-            #generate histogram
-            src05 = rasterio.open(outputPathSubdirectoryfile05)
-            plt.imshow(src05.read(1), cmap='pink')
-            plt.title = "band 5"
-            plt.show()
-            '''
-            #generate histogram
-            src = rasterio.open(outputPathSubdirectoryfiletodas)
-            #Histograma
-            print("Grafico 1")
-            show_hist(
-                src, bins=50, lw=0.0, stacked=False, alpha=0.3,
-                histtype='stepfilled', title="Histogram")
-            print("Grafico 2")
-            fig, (axrgb, axhist) = plt.subplots(1, 2, figsize=(14,7))
-            show(src, ax=axrgb)
-            show_hist(src, bins=50, histtype='stepfilled',
-                lw=0.0, stacked=False, alpha=0.3, ax=axhist)
-            plt.show()
-            #generate histogram
-            src06 = rasterio.open(outputPathSubdirectoryfile06)
-            plt.imshow(src06.read(1), cmap='pink')
-            plt.title = "band 6"
-            plt.show()
-            #For single-band rasters, there is also an option to generate contours.
-            fig, ax = plt.subplots(1, figsize=(12, 12))
-            show((src06, 1), cmap='Greys_r', interpolation='none', ax=ax)
-            show((src06, 1), contour=True, ax=ax)
-            plt.show()
-
+       
 
     else:
         print ("Choose an action")

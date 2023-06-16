@@ -2,3 +2,28 @@ Localizar puntos por coordenadas
 Añadir puntos al mapa
 preparar presentación
 Histograma de información por puntos
+
+
+
+sigpac
+https://github.com/javisantana/agromaps/blob/master/tools/sigpac_scrap/sigpac.py
+https://github.com/javisantana/agromaps/blob/master/tools/sigpac_scrap/sigpac.py
+https://gist.github.com/DaniSagan/67b3564fb27bdffaad36
+
+Reunion jueves 08/06/2023
+
+
+Reunion viernes 09/06/2023
+Rteferencia sigpac  ( buscar coordenadas en sigpac)
+Parcelas secano y cereales
+En una misma zona 3 manejos en ecológico en siembra directa
+La sequía ha afectado por falta de siembras
+Tenemos coordenadas de puntos
+Cultivos herbaceous
+En Burgos 30 parcelas
+11 convencionales
+9 en ecológico
+El resto en siembra directa
+Obtenemos valor promedio para la parcela  , extrapolar valores a la parcela 
+Ta se han identificado los puntos de muestra
+Obtener datos parcelas ( cultivo y fecha toma de la medida)

@@ -834,7 +834,7 @@ def main(options):
                         point = transformer.transform(lat,long)
                         valmap  =  retrieve_pixel_value(point[0], point[1],src_ds)
                         valmap_res = valmap * r
-                        print (tiff_file , tiff_file[1:3] )
+                        #print (tiff_file , tiff_file[1:3] )
                         bandstr = str(tiff_file[1:3])
                         '''print ('long,lat')
                         print (long,lat)
@@ -855,8 +855,22 @@ def main(options):
             band_coord_values_df['read'] = read_val
             band_coord_values_df['map'] =  map_val
             band_coord_values_df["map_rescaled"] = map_val_reescaled
-            print(band_coord_values_df)
-                    
+            band_coord_values_df.to_csv('./csv/out.csv')
+            
+        elif options.action == "hist":
+            #leemos el csv con los datos
+            datos_coords = pd.read_csv('./csv/out.csv', usecols= ['long','lat','read','map_rescaled'])
+            datos_coords["pos"]  = datos_coords['long'].astype(str) +"-"+ datos_coords['lat'].astype(str) 
+            
+            datos_coords.hist(by='pos',
+                    column='map_rescaled')
+            plt.title("Hitograma valores sentinel")
+            plt.show()
+            datos_coords.hist(by='pos',
+                    column='read')
+            plt.title("Hitograma valores de campo")
+            plt.show()
+
         elif options.action == "coord_todas":
             basename = ""
             for file in os.listdir(src_root_data_dir):

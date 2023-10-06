@@ -1,0 +1,9 @@
+Collecting GDAL
+  Using cached GDAL-3.7.1.1.tar.gz (776 kB)
+  Preparing metadata (setup.py): started
+  Preparing metadata (setup.py): finished with status 'done'
+Building wheels for collected packages: GDAL
+  Building wheel for GDAL (setup.py): started
+  Building wheel for GDAL (setup.py): finished with status 'error'
+  Running setup.py clean for GDAL
+Failed to build GDAL

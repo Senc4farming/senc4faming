@@ -1,0 +1,21 @@
+  
+   
+   
+  
+
+Gene symbol: POLDI Extended eDNA not avallable
+
+    
+    
+
+[Database: Small deletions - micro-deletions (20 bp or less) are presented in terms of the deleted bases in lower case plus, in upper case, 10 bp DNA sequence flanking both sides of the lesion. The numbered
+codon is preceded in the given sequence by the caret character ("). There are currently 2 mutations available in this category.
+
+ 
+
+cD136841 TeGAc*(6a3)TTeTCeteccTETACCcE ‘Available to subscribers.
+
+ 
+
+ 
+

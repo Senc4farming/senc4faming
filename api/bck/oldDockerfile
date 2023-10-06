@@ -1,0 +1,163 @@
+FROM python:3.9-slim-buster as builder
+
+RUN apt-get update
+RUN apt-get install -y --no-install-recommends \
+    cmake build-essential wget ca-certificates unzip pkg-config \
+    zlib1g-dev libfreexl-dev libxml2-dev nasm libpng-dev
+
+WORKDIR /app
+
+ENV CPUS 2
+
+# Install GDAL dependencies
+ENV GDAL_SHORT_VERSION 3.2.1
+ENV GDAL_VERSION 3.2.1
+RUN wget -q https://download.osgeo.org/gdal/${GDAL_SHORT_VERSION}/gdal-${GDAL_VERSION}.tar.gz
+RUN tar -xzf gdal-${GDAL_VERSION}.tar.gz && cd gdal-${GDAL_SHORT_VERSION} && \
+    ./configure \
+    --disable-debug \
+    --prefix=/usr/local \
+    --disable-static \
+    --with-curl=/usr/local/bin/curl-config \
+    --with-geos \
+    --with-geotiff=/usr/local \
+    --with-hide-internal-symbols=yes \
+    --with-libtiff=/usr/local \
+    --with-jpeg=/usr/local \
+    --with-png \
+    --with-openjpeg \
+    --with-sqlite3 \
+    --with-proj=/usr/local \
+    --with-rename-internal-libgeotiff-symbols=yes \
+    --with-rename-internal-libtiff-symbols=yes \
+    --with-threads=yes \
+    --with-webp=/usr/local \
+    --with-zstd=/usr/local \
+    --with-libdeflate \
+    && echo "building GDAL ${GDAL_VERSION}..." \
+    && make -j${CPUS} && make --quiet install
+
+
+#Install wget
+RUN  apt-get update \
+  && apt-get install -y wget \
+  && apt-get install -y curl \
+  && apt-get install -y gnupg \ 
+  && apt-get install -y gnupg1 \ 
+  && apt-get install -y gnupg2 \
+  && apt-get install -y apt-utils \
+  && apt-get install -y unzip \
+  && apt-get install -y \
+        apt-utils \
+        fonts-liberation \
+        libasound2 \
+        libatk-bridge2.0-0 \
+        libatk1.0-0 \
+        libatspi2.0-0 \
+        libcups2 \
+        libdbus-1-3 \
+        libdrm2 \
+        libgbm1 \
+        libgtk-3-0 \
+        libnspr4 \
+        libnss3 \
+        libx11-xcb1 \
+        libxcb-dri3-0 \
+        libxcomposite1 \
+        libxdamage1 \
+        libxfixes3 \
+        libxrandr2 \
+        xdg-utils \
+        libpq-dev \
+        gcc \
+        libgdk-pixbuf2.0-0 \
+        python3-numpy \
+&& apt-get install -y tesseract-ocr \
+    libtesseract-dev \
+    libleptonica-dev \
+    python3 \
+    python3-distutils \
+    python3-pip \ 
+&& rm -rf /var/lib/apt/lists/*
+
+
+# Update C env vars so compiler can find gdal
+ENV CPLUS_INCLUDE_PATH=/usr/include/gdal
+ENV C_INCLUDE_PATH=/usr/include/gdal
+
+
+
+
+
+# uwsgi must be compiled - install necessary build tools, compile uwsgi
+# and then remove the build tools to minimize image size
+# (buildDeps are removed, deps are kept)
+RUN set -ex \
+    && buildDeps=' \
+        build-essential \
+    ' \
+    && deps=' \
+        htop \
+    ' \
+    && apt-get update && apt-get install -y $buildDeps $deps --no-install-recommends  && rm -rf /var/lib/apt/lists/* \
+    && pip install uWSGI==2.0.19.1 \
+    && apt-get purge -y --auto-remove $buildDeps \
+    && find /usr/local -depth \
+    \( \
+        \( -type d -a -name test -o -name tests \) \
+        -o \
+        \( -type f -a -name '*.pyc' -o -name '*.pyo' \) \
+    \) -exec rm -rf '{}' +
+RUN pip3 install --upgrade pip
+RUN pip3 install pytesseract
+# install psycopg2 library with PIP
+RUN pip3 install psycopg2
+
+# install other py libs - not require compilation
+#COPY applications/google_chrome_86_0_4240_75.deb /app/applications/
+#COPY applications/chromedriver /app/applications/
+COPY requirements.txt /app/requirements.txt
+RUN pip --use-deprecated=legacy-resolver install -r /app/requirements.txt
+#RUN pip install --upgrade pip \
+#    && dpkg -i applications/google_chrome_86_0_4240_75.deb \
+#    && chmod a+x applications/chromedriver
+RUN echo 'we are running some # of cool things'
+# copy source files
+COPY conf /app/conf
+COPY py /app/py
+COPY migrations /app/migrations
+COPY migrations_sqlite /app/migrations_sqlite
+COPY scripts /app/scripts
+COPY templates /app/templates
+COPY test /app/test
+COPY conf/loginscript.sh /etc/profile
+RUN python /app/py/check_sys.py
+# background spooler dir
+RUN mkdir /tmp/pysrv_spooler
+
+# we don't need this file with Docker but uwsgi looks for it
+RUN echo `date +%s` >/app/VERSION
+
+EXPOSE 80
+RUN echo 'we are running some # of cool things'
+
+# our server config file
+# - you should write your own config file and put OUTSIDE the repository
+#   since the config file contains secrets
+# - here I use the sample template from repo
+# - it is also possible to override the config with env variables, either here
+#   or in Amazon ECS or Kubernetes configuration
+COPY conf/server-config.json /app/real-server-config.json
+ENV PYSRV_DATABASE_HOST host.docker.internal
+# ENV PYSRV_REDIS_HOST host.docker.internal
+# ENV PYSRV_DATABASE_PASSWORD x
+
+# build either a production or dev image
+ARG BUILDMODE=production
+ENV ENVBUILDMODE=$BUILDMODE
+
+RUN echo "BUILDMODE $ENVBUILDMODE"
+
+# run in shell mode with ENV expansion
+CMD uwsgi --ini /app/conf/uwsgi.ini:uwsgi-$ENVBUILDMODE
+

@@ -1,0 +1,61 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sd="http://www.w3.org/1999/xhtml"
+      xmlns:sec="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{/layout/layout}">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{userguide.myqueries.title}"></title>
+</head>
+<body>
+<div layout:fragment="cabecera">
+    <h1 th:text="#{userguide.myqueries.title}"></h1>
+    <h1 th:if="${ayudatitulo != 'Not found' }"  th:text="${ayudatitulo}"></h1>
+</div>
+<div layout:fragment="contenido">
+    <form class="mx-1 mx-md-4"  role="form"  method="get">
+        <div>
+            <a th:href="@{/userguide/ctr/home}" >Go to user guide main page</a>
+            <div class="field-item even">
+                <p id="buttontoscreen">My queries list  access: <button type="submit" value="myqueriesspage"
+                                                                        class="btn btn-outline-success btn-sm"
+                                                                        th:formaction="'/filtrolistararchivos'"
+                                                                        th:method="get"
+                                                                        th:text="#{userguide.myqueries.ayudabody}" ></button>.
+                </p>
+                <p id="introduction">
+                This screen let users list queries to download geotiff files from Copernicus Sentinel HUB.
+                <div class="container-sm py-5">
+                    <img class="img-fluid" id="Picturep" th:src="@{/img/myquerieslist.png}"/>
+                </div>
+                For each query offers options to:
+                <ul>
+                    <li>Show query details</li>
+                    Show query details, reference, initial and end date, max cloud cover and polygon.
+                    Coordinates format is  <strong>lat&#60;space&#62;long,lat&#60;space&#62;long,,,,,,,,,lat&#60;space&#62;long</strong>
+                    User cannot edit this fields.
+                    <div class="container-sm py-5">
+                        <img class="img-fluid" id="Picture09" th:src="@{/img/myquerieslistdet.png}"/>
+                    </div>
+                    <li>Show list of .SAFE files gotten when query was last time executed</li>
+                    <div class="container-sm py-5">
+                        <img class="img-fluid" id="Picturep1" th:src="@{/img/myquerieslistsafe1.png}"/>
+                    </div>
+                    For each .SAFE file user has access to download one geotiff per sentinel reflectance band, and show downloaded geotiff bands.
+                    After giving the order for downloading, an asynchronous process will be launched, so that user must wait and list later geotiff files.
+                    <div class="container-sm py-5">
+                        <img class="img-fluid" id="Picturep2" th:src="@{/img/myquerieslistsafe1tiff.png}"/>
+                    </div>
+                    There are 2 different view options, as a map where polygon is shown or as geotiff image.
+                    <li>Relaunch query</li>
+                    <li>Delete query</li>
+                </ul>
+
+
+                </p>
+            </div>
+        </div>
+    </form>
+</div>
+</body>
+</html>

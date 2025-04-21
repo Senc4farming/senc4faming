@@ -1,0 +1,46 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sd="http://www.w3.org/1999/xhtml"
+      xmlns:sec="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{/layout/layout}">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{userguide.uploadkmlfile.title}"></title>
+</head>
+<body>
+<div layout:fragment="cabecera">
+    <h1 th:text="#{userguide.uploadkmlfile.title}"></h1>
+    <h1 th:if="${ayudatitulo != 'Not found' }"  th:text="${ayudatitulo}"></h1>
+</div>
+<div layout:fragment="contenido">
+    <form class="mx-1 mx-md-4"  role="form"  method="get">
+        <div>
+            <a th:href="@{/userguide/ctr/home}" >Go to user guide main page</a>
+            <div class="field-item even">
+                <p id="introduction">
+                    This page has been designed to let users upload csv files to interact with Copernicus Sentinel HUB or Google Earth Engine to train ML predictor and/or query SOC</p>
+                <p id="buttontoscreen">User kml files upload access: <button type="submit" value="uploadkmlpage"
+                                                                              class="btn btn-outline-success btn-sm"
+                                                                              th:formaction="'/upload/kml'"
+                                                                              th:method="get"
+                                                                              th:text="#{userguide.uploadkmlfile.ayudabody}" ></button>.
+                </p>
+                <p id="stepsoptions">
+                    When pushing "Choose file" button, WALGREEN will ask user to select a csv file.
+                <div class="container-sm py-5">
+                    <img class="img-fluid" id="Picture1" th:src="@{/img/uploadkml1.png}"/>
+                </div>
+
+
+                In case user need to draw kml file on a map must go to <button type="submit" value="usercsvfileslistpage"
+                                                                       class="btn btn-outline-success btn-sm"
+                                                                       th:formaction="'/uploadedfiles'"
+                                                                       th:method="get"
+                                                                       th:text="#{userguide.usercsvfiles.ayudabody}" ></button>.
+                </p>
+            </div>
+        </div>
+    </form>
+</div>
+</body>
+</html>

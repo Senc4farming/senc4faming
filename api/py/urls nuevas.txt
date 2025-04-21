@@ -1,0 +1,5 @@
+https://documentation.dataspace.copernicus.eu/notebook-samples/sentinelhub/data_download_process_request.html
+
+
+https://github.com/SDFIdk/CDSETool/blob/main/tests/query/query_test.py
+

@@ -1,0 +1,109 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sd="http://www.w3.org/1999/xhtml"
+      xmlns:sec="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{/layout/layout}">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{evalscript.title}"></title>
+</head>
+<body>
+    <div layout:fragment="cabecera">
+        <h1 th:text="#{evalscript.list.title}"></h1>
+    </div>
+    <div layout:fragment="contenido">
+        <div class="box-body">
+            Show <span sd:page-size-selector="javascript"></span> entries
+
+            <form action="#" th:action="@{/}" method="post">
+                <div id="tableitms" class="table-responsive">
+                <!-- Opcion 1 : tabla con contenido ( recomandable en caso de listas-->
+                    <table class="table table-bordered table-hover">
+                        <tr>
+                            <th th:text="#{evalscript.field.scriptTitle}"></th>
+                            <th th:text="#{evalscript.field.scriptDescription}"></th>
+                            <th>&nbsp</th>
+                            <th>&nbsp</th>
+                        </tr>
+                        <tr th:each="elemento , posicion : ${lista}">
+                            <td th:text="${elemento.scriptTitle}"></td>
+                            <td th:text="${elemento.scriptDescription}"></td>
+                            <td>
+                                <!-- meter un link para ver  con texto "ver"-->
+                                <a th:href="@{'/evalscript/'+ ${elemento.id}}"
+                                   class="text-success"
+                                   th:text="#{general.detalles}"></a>
+                            </td>
+                            <td>
+                                <!-- meter un boton para borrar  con un boton-->
+                                <button type="submit" value="Eliminar"
+                                        class="btn btn-success btn-lg"
+                                        th:text="#{general.eliminar}"
+                                        id="delete"
+                                        th:formaction="'/evalscript/'+ ${elemento.id} +'/delete'"></button>
+                            </td>
+                        </tr>
+                        <!--Mostramos una ultima fila con inormación cuando no hay registros -->
+                        <tr th:if="${lista ==null or  lista.empty}">
+                            <td colspan="13" class="text-center" th:text="#{general.nodata}"></td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="alert" th:if="${resultado}" th:text="${resultado}"></div>
+            </form>
+        </div>
+        <!-- preparamos el div para poner los numeros de pagina-->
+        <div  th:if="${lista!=null and !lista.empty}" >
+            <div class="text-center">
+                <nav>
+                    <ul class="pagination" sd:pagination="full">
+                        <!--  si hay menos del numero minimo de registos no muestro la barra-->
+                        <div  th:if="${lista.totalPages > 0}" class="pagination"
+                           th:each="pageNumber : ${pageNumbers}">
+                            <li th:class="${pageNumber==lista.number + 1} ? active">
+                                <a href="#" th:href="@{/evalscript(size=${lista.size}, page=${pageNumber})}"
+                                   th:text=${pageNumber}></a>
+                            </li>
+                        </div>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+    <div layout:fragment="turorial">
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                let steps = [{
+                    title: "WALGREEN",
+                    intro: "Welcome to user's evalscripts list tutorial page."
+                },
+                    {
+                        element: '#tableitms',
+                        intro: "A list of evalscripts  will be shown usind a paging system."
+                    },
+                    {
+                        element: '#details',
+                        intro: "For each item user can see the query parameters."
+                    },
+                    {
+                        element: '#delete',
+                        intro: "User can delete any item from the list."
+                    }
+                ];
+
+                document.getElementById('inicio_tutorial').addEventListener('click', function () {
+                    this.style.animation = "none";
+                    introJs().setOptions({
+                        steps: steps,
+                        'nextLabel': "Next",
+                        'prevLabel': "Previous",
+                        'doneLabel': "Done",
+                    }).start();
+                });
+            });
+
+        </script>
+    </div>
+</body>
+</html>
+

@@ -1,0 +1,52 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sd="http://www.w3.org/1999/xhtml"
+      xmlns:sec="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{/layout/layout}">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{userguide.newquery.title}"></title>
+</head>
+<body>
+<div layout:fragment="cabecera">
+    <h1 th:text="#{userguide.newquery.title}"></h1>
+    <h1 th:if="${ayudatitulo != 'Not found' }"  th:text="${ayudatitulo}"></h1>
+</div>
+<div layout:fragment="contenido">
+    <form class="mx-1 mx-md-4"  role="form"  method="get">
+        <div>
+            <a th:href="@{/userguide/ctr/home}" >Go to user guide main page</a>
+            <div class="field-item even">
+                <p id="buttontoscreen">New query access: <button type="submit" value="sentinelcredentialspage"
+                                                                          class="btn btn-outline-success btn-sm"
+                                                                          th:formaction="'/api/credentials'"
+                                                                          th:method="get"
+                                                                          th:text="#{userguide.createevalscript.ayudabody}" ></button>.
+                </p>
+                <p id="introduction">
+                    This screen let users run queries to download geotiff files from Copernicus Sentinel HUB.
+                <div class="container-sm py-5">
+                    <img class="img-fluid" id="Picturep" th:src="@{/img/myqueriesnewquery.png}"/>
+                </div>
+                Parameters details are:
+                <ul>
+                    <li>Reference:Reference</li>
+                    <li>Initial Date:Initial date, format YYYY-MM-DD</li>
+                    <li>End date:End date, format YYYY-MM-DD</li>
+                    <li>Maxcloud coverage: Max cloud coverage for sentinel tiff images</li>
+                    <li>Polygon: Coordinates format is  <strong>lat&#60;space&#62;long,lat&#60;space&#62;long,,,,,,,,,lat&#60;space&#62;long</strong></li>
+                </ul>
+                Screen gives user options to check polygon size. Copernicus Sentinel HUB does not support files with heigth or width greater than 2500.
+                In case query does not find results next screen will be shown:
+                <div class="container-sm py-5">
+                    <img class="img-fluid" id="Picturenodata" th:src="@{/img/createevalscriptnodata.png}"/>
+                </div>
+                In case query find results it will be shown the list of .SAFE files.
+                Check <a th:href="@{/userguide/ctr/copsh/listqueries}" th:text="#{userguide.myqueries.ayudadesc}"></a> , to view tiff files.
+                </p>
+            </div>
+        </div>
+    </form>
+</div>
+</body>
+</html>

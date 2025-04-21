@@ -1,0 +1,11 @@
+.DS_Store
+
+node_modules
+
+/browser
+/lib
+/docs
+
+/test_report
+/coverage
+/.nyc_output

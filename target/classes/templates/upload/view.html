@@ -1,0 +1,135 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sd="http://www.w3.org/1999/xhtml"
+      xmlns:sec="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{/layout/layout}">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{uploaded.vistacsv.title}"></title>
+</head>
+<body>
+<div layout:fragment="cabecera">
+
+
+</div>
+<div layout:fragment="contenido">
+    <div class="box-body">
+
+
+        <form action="#" th:action="@{/uploadedfiles}" method="get">
+            <div class="row">
+                <div class="col-2">
+                    <h1  th:text="#{uploaded.vistacsv.title}"></h1>
+                </div>
+                <div class="col-10">
+                    <div class="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
+                        <button type="submit"  class="btn btn-success btn-lg" th:text="#{btn.volver}"></button>
+                    </div>
+                </div>
+            </div>
+            <div class="addScroll">
+                <div class="table-responsive">
+                <!-- Opcion 1 : tabla con contenido ( recomandable en caso de listas-->
+                    <table class="table table-bordered table-hover">
+                        <tr>
+                            <th th:text="#{uploaded.vistacsv.depth}"></th>
+                            <th th:text="#{uploaded.vistacsv.pointid}"></th>
+                            <th th:text="#{uploaded.vistacsv.soc}"></th>
+                            <th th:text="#{uploaded.vistacsv.latitude}"></th>
+                            <th th:text="#{uploaded.vistacsv.longitude}"></th>
+                            <th th:text="#{uploaded.vistacsv.surveydate}"></th>
+                            <th th:text="#{uploaded.vistacsv.elev}"></th>
+                            <th th:text="#{uploaded.vistacsv.desc1}"></th>
+                            <th th:text="#{uploaded.vistacsv.desc2}"></th>
+                            <th th:text="#{uploaded.vistacsv.desc3}"></th>
+                            <th th:text="#{uploaded.actions}"></th>
+                        </tr>
+                        <tr th:each="elemento , posicion : ${lista}">
+                            <td th:text="${elemento.depth}"></td>
+                            <td th:text="${elemento.pointid}"></td>
+                            <td th:text="${elemento.soc}"></td>
+                            <td th:text="${elemento.latitude}"></td>
+                            <td th:text="${elemento.longitude}"></td>
+                            <td th:text="${elemento.surveydate}"></td>
+                            <td th:text="${elemento.elev}"></td>
+                            <td th:text="${elemento.desc1}"></td>
+                            <td th:text="${elemento.desc2}"></td>
+                            <td th:text="${elemento.desc3}"></td>
+                            <td class="text-center">
+                                <div   class="btn-group"  id="group-principal"
+                                     role="group" aria-label="Button group with nested dropdown">
+                                    <div class="btn-group" role="group">
+                                        <button type="button" class="btn btn-success dropdown-toggle"
+                                                data-bs-toggle="dropdown" aria-expanded="false"
+                                                th:text="#{uploaded.kalmanfilters}">
+                                        </button>
+                                        <ul class="dropdown-menu" >
+                                            <li  class="dropdown-submenu">
+                                                <a class="test" tabindex="-1" href="#" th:text="#{uploaded.kalmanfilters.landsat}"></a>
+                                                <ul class="dropdown-menu">
+                                                     <li>
+                                                        <button
+                                                                type="submit" value="Getreflectancekalmanl"
+                                                                class="btn btn-outline-success btn-sm"
+                                                                th:formaction="'/api/uploadedfiles/kalman/gee/2/1/'+${filtro.id}+'/'+ ${elemento.pointid} "
+                                                                th:method="GET"
+                                                                th:object="${filtro}"
+                                                                th:text="#{uploaded.kalmanfilters.reflectance}" >
+                                                        </button>
+                                                    </li>
+                                                    <!--li>
+                                                        <button
+                                                                type="submit" value="GetSOCkalmanl"
+                                                                class="btn btn-outline-success btn-sm"
+                                                                th:formaction="'/api/uploadedfiles/kalman/gee/1/1/'+${filtro.id}+'/'+ ${elemento.pointid} "
+                                                                th:method="GET"
+                                                                th:object="${filtro}"
+                                                                th:text="#{uploaded.kalmanfilters.soc}" >
+                                                        </button>
+                                                    </li-->
+                                                </ul>
+                                            </li>
+                                            <li  class="dropdown-submenu">
+                                                <a class="test" tabindex="-1" href="#" th:text="#{uploaded.kalmanfilters.sentinel}"></a>
+                                                <ul class="dropdown-menu">
+                                                    <li>
+                                                        <button
+                                                                type="submit" value="Getreflectancekalmanl"
+                                                                class="btn btn-outline-success btn-sm"
+                                                                th:formaction="'/api/uploadedfiles/kalman/gee/2/2/'+${filtro.id}+'/'+ ${elemento.pointid} "
+                                                                th:method="GET"
+                                                                th:object="${filtro}"
+                                                                th:text="#{uploaded.kalmanfilters.reflectance}" >
+                                                        </button>
+                                                    </li>
+                                                    <!--li>
+                                                        <button
+                                                                type="submit" value="GetSOCkalmanl"
+                                                                class="btn btn-outline-success btn-sm"
+                                                                th:formaction="'/api/uploadedfiles/kalman/gee/1/2/'+${filtro.id}+'/'+ ${elemento.pointid} "
+                                                                th:method="GET"
+                                                                th:object="${filtro}"
+                                                                th:text="#{uploaded.kalmanfilters.soc}" >
+                                                        </button>
+                                                    </li-->
+                                                </ul>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <!--Mostramos una ultima fila con inormación cuando no hay registros -->
+                        <tr th:if="${lista ==null or  lista.empty}">
+                            <td colspan="13" class="text-center" th:text="#{general.nodata}"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+</body>
+</html>
+

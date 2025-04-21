@@ -1,0 +1,18 @@
+{
+  "plugins": [
+    "@babel/plugin-transform-modules-commonjs",
+    ["replace-import-extension", {
+      "extMapping": { ".mjs": ".cjs" }
+    }]
+  ],
+  "assumptions": {
+    "constantReexports": true,
+    "noIncompleteNsImportDetection": true
+  },
+  "env": {
+    "test": {
+      "sourceMaps": "inline"
+    }
+  },
+  "comments": false
+}

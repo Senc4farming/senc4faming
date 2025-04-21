@@ -1,0 +1,37 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sd="http://www.w3.org/1999/xhtml"
+      xmlns:sec="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{/layout/layout}">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{userguide.userslist.title}"></title>
+</head>
+<body>
+<div layout:fragment="cabecera">
+    <h1 th:text="#{userguide.userslist.title}"></h1>
+    <h1 th:if="${ayudatitulo != 'Not found' }"  th:text="${ayudatitulo}"></h1>
+</div>
+<div layout:fragment="contenido">
+    <form class="mx-1 mx-md-4"  role="form"  method="get">
+        <div>
+            <a th:href="@{/userguide/ctr/home}" >Go to user guide main page</a>
+            <div>
+
+                <p>User’s list screen is only available for administrators.</p>
+                <p >Gives options to enable and disable users so that it is
+                    possible to block a user without deleting his account.</p>
+                <div class="container-sm py-5">
+                    <img class="img-fluid" id="Picture 1" th:src="@{/img/userslist1.png}"/>
+                </div>
+
+
+                <p>In case is needed administrators has also the option to delete
+                    a user account.</p>
+        </div>
+        </div>
+    </form>
+
+</div>
+</body>
+</html>

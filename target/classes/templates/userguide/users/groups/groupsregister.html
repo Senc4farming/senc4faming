@@ -1,0 +1,28 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sd="http://www.w3.org/1999/xhtml"
+      xmlns:sec="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{/layout/layout}">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{userguide.groupregistry.title}"></title>
+</head>
+<body>
+<div layout:fragment="cabecera">
+    <h1 th:text="#{userguide.groupregistry.title}"></h1>
+    <h1 th:if="${ayudatitulo != 'Not found' }"  th:text="${ayudatitulo}"></h1>
+</div>
+<div layout:fragment="contenido">
+    <div class="box-body">
+        <p th:text="#{userguide.groupregistry.ayudadesc}"></p>
+        <p th:if="${ayudadesc != 'Not found' }"  th:text="${ayudadesc}"> </p>
+    </div>
+        <div>
+            <div class="box-body">
+                <p th:text="#{userguide.groupregistry.ayudabody}"></p>
+                <p th:if="${ayudabody != 'Not found' }"  th:text="${ayudabody}"> </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

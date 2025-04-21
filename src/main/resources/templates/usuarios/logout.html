@@ -1,0 +1,39 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sd="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{/layout/layout}">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{usuarios.logout.title}"></title>
+</head>
+<body>
+    <div layout:fragment="cabecera">
+        <p class="text-center h1 fw-bold mb-5 mx-1 mx-md-4 mt-4" th:text="#{logout.subtitle}"></p>
+    </div>
+    <div layout:fragment="contenido">
+        <p class="text-center h1 fw-bold mb-5 mx-1 mx-md-4 mt-4" th:text="#{logout.content}"></p>
+    </div>
+    <div layout:fragment="turorial">
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                let steps = [{
+                    title: "WALGREEN",
+                    intro: "Logout users page is shown when user logs out."
+                }
+                ];
+
+                document.getElementById('inicio_tutorial').addEventListener('click', function () {
+                    this.style.animation = "none";
+                    introJs().setOptions({
+                        steps: steps,
+                        'nextLabel': "Next",
+                        'prevLabel': "Previous",
+                        'doneLabel': "Done",
+                    }).start();
+                });
+            });
+
+        </script>
+
+</body>
+</html>

@@ -1,0 +1,35 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sd="http://www.w3.org/1999/xhtml"
+      xmlns:sec="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{/layout/layout}">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{userguide.csv.copsh.getrefl.title}"></title>
+</head>
+<body>
+<div layout:fragment="cabecera">
+    <h1 th:text="#{userguide.csv.copsh.getrefl.title}"></h1>
+    <h1 th:if="${ayudatitulo != 'Not found' }"  th:text="${ayudatitulo}"></h1>
+</div>
+<div layout:fragment="contenido">
+    <form class="mx-1 mx-md-4"  role="form"  method="get">
+        <div>
+            <a th:href="@{/userguide/ctr/home}" >Go to user guide main page</a>
+            <div class="container-sm py-5">
+                <img class="img-fluid" id="Picture 1" th:src="@{/img/getrefl.png}"/>
+            </div>
+            <p id="introduction">
+                This option is accessible throught  User csv and kml files menu option.
+                Reads the point contained in the csv file and query Copernicus Sentinel HUB to get reflectance vectors.
+            </p>
+            <p id="buttontoscreen">User csv and kml files access: <button type="submit" value="usercsvfileslistpage"
+                                                                          class="btn btn-outline-success btn-sm"
+                                                                          th:formaction="'/uploadedfiles'"
+                                                                          th:method="get"
+                                                                          th:text="#{userguide.usercsvfiles.ayudabody}" ></button>.</p>
+        </div>
+    </form>
+</div>
+</body>
+</html>

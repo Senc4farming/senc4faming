@@ -1,0 +1,56 @@
+{
+    "name": "hgmd",
+
+    "PYSRV_IS_PRODUCTION": "",
+
+
+    "PYSRV_DATABASE_HOST": "host.docker.internal",
+    "PYSRV_DATABASE_HOST_POSTGRESQL": "host.docker.internal",
+    "PYSRV_DATABASE_HOST_SQLITE": "/app/data/mydb.sqlite",
+    "PYSRV_DATABASE_PORT": "5436",
+    "PYSRV_DATABASE_NAME": "tmdb",
+    "PYSRV_DATABASE_USER": "tm",
+    "PYSRV_DATABASE_PASSWORD": "eneas",
+    "PYSRV_PHARMAGKB_TSV_PATH": "/app/db/etl/tsv",
+
+    "PYSRV_COOKIE_HTTPS_ONLY": false,
+    "PYSRV_REDIS_HOST": "host.docker.internal:6379",
+    "PYSRV_DOMAIN_NAME": "",
+    "PYSRV_CORS_ALLOW_ORIGIN": "*",
+
+    
+    "PYSRV_SENTINEL_USERNAME": "jmafernandez",
+    "PYSRV_SENTINEL_PASSWORD": "EneasDuna2805..",
+
+
+    "PYSRV_SENTINEL_CLIENT_ID":"sh-011e2359-8f85-475a-8b80-4f58dc8603aa",
+    "PYSRV_SENTINEL_SECRET": "5TWsNGWu8knTtBX7L3wjTaMCCow9uQ9I",
+
+
+    "PYSRV_SENTINEL_CLIENT_ID_JUAN":"sh-cc570359-b763-4fd6-8e3d-c0749c697cb6",
+    "PYSRV_SENTINEL_SECRET_JUAN": "NtuPaiMLj0TAUZE0fuBuBQNtQzqb2NTpV2qYFJ",
+
+    "PYSRV_SENTINEL_CLIENT_ID_UBU":"sh-92af2db1-ce3f-4b41-853b-7bd3dcab3382",
+    "PYSRV_SENTINEL_SECRET_UBU": "8eBrxDr5krlSSRaQocMNzAyZjGstsCyr",
+
+    "PYSRV_SENTINEL_CLIENT_ID_ENE":"sh-bfa182f9-4f4b-4ec5-a48d-7e27c9309fdc",
+    "PYSRV_SENTINEL_SECRET_ENE": "5oidnDXOdGOHMh5LMclwrdNkdND9aMdb",
+
+    "PYSRV_SENTINEL_CLIENT_ID_APP":"sh-98c28961-9cb0-4272-9c40-332f0e349c69",
+    "PYSRV_SENTINEL_SECRET_APP": "u5jGcYp8YStVkaQCSnYdiAMhDFxgJl8s",
+
+    "PYSRV_SENTINEL_CLIENT_ID_APP1":"sh-f1ca314e-24e1-443c-a011-212fe47fb2ca",
+    "PYSRV_SENTINEL_SECRET_APP1": "hYAGo9SS497yTCHUQxSl40yA02UYmj9q",
+
+    
+    "PYSRV_SRC_ROOT_DATA_DIR": "/app/files/src_data",
+    "PYSRV_SRC_ROOT_DATA_DIR_PROC": "/app/files/src_data_proc",
+    "PYSRV_SRC_ROOT_DATA_DIR_PROCESS": "/app/files/src_data_process",
+    "PYSRV_SRC_ROOT_DATA_DIR_PROCESS_GDAL": "/app/files/src_data_process_gdal",
+    "PYSRV_SRC_ROOT_DATA_SAFE": "/app/files/src_data_safe",
+    "PYSRV_COORDS_DATA": "/app/files/data",
+    "PYSRV_USER_ROOT_IMAGE": "/app/files/userfiles",    
+    "PYSRV_DATA_UPLOAD": "/app/files/upload",
+    "PYSRV_GEE_CONFIG_FILE": "/app/conf/ee-josemanuelarocafernandez-b74d15199ebb.json"
+}
+

@@ -1,0 +1,88 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sd="http://www.w3.org/1999/xhtml"
+      xmlns:sec="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{/layout/layout}">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{uploaded.vistacsv.title}"></title>
+</head>
+<body>
+    <div layout:fragment="cabecera">
+        <h1  th:text="#{aimodels.list.title}"></h1>
+    </div>
+    <div layout:fragment="contenido">
+        <form action="#" th:action="@{/api/ai/models}" method="get">
+
+            <div class="row>">
+                <div class="addScroll">
+                    <div class="table-responsive">
+                        <!-- Opcion 1 : tabla con contenido ( recomandable en caso de listas-->
+                        <table id = "tableitm" class="table table-sm table-bordered
+                               bg-light text-bg-dark rounded-start">
+                            <tr>
+                                <th th:text="#{aimodels.list.referencia}"></th>
+                                <th th:text="#{aimodels.list.elemento}"></th>
+                                <th th:text="#{aimodels.list.rmse}"></th>
+                                <th th:text="#{aimodels.list.mae}"></th>
+                                <th th:text="#{aimodels.list.r2}"></th>
+                                <th th:text="#{aimodels.list.pearson}"></th>
+                                <th>Actions</th>
+                            </tr>
+                            <tr th:each="elemento , posicion : ${lista}">
+                                <td th:text="${elemento.referencia}"></td>
+                                <td th:text="${elemento.elemento}"></td>
+                                <td th:text="${#numbers.formatDecimal(elemento.rmse, 1, 3, 'COMMA')}"></td>
+                                <td th:text="${#numbers.formatDecimal(elemento.mae, 1, 3, 'COMMA')}"></td>
+                                <td th:text="${#numbers.formatDecimal(elemento.r2, 1, 3, 'COMMA')}"></td>
+                                <td th:text="${elemento.pearson}"></td>
+                                <td> <button type="submit" value="Utilizar"
+                                             class="btn btn-success"
+                                             id="use"
+                                             th:text="#{aimodels.list.utilizar}"
+                                             th:formaction="'/api/ai/models/'+ ${elemento.referencia} +'/ejecutar'"></button></td>
+                            </tr>
+                            <!--Mostramos una ultima fila con inormación cuando no hay registros -->
+                            <tr th:if="${lista ==null or  lista.empty}">
+                                <td colspan="13" class="text-center" th:text="#{general.nodata}"></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+    </div>
+    <div layout:fragment="turorial">
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                let steps = [{
+                    title: "WALGREEN",
+                    intro: "Welcome AI Models for predictions tutorial page."
+                },
+                    {
+                        element: '#tableitm',
+                        intro: "In the main table are listed the ML Algorithms that has been trained showing the RMSE, MAE, R2 and Peardon coefficient."
+                    },
+                    {
+                        element: '#use',
+                        intro: "Push this button to select model "
+                    }
+                ];
+
+                document.getElementById('inicio_tutorial').addEventListener('click', function () {
+                    this.style.animation = "none";
+                    introJs().setOptions({
+                        steps: steps,
+                        'nextLabel': "Next",
+                        'prevLabel': "Previous",
+                        'doneLabel': "Done",
+                    }).start();
+                });
+            });
+
+        </script>
+    </div>
+</body>
+</html>
+

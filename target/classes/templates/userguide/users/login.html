@@ -1,0 +1,46 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sd="http://www.w3.org/1999/xhtml"
+      xmlns:sec="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{/layout/layout}">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{userguide.login.title}"></title>
+</head>
+<body>
+    <div layout:fragment="cabecera">
+        <h1 th:text="#{userguide.login.title}"></h1>
+        <h1 th:if="${ayudatitulo != 'Not found' }"  th:text="${ayudatitulo}"></h1>
+    </div>
+    <div layout:fragment="contenido">
+        <form class="mx-1 mx-md-4"  role="form"  method="get">
+            <div>
+                <a th:href="@{/userguide/ctr/home}" >Go to user guide main page</a>
+                <h3>Steps to Login:</h3>
+                <ul>
+                    <li>1. Go to the <button type="submit" value="loginresetpasswordpage"
+                                             class="btn btn-outline-success btn-sm"
+                                             th:formaction="'/usuarios/login'"
+                                             th:method="get"
+                                             th:text="#{userguide.login.ayudabody}" ></button>.</li>
+                    <div class="container-sm py-5">
+                        <img class="img-fluid" id="Picture 1" th:src="@{/img/login.png}"/>
+                    </div>
+                    <li>2. Enter your email.</li>
+                    <li>3. Enter your password.</li>
+                    <li>4. Click on the "Enter" button.</li>
+                </ul>
+
+
+                <h3>Troubleshooting:</h3>
+                <ul>
+                    <li>- Ensure CAPS LOCK is off while entering the password.</li>
+                    <li>- Check if your internet connection is stable.</li>
+                    <li>- Clear your browser cache and try again.</li>
+                    <li>- Contact support if the issue persists.</li>
+                </ul>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

@@ -1,0 +1,129 @@
+{
+  "env": {
+    "es6": true
+  },
+  "extends": [
+    "eslint:recommended",
+    "plugin:import/errors",
+    "plugin:import/warnings",
+    "plugin:jsdoc/recommended"
+  ],
+  "parserOptions": {
+    "ecmaVersion": 2015,
+    "sourceType": "module"
+  },
+  "plugins": ["import", "jsdoc"],
+  "rules": {
+    "arrow-parens": ["error", "always"],
+    "comma-dangle": ["error", "always-multiline"],
+    "curly": ["error", "all"],
+    "eol-last": ["error", "always"],
+    "getter-return": "off",
+    "indent": ["error", 2, { "SwitchCase": 1 }],
+    "no-debugger": "warn",
+    "no-restricted-globals": [
+      "error",
+      "Array",
+      "ArrayBuffer",
+      "BigInt",
+      "BigInt64Array",
+      "BigUint64Array",
+      "Boolean",
+      "DataView",
+      "Date",
+      "Error",
+      "EvalError",
+      "Float32Array",
+      "Float64Array",
+      "Function",
+      "Int16Array",
+      "Int32Array",
+      "Int8Array",
+      "isFinite",
+      "isNaN",
+      "JSON",
+      "Map",
+      "Math",
+      "Number",
+      "Object",
+      "Promise",
+      "Proxy",
+      "RangeError",
+      "ReferenceError",
+      "Reflect",
+      "RegExp",
+      "Set",
+      "SharedArrayBuffer",
+      "String",
+      "Symbol",
+      "SyntaxError",
+      "TypeError",
+      "URIError",
+      "Uint16Array",
+      "Uint32Array",
+      "Uint8Array",
+      "Uint8ClampedArray",
+      "WeakMap",
+      "WeakSet",
+      "parseFloat",
+      "parseInt"
+    ],
+    "no-restricted-syntax": [
+      "error",
+      {
+        "selector": "ForInStatement",
+        "message": "Do not use ForInStatement"
+      },
+      {
+        "selector": "FunctionDeclaration ForOfStatement, FunctionExpression ForOfStatement, ArrowFunctionExpression ForOfStatement",
+        "message": "Do not use ForOfStatement in function"
+      },
+      {
+        "selector": "SpreadElement[argument.callee.name!=safeIfNeeded]",
+        "message": "Use `safeIfNeeded` utility function to account for the case that Array.prototype [@@iterator] has been modified"
+      },
+      {
+        "selector": "CallExpression[callee.type=MemberExpression]",
+        "message": "Do not call methods directly, use primordials"
+      }
+    ],
+    "no-undef": "error",
+    "no-unused-vars": [
+      "error",
+      { "argsIgnorePattern": "^_" }
+    ],
+    "object-curly-spacing": ["error", "always"],
+    "quotes": ["error", "double", "avoid-escape"],
+    "semi": ["error", "always"],
+    "sort-imports": [
+      "error",
+      {
+        "ignoreDeclarationSort": true
+      }
+    ],
+    "space-before-function-paren": [
+      "error",
+      {
+        "anonymous": "always",
+        "named": "never"
+      }
+    ],
+    "import/extensions": ["error", "always"],
+    "import/no-default-export": "error",
+    "import/no-unresolved": "off",
+    "import/order": ["error", {
+      "newlines-between": "never",
+      "alphabetize": {
+        "order": "asc"
+      }
+    }],
+    "jsdoc/no-undefined-types": "off",
+    "jsdoc/require-jsdoc": "off",
+    "jsdoc/require-param": "off",
+    "jsdoc/require-param-description": "off",
+    "jsdoc/require-returns": "off",
+    "jsdoc/require-returns-check": "off",
+    "jsdoc/require-returns-description": "off",
+    "jsdoc/valid-types": "off"
+  }
+}

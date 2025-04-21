@@ -1,0 +1,60 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sd="http://www.w3.org/1999/xhtml"
+      xmlns:sec="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{/layout/layout}">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{userguide.querysoc.ayudadesc}"></title>
+</head>
+<body>
+<div layout:fragment="cabecera">
+    <h1 th:text="#{userguide.querysoc.ayudadesc}"></h1>
+    <h1 th:if="${ayudatitulo != 'Not found' }"  th:text="${ayudatitulo}"></h1>
+</div>
+<div layout:fragment="contenido">
+    <form class="mx-1 mx-md-4"  role="form"  method="get">
+        <div>
+            <a th:href="@{/userguide/ctr/home}" >Go to user guide main page</a>
+            <div class="field-item even">
+                <p id="introduction">
+                    This page has been designed to let users upload csv files to interact with Copernicus Sentinel HUB or Google Earth Engine to train ML predictor and/or query SOC</p>
+                <p id="buttontoscreen">QuerySOC screen access: <button type="submit" value="querysocpage"
+                                                                             class="btn btn-outline-success btn-sm"
+                                                                             th:formaction="'/api/models/list'"
+                                                                             th:method="get"
+                                                                             th:text="#{userguide.querysoc.ayudabody}" ></button>.
+                </p>
+                <p id="stepsoptions">
+                    When user needs to query SOC for a point, must follow this steps:
+                    <ul>
+                        <li>Select the ML predictor to use
+                            <div class="container-sm py-5">
+                                <img class="img-fluid" id="Picture1" th:src="@{/img/querysoc1.png}"/>
+                            </div>
+                        </li>
+                        <li>Fill in query values:
+                            <ul>
+                                <li>Id: Point id.</li>
+                                <li>Initial date: Format DD/MM/YY</li>
+                                <li>End date: Format DD/MM/YY</li>
+                                <li>Max cloud: Max cloud cover value.</li>
+                                <li>Longitude: In WGS84.</li>
+                                <li>Latitude: In WGS84.</li>
+                            </ul>
+                            <div class="container-sm py-5">
+                                <img class="img-fluid" id="Picture2" th:src="@{/img/querysoc2.png}"/>
+                            </div>
+                            Once user push query button, SOC value will be shown on the text square on the right.
+                            <div class="container-sm py-5">
+                                <img class="img-fluid" id="Picture3" th:src="@{/img/querysoc3.png}"/>
+                            </div>
+                        </li>
+                    </ul>
+                </p>
+            </div>
+        </div>
+    </form>
+</div>
+</body>
+</html>

@@ -1,0 +1,69 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sd="http://www.w3.org/1999/xhtml"
+      xmlns:sec="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{/layout/layout}">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{lucas2018.lista.title}"></title>
+    <style>
+        .addScroll{
+            overflow-y:auto;
+            height: 400px;
+        }
+    </style>
+</head>
+<body>
+<div layout:fragment="cabecera">
+    <h1  th:text="#{uploaded.lista.title}"></h1>
+</div>
+<div layout:fragment="contenido">
+    <div class="box-body">
+        <form action="#"  method="get">
+            <div class="row">
+                <div class="col">
+                    <div class="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
+                        <button type="submit"  class="btn btn-success btn-lg"
+                                th:text="#{btn.downloadcsv}"
+                                th:method="get"
+                                th:formaction="'/api/uploadedfiles/uploadCsvExport/'+ ${idres} "></button>
+                    </div>
+                </div>
+            </div>
+            <div class="addScroll">
+                <div class="table-responsive" >
+                <!-- Opcion 1 : tabla con contenido ( recomandable en caso de listas-->
+                    <table class="table table-bordered table-hover">
+                        <tr>
+                            <th th:text="#{uploaded.lista.longitud}"></th>
+                            <th th:text="#{uploaded.lista.latitud}"></th>
+                            <th th:text="#{uploaded.lista.id}"></th>
+                            <th th:text="#{uploaded.lista.reflectance}"></th>
+                            <th th:text="#{uploaded.lista.band}"></th>
+                            <th th:text="#{uploaded.lista.survey_date}"></th>
+                            <th th:text="#{uploaded.lista.oc}"></th>
+                            <th style="display:none"></th>
+
+                        </tr>
+                        <tr th:each="elemento , posicion : ${lista}">
+                            <td th:text="${#numbers.formatDecimal(elemento.longitud, 1, 5, 'COMMA')}"></td>
+                            <td th:text="${#numbers.formatDecimal(elemento.latitud, 1, 5, 'COMMA')}"></td>
+                            <td th:text="${elemento.pointid}"></td>
+                            <td th:text="${#numbers.formatDecimal(elemento.reflectance, 1, 4, 'COMMA')}"></td>
+                            <td th:text="${elemento.band}"></td>
+                            <td th:text="${elemento.survey_date}"></td>
+                            <td th:text="${elemento.oc}"></td>
+                            <td style="display:none" th:text="${elemento.id}"></td>
+                        </tr>
+
+                    </table>
+                </div>
+            </div>
+        </form>
+    </div>
+    <!-- preparamos el div para poner los numeros de pagina-->
+</div>
+
+</body>
+</html>
+

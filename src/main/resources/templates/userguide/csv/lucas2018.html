@@ -1,0 +1,106 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sd="http://www.w3.org/1999/xhtml"
+      xmlns:sec="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{/layout/layout}">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{userguide.lucas.title}"></title>
+</head>
+<body>
+<div layout:fragment="cabecera">
+    <h1 th:text="#{userguide.lucas.title}"></h1>
+    <h1 th:if="${ayudatitulo != 'Not found' }"  th:text="${ayudatitulo}"></h1>
+</div>
+<div layout:fragment="contenido">
+    <form class="mx-1 mx-md-4"  role="form"  method="get">
+        <div>
+            <a th:href="@{/userguide/ctr/home}" >Go to user guide main page</a>
+            <a href="https://esdac.jrc.ec.europa.eu/content/lucas-2018-topsoil-data">The 2018 LUCAS campaign</a> has been used to train Machine Learning
+            algorithms.
+            <div class="field-item even">
+                <p>Topsoil&nbsp;data for 18,984 samples from LUCAS 2018 are available as a CSV file and, to facilitate use of the data,
+                    an ESRI shapefile containing the theoretical points to which the taken samples should be associated; you may preview the
+                    <a href="/public_path/shared_folder/dataset/75-LUCAS-SOIL-2018/readme_LUCAS-SOIL-2018-29_07_2022.docx">
+                        <span style="background-color:#ffff00;">readme </span>
+                    </a>file to find a description of these data.
+                </p>
+                <p><strong>Documentation</strong>: these data are accompanied by a&nbsp; <a href="/public_path/shared_folder/dataset/75-LUCAS-SOIL-2018/JRC_Report_2018%20LUCAS_Soil_Final-v2.pdf"><span style="background-color:#ffff00;">report&nbsp; </span></a>describing the 2018 dataset.</p>
+                <p><strong>Geographical extent</strong>: European Union plus UK.</p>
+                <p><strong>Format</strong>: CSV (with soil property data) + shapefile (theoretical sampling points, based on LUCAS Grid)</p>
+                <div>
+                    <strong>Measured properties</strong>: pH (CaCl2 and H2O), organic carbon content, CaCO3, nitrogen, phosphorous, potassium, EC (Electrical conductivity), Oxalate extractable Fe and Al .<br>
+                    <p>Clay, silt,&nbsp;sand content and&nbsp;coarse fragments have been measured in previous surveys - these data will be made available in a single file in the very near future).</p>
+                </div>
+                <div>&nbsp;</div>
+                <div><strong>Reference Year: </strong>samples taken in 2018 .</div>
+                <div>&nbsp;</div>
+                <div>
+                    Previous LUCAS campaigns topsoil data are found here&nbsp; <a href="https://esdac.jrc.ec.europa.eu/content/lucas-2009-topsoil-data">(2009/2012)</a> and here <a href="https://esdac.jrc.ec.europa.eu/content/lucas2015-topsoil-data">(2015)</a>
+                    <p>Note that for this dataset of basic soil properties, data of physical and chemical properties were analysed in samples taken at various depths in 18,984 LUCAS points as follows:</p>
+                    <ul>
+                        <li>Samples taken from 0-20 cm depth in 18,744 points (in 141 of these points, all taken in Portugal, OC and CaCO3 were also analysed in additional samples taken from 20-30-cm depth)</li>
+                        <li>Samples taken from 0-10 cm depth in 232 points,</li>
+                        <li>Samples taken from 10-20 cm depth in 8 points</li>
+                    </ul>
+                    <hr>
+                    <p>Further information from this LUCAS SOIL 2018 campaign is in preparation. These include:</p>
+                    <ul>
+                        <li>As assessment of changes between 2009/2012 and 2018: report and summary data.</li>
+                        <li>Heavy metals:&nbsp; a summary of descriptive statistics of 997 LUCAS points with high and low concentrations of metals; the point data will not be made publicly available.</li>
+                        <li>Erosion assessment: information recorded on gully erosion in 211 LUCAS points.</li>
+                        <li>Assessment of depths of organic soils: measurements of organic horizon from 1,042 LUCAS points.</li>
+                        <li>Biodiversity and plant protection products: report and summary statistics.</li>
+                        <li>Environmental conditions: reference ancillary data describing a range of environmental conditions for all LUCAS points of the soil module; these data are the same as those distributed with the <a href="https://esdac.jrc.ec.europa.eu/content/lucas2015-topsoil-data">LUCAS SOIL 2015 data</a>.</li>
+                    </ul>
+                    <p>&nbsp;</p>
+                </div>
+                WALGREEN has downloaded tiff files for this dataset in order to offer them to users.
+                </p>
+                <p>
+                    To query Lucas 2018 SOC datasets user must follow this steps, step 0 offers a link to the screen.
+                </p>
+                <ul>
+                    <li>Lucas 2018 WALGREEN  data access: <button type="submit" value="loginresetpasswordpage"
+                                             class="btn btn-outline-success btn-sm"
+                                             th:formaction="'/api/lucas/lucas2018Search'"
+                                             th:method="get"
+                                             th:text="#{userguide.lucas.ayudabody}" ></button>.</li>
+
+                    <li>
+                        <p>1. Enter polygon coordinates to query dataset</p>
+                        <div class="container-sm py-5">
+                            <img class="img-fluid" id="Picture 1" th:src="@{/img/lucas01.png}"/>
+                        </div>
+                    </li>
+                    <li>
+                        <p>2. Write pplygon coordinates.</p>
+                        <p>Coordinates format is: <strong>lat&#60;space&#62;long,lat&#60;space&#62;long,,,,,,,,,lat&#60;space&#62;long</strong></p>
+                        <p>User can use this set of coordinates as example: <strong>-3 41.5,-2 42.301402752089,-2 42.30127347013828,-3.683280108931597 42.30023457260301,-3 41.5</strong></p>
+                        <div class="container-sm py-5">
+                            <img class="img-fluid" id="Picture 2" th:src="@{/img/lucas02.png}"/>
+                        </div>
+                    </li>
+                    <li>
+                        <p>3. Download csv file with queried points</p>
+                        <div class="container-sm py-5">
+                            <img class="img-fluid" id="Picture 4" th:src="@{/img/lucas04.png}"/>
+                        </div>
+                    </li>
+                    <li>
+                        <p>5. Show geotiff </p>
+                        <div class="container-sm py-5">
+                            <img class="img-fluid" id="Picture 5" th:src="@{/img/lucas05.png}"/>
+                        </div>
+                        <p> Screen gives users the option to download geotiff</p>
+                        <div class="container-sm py-5">
+                            <img class="img-fluid" id="Picture 6" th:src="@{/img/lucas06.png}"/>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </form>
+</div>
+</body>
+</html>

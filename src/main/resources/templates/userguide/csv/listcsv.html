@@ -1,0 +1,105 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sd="http://www.w3.org/1999/xhtml"
+      xmlns:sec="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{/layout/layout}">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{userguide.usercsvfiles.title}"></title>
+</head>
+<body>
+<div layout:fragment="cabecera">
+    <h1 th:text="#{userguide.usercsvfiles.title}"></h1>
+    <h1 th:if="${ayudatitulo != 'Not found' }"  th:text="${ayudatitulo}"></h1>
+</div>
+<div layout:fragment="contenido">
+    <form class="mx-1 mx-md-4"  role="form"  method="get">
+        <div>
+            <a th:href="@{/userguide/ctr/home}" >Go to user guide main page</a>
+            <div class="field-item even">
+                <p id="introduction">
+                This page has been designed to let users handle csv and kml files, offering different options depending on file type.
+                </p>
+                <p id="buttontoscreen">User csv and kml files access: <button type="submit" value="usercsvfileslistpage"
+                                                          class="btn btn-outline-success btn-sm"
+                                                          th:formaction="'/uploadedfiles'"
+                                                          th:method="get"
+                                                          th:text="#{userguide.usercsvfiles.ayudabody}" ></button>.</p>
+                <p id="stepsoptions">
+                    For each file, in case type is kml the only option is show content on map and in case type is csv options offered are:
+                    <div class="container-sm py-5">
+                        <img class="img-fluid" id="Picture1" th:src="@{/img/csvuploaded2.png}"/>
+                    </div>
+
+                    <ul>
+                        <li>Show csv file content</li>
+                        <li>Show csv file on map</li>
+                        <li>Remote sensing interactions:
+                            Screen offers for each of the menu options the possibility to:
+                            <ul>
+                                <li>Use Sentinel 2 images when working with Copernicus Sentinel HUB</li>
+                                <li>Use Sentinel 2 and Landsat images when working with Google Earth Engine </li>
+                            </ul>
+                            Image show options for getting reflectance values submenu, and are identical for listing , training ML predictors and getting SOC values.
+                            <div class="container-sm py-5">
+                                <img class="img-fluid" id="Picture0" th:src="@{/img/csvuploaded1.png}"/>
+                            </div>
+                            <ul>
+                                <li>Get reflectance vectors:
+                                    <ul>
+                                        <li>
+                                            <a th:href="@{/userguide/ctr/csv/copsh/listcsv/getrefl}" th:text="#{userguide.usercsvfiles.copsh.getrefl.ayudadesc}"></a>
+                                        </li>
+                                        <li>
+                                            <a th:href="@{/userguide/ctr/csv/gee/listcsv/getrefl}" th:text="#{userguide.usercsvfiles.gee.getrefl.ayudadesc}"></a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li>List reflectance vector values:
+                                    <ul>
+                                        <li>
+                                            <a th:href="@{/userguide/ctr/csv/copsh/listcsv/listrefl}" th:text="#{userguide.usercsvfiles.copsh.listrefl.ayudadesc}"></a>
+                                        </li>
+                                        <li>
+                                            <a th:href="@{/userguide/ctr/csv/gee/listcsv/listrefl}" th:text="#{userguide.usercsvfiles.gee.listrefl.ayudadesc}"></a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li>Train ML predictor:
+                                    <ul>
+                                        <li>
+                                            <a th:href="@{/userguide/ctr/csv/copsh/listcsv/trainml}" th:text="#{userguide.usercsvfiles.copsh.trainml.ayudadesc}"></a>
+                                            <ul>
+                                                <li>Train knn</li>
+                                                <li>Train svr:</li>
+                                            </ul>
+                                        </li>
+                                        <li>
+                                            <a th:href="@{/userguide/ctr/csv/gee/listcsv/trainml}" th:text="#{userguide.usercsvfiles.gee.trainml.ayudadesc}"></a>
+                                            <ul>
+                                                <li>Train knn</li>
+                                                <li>Train svr</li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li>Get SOC:
+                                    <ul>
+                                        <li>
+                                            <a th:href="@{/userguide/ctr/csv/copsh/listcsv/getsoc}" th:text="#{userguide.usercsvfiles.copsh.getsoc.ayudadesc}"></a>
+                                        </li>
+                                        <li>
+                                            <a th:href="@{/userguide/ctr/csv/gee/listcsv/getsoc}" th:text="#{userguide.usercsvfiles.gee.getsoc.ayudadesc}"></a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </p>
+            </div>
+        </div>
+    </form>
+</div>
+</body>
+</html>

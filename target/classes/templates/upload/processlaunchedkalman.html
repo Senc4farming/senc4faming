@@ -1,0 +1,31 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sd="http://www.w3.org/1999/xhtml"
+      xmlns:sec="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{/layout/layout}">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{uploaded.kalmanfilters}"></title>
+</head>
+<body>
+    <div layout:fragment="cabecera">
+        <h1  th:text="#{uploaded.kalmanfilters}"></h1>
+    </div>
+    <div layout:fragment="contenido">
+        <div class="box-body">
+            <h2 th:text="${resultado}"></h2>
+            <H2>
+                <p>Query results on inference menu</p>
+            </H2>
+            <form action="#"  method="get">
+                <div class="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
+                    <button type="submit"  class="btn btn-success btn-lg"
+                            th:text="#{btn.backtolist}"
+                            th:formaction="'/uploadedfiles/view/'+${csvid}"
+                    ></button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

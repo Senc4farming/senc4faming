@@ -1,0 +1,62 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sd="http://www.w3.org/1999/xhtml"
+      xmlns:sec="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{/layout/layout}">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{userguide.uploadcsvfile.title}"></title>
+</head>
+<body>
+<div layout:fragment="cabecera">
+    <h1 th:text="#{userguide.uploadcsvfile.title}"></h1>
+    <h1 th:if="${ayudatitulo != 'Not found' }"  th:text="${ayudatitulo}"></h1>
+</div>
+<div layout:fragment="contenido">
+    <form class="mx-1 mx-md-4"  role="form"  method="get">
+        <div>
+            <a th:href="@{/userguide/ctr/home}" >Go to user guide main page</a>
+            <div class="field-item even">
+                <p id="introduction">
+                    This page has been designed to let users upload csv files to interact with Copernicus Sentinel HUB or Google Earth Engine to train ML predictor and/or query SOC</p>
+                <p id="buttontoscreen">User csv files upload access: <button type="submit" value="uploadcsvpage"
+                                                                              class="btn btn-outline-success btn-sm"
+                                                                              th:formaction="'/upload'"
+                                                                              th:method="get"
+                                                                              th:text="#{userguide.uploadcsvfile.ayudabody}" ></button>.
+                </p>
+                <p id="stepsoptions">
+                    When pushing "Choose file" button, WALGREEN will ask user to select a csv file.
+                <div class="container-sm py-5">
+                    <img class="img-fluid" id="Picture1" th:src="@{/img/uploadcsv1.png}"/>
+                </div>
+
+                    Csv file must contain fields as shown on image using ";" as column separator.
+                <div class="container-sm py-5">
+                    <img class="img-fluid" id="Picture2" th:src="@{/img/uploadcsvformat.png}"/>
+                </div>
+                Field details and specification is:
+                <ul>
+                    <li>Depth: Indicate the depth used for digging to get soil samples.</li>
+                    <li><strong>POINTID: Internal ID that will be used to identify point.</strong></li>
+                    <li><strong>OC: SOC value measured.</strong></li>
+                    <li><strong>TH_LAT: WGS84 latitude.</strong></li>
+                    <li><strong>TH_LONG: WGS84 longitude.</strong></li>
+                    <li><strong>SURVEY_DATE: Date when sample was taken.</strong></li>
+                    <li>Elev: Elevation.</li>
+                    <li>LC0_Desc: Description 1.</li>
+                    <li>LC1_Desc: Description 2.</li>
+                    <li>LU1_Desc: Description 3.</li>
+                </ul>
+                In case user need to check csv file must go to <button type="submit" value="usercsvfileslistpage"
+                                                                       class="btn btn-outline-success btn-sm"
+                                                                       th:formaction="'/uploadedfiles'"
+                                                                       th:method="get"
+                                                                       th:text="#{userguide.usercsvfiles.ayudabody}" ></button>.
+                </p>
+            </div>
+        </div>
+    </form>
+</div>
+</body>
+</html>

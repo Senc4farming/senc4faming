@@ -1,0 +1,65 @@
+<kml>
+<Document>
+  <name>P</name>
+  <description>JMA Sen4Farming</description>
+  <ScreenOverlay id="CopyrightNotice">
+  <name>Copyright Notice</name>
+    <description>
+      Description
+    </description>
+  <Snippet>Copyright (c) OpenStreetMap Contributors. CC-BY-SA 2.0 License.</Snippet>
+    <Icon>
+      <href>OSMCopyright.png</href>
+    </Icon>
+    <overlayXY x="0" xunits="fraction" y="1" yunits="fraction"/>
+    <screenXY x="0" xunits="fraction" y="1" yunits="fraction"/>
+    <size x="0" xunits="fraction" y="0" yunits="fraction"/>
+  </ScreenOverlay>
+  <Folder>
+    <name>POI</name>
+  <description>SOC data points</description>
+    <Folder>
+      <name>1</name>
+      <Style id="style-cropland">
+        <IconStyle>
+          <scale>0.2</scale>
+          <Icon>
+            <href>https://maps.google.com/mapfiles/kml/paddle/blu-circle.png</href>
+          </Icon>
+        </IconStyle>
+      </Style>
+<Style id="style-other">
+        <IconStyle>
+          <scale>0.2</scale>
+          <Icon>
+            <href>https://maps.google.com/mapfiles/kml/paddle/blu-circle.png</href>
+          </Icon>
+        </IconStyle>
+      </Style><Placemark id="1"><name></name><styleUrl>#style-cropland</styleUrl>
+		<Snippet maxLines="0">empty</Snippet>
+		<description><![CDATA[<table cellpadding="1" cellspacing="1">
+<tr><td>survey_date:</td><td>06/07/2018</td><td>SOC:</td><td>12.4</td><td>lc0_desc:</td><td>Woodland</td><td>lc1_desc:</td><td>Other coniferous woodland</td><td>lu1_desc:</td><td>Forestry</td></tr></table>]]></description><Point><coordinates>16.13421,47.15024,0</coordinates></Point></Placemark><Placemark id="2"><name></name><styleUrl>#style-cropland</styleUrl>
+		<Snippet maxLines="0">empty</Snippet>
+		<description><![CDATA[<table cellpadding="1" cellspacing="1">
+<tr><td>survey_date:</td><td>06/07/2018</td><td>SOC:</td><td>16.7</td><td>lc0_desc:</td><td>Woodland</td><td>lc1_desc:</td><td>Spruce dominated coniferous woodland</td><td>lu1_desc:</td><td>Forestry</td></tr></table>]]></description><Point><coordinates>16.17536,47.27427,0</coordinates></Point></Placemark><Placemark id="3"><name></name><styleUrl>#style-cropland</styleUrl>
+		<Snippet maxLines="0">empty</Snippet>
+		<description><![CDATA[<table cellpadding="1" cellspacing="1">
+<tr><td>survey_date:</td><td>02/06/2018</td><td>SOC:</td><td>47.5</td><td>lc0_desc:</td><td>Woodland</td><td>lc1_desc:</td><td>Other mixed woodland</td><td>lu1_desc:</td><td>Forestry</td></tr></table>]]></description><Point><coordinates>16.28969,47.12326,0</coordinates></Point></Placemark><Placemark id="4"><name></name><styleUrl>#style-cropland</styleUrl>
+		<Snippet maxLines="0">empty</Snippet>
+		<description><![CDATA[<table cellpadding="1" cellspacing="1">
+<tr><td>survey_date:</td><td>06/07/2018</td><td>SOC:</td><td>28.1</td><td>lc0_desc:</td><td>Woodland</td><td>lc1_desc:</td><td>Pine dominated coniferous woodland</td><td>lu1_desc:</td><td>Forestry</td></tr></table>]]></description><Point><coordinates>16.35751,47.24569,0</coordinates></Point></Placemark><Placemark id="5"><name></name><styleUrl>#style-cropland</styleUrl>
+		<Snippet maxLines="0">empty</Snippet>
+		<description><![CDATA[<table cellpadding="1" cellspacing="1">
+<tr><td>survey_date:</td><td>05/07/2018</td><td>SOC:</td><td>19.4</td><td>lc0_desc:</td><td>Woodland</td><td>lc1_desc:</td><td>Pine dominated coniferous woodland</td><td>lu1_desc:</td><td>Forestry</td></tr></table>]]></description><Point><coordinates>16.41678,47.29637,0</coordinates></Point></Placemark><Placemark id="6"><name></name><styleUrl>#style-cropland</styleUrl>
+		<Snippet maxLines="0">empty</Snippet>
+		<description><![CDATA[<table cellpadding="1" cellspacing="1">
+<tr><td>survey_date:</td><td>18/06/2018</td><td>SOC:</td><td>18.0</td><td>lc0_desc:</td><td>Cropland</td><td>lc1_desc:</td><td>Triticale</td><td>lu1_desc:</td><td>Agriculture (excluding fallow land and kitchen gardens)</td></tr></table>]]></description><Point><coordinates>16.52059,47.48882,0</coordinates></Point></Placemark><Placemark id="7"><name></name><styleUrl>#style-cropland</styleUrl>
+		<Snippet maxLines="0">empty</Snippet>
+		<description><![CDATA[<table cellpadding="1" cellspacing="1">
+<tr><td>survey_date:</td><td>18/06/2018</td><td>SOC:</td><td>12.5</td><td>lc0_desc:</td><td>Cropland</td><td>lc1_desc:</td><td>Rape and turnip rape</td><td>lu1_desc:</td><td>Agriculture (excluding fallow land and kitchen gardens)</td></tr></table>]]></description><Point><coordinates>16.63556,47.5541,0</coordinates></Point></Placemark><Placemark id="8"><name></name><styleUrl>#style-cropland</styleUrl>
+		<Snippet maxLines="0">empty</Snippet>
+		<description><![CDATA[<table cellpadding="1" cellspacing="1">
+<tr><td>survey_date:</td><td>21/05/2018</td><td>SOC:</td><td>22.9</td><td>lc0_desc:</td><td>Cropland</td><td>lc1_desc:</td><td>Vineyards</td><td>lu1_desc:</td><td>Agriculture (excluding fallow land and kitchen gardens)</td></tr></table>]]></description><Point><coordinates>16.71116,47.9287,0</coordinates></Point></Placemark><Placemark id="9"><name></name><styleUrl>#style-cropland</styleUrl>
+		<Snippet maxLines="0">empty</Snippet>
+		<description><![CDATA[<table cellpadding="1" cellspacing="1">
+<tr><td>survey_date:</td><td>26/06/2018</td><td>SOC:</td><td>29.1</td><td>lc0_desc:</td><td>Cropland</td><td>lc1_desc:</td><td>Rape and turnip rape</td><td>lu1_desc:</td><td>Agriculture (excluding fallow land and kitchen gardens)</td></tr></table>]]></description><Point><coordinates>16.86385,47.86506,0</coordinates></Point></Placemark></Folder></Folder></Document></kml>

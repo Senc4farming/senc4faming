@@ -1,0 +1,64 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sd="http://www.w3.org/1999/xhtml" xmlns:h1th="http://www.w3.org/1999/html"
+      layout:decorate="~{/layout/layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>Inicio</title>
+</head>
+<body>
+    <div layout:fragment="cabecera">
+        <h1 th:text="#{principal.project.nombre}"></h1>
+    </div>
+    <div layout:fragment="contenido" >
+        <div class="container">
+            <div class="row">
+                <div class="d-flex flex-grow-1 justify-content-center align-items-center">
+                    <div class="col">
+                            <h3  th:text="#{home.bloque1.titulo}" ></h3>
+                            <h6  style="text-align: justify;margin: 10px" th:text="#{home.bloque1.contenido}" ></h6>
+                    </div>
+                    <div class="col">
+                        <img  th:src="@{/img/fondo_home_ancho.jpg}"
+                              class="img-fluid" alt="Sample image">
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="d-flex flex-grow-1 justify-content-center align-items-center">
+                    <div class="col">
+                        <img  th:src="@{/img/logogrande.png}"
+                              class="img-fluid" alt="Sample image">
+                    </div>
+                    <div class="col">
+                            <h3 th:text="#{home.bloque2.titulo}"  ></h3>
+                            <h6 style="text-align: justify;margin: 10px" th:text="#{home.bloque2.contenido1}" ></h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div layout:fragment="turorial">
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                let steps = [{
+                    title: "WALGREEN",
+                    intro: "Here you can read information about SEN4CFARMING."
+                }
+                ];
+
+                document.getElementById('inicio_tutorial').addEventListener('click', function () {
+                    this.style.animation = "none";
+                    introJs().setOptions({
+                        steps: steps,
+                        'nextLabel': "Next",
+                        'prevLabel': "Previous",
+                        'doneLabel': "Done",
+                    }).start();
+                });
+            });
+
+        </script>
+    </div>
+</body>
+</html>

@@ -1,0 +1,199 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sd="http://www.w3.org/1999/xhtml"
+      xmlns:sec="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{/layout/layout}">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{userguide.home.ayudadesc}"></title>
+</head>
+<body>
+<div layout:fragment="cabecera">
+    <h1 th:text="#{userguide.home.ayudadesc}"></h1>
+    <h1 th:if="${ayudatitulo != 'Not found' }"  th:text="${ayudatitulo}"></h1>
+</div>
+<div layout:fragment="contenido">
+    <h3 th:text="#{userguide.menu.gen}"></h3>
+    <p th:text="#{userguide.menu.gen.instr}"></p>
+    <form class="mx-1 mx-md-4"  role="form"  method="get">
+        <div class="row">
+            <div class="col">
+                <h3 th:text="#{userguide.menu.actions.users}"></h3>
+                <ul>
+                    <li>
+                        <a th:href="@{/userguide/ctr/ctr/users/login}" th:text="#{userguide.login.ayudadesc}"></a>
+                        <button type="submit" value="login page"
+                                                                               class="btn btn-outline-success btn-sm"
+                                                                               th:formaction="'/login'"
+                                                                               th:method="get"
+                                                                               th:text="#{userguide.login.ayudabody}" ></button>.
+                    </li>
+                    <li><a th:href="@{/userguide/ctr/users/userslisthelp}" th:text="#{userguide.userslist.ayudadesc}"></a>
+                        <button type="submit" value="userslistpage"
+                                                                                   class="btn btn-outline-success btn-sm"
+                                                                                   th:formaction="'/usuarios'"
+                                                                                   th:method="get"
+                                                                                   th:text="#{userguide.userslist.ayudabody}" ></button>.
+                    </li>
+                    <li>
+                        <a th:href="@{/userguide/ctr/users/userregistry}" th:text="#{userguide.usersregistry.ayudadesc}"></a>
+                        <button type="submit" value="usersregistrypage"
+                                                                                       class="btn btn-outline-success btn-sm"
+                                                                                       th:formaction="'/usuarios/registro'"
+                                                                                       th:method="get"
+                                                                                       th:text="#{userguide.usersregistry.ayudabody}" ></button>.</li>
+                    <li>
+                        <a th:href="@{/userguide/ctr/users/changepassw}" th:text="#{userguide.changepassword.ayudadesc}"></a>
+                        <button type="submit" value="changepasswordpage"
+                                                                                        class="btn btn-outline-success btn-sm"
+                                                                                        th:formaction="'/usuarios/cambiopass'"
+                                                                                        th:method="get"
+                                                                                        th:text="#{userguide.changepassword.ayudabody}" ></button>.</li>
+                    <li>
+                        <a th:href="@{/userguide/ctr/users/resetpassword}" th:text="#{userguide.resetpassword.ayudadesc}"></a>
+                        <button type="submit" value="resetpasswordpage"
+                                                                                       class="btn btn-outline-success btn-sm"
+                                                                                       th:formaction="'/usuarios/hasOlvidadoTuPassword'"
+                                                                                       th:method="get"
+                                                                                       th:text="#{userguide.resetpassword.ayudabody}" ></button>.</li>
+                </ul>
+            </div>
+            <div class="col">
+                <h3 th:text="#{userguide.menu.actions.csvfiles}"></h3>
+                <ul>
+                    <li>
+                        <a th:href="@{/userguide/ctr/csv/lucas2018}" th:text="#{userguide.lucas.ayudadesc}"></a>
+                        <button type="submit" value="lucaspage"
+                                                                               class="btn btn-outline-success btn-sm"
+                                                                               th:formaction="'/api/lucas/lucas2018Search'"
+                                                                               th:method="get"
+                                                                               th:text="#{userguide.lucas.ayudabody}" ></button>.</li>
+                    <li>
+                        <a th:href="@{/userguide/ctr/csv/listcsv}" th:text="#{userguide.usercsvfiles.ayudadesc}"></a>
+                        <button type="submit" value="usercsvfilespage"
+                                                                                      class="btn btn-outline-success btn-sm"
+                                                                                      th:formaction="'/uploadedfiles'"
+                                                                                      th:method="get"
+                                                                                      th:text="#{userguide.usercsvfiles.ayudabody}" ></button>.</li>
+                    <li>
+                        <a th:href="@{/userguide/ctr/csv/uploadkml}" th:text="#{userguide.uploadkmlfile.ayudadesc}"></a>
+                        <button type="submit" value="uploadkmlfilepage"
+                                                                                       class="btn btn-outline-success btn-sm"
+                                                                                       th:formaction="'/upload/kml'"
+                                                                                       th:method="get"
+                                                                                       th:text="#{userguide.uploadkmlfile.ayudabody}" ></button>.</li>
+                    <li>
+                        <a th:href="@{/userguide/ctr/csv/uploadcsv}" th:text="#{userguide.uploadcsvfile.ayudadesc}"></a>
+                        <button type="submit" value="uploadcsvfilepage"
+                                class="btn btn-outline-success btn-sm"
+                                th:formaction="'/upload'"
+                                th:method="get"
+                                th:text="#{userguide.uploadcsvfile.ayudabody}" ></button>.</li>
+                    <li>
+                        <a th:href="@{/userguide/ctr/csv/querysoc}" th:text="#{userguide.querysoc.ayudadesc}"></a>
+                        <button type="submit" value="querysocpage"
+                                                                                  class="btn btn-outline-success btn-sm"
+                                                                                  th:formaction="'/userguide/ctr/csv/querysoc'"
+                                                                                  th:method="get"
+                                                                                  th:text="#{userguide.querysoc.ayudabody}" ></button>.</li>
+                </ul>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <h3 th:text="#{userguide.menu.actions.copsh}"></h3>
+                <ul>
+                    <li>
+                        <a th:href="@{/userguide/ctr/csv/listcsv}" th:text="#{userguide.usercsvfiles.ayudadesc}"></a>
+                        <button type="submit" value="usercsvfilescopshpage"
+                                                                                              class="btn btn-outline-success btn-sm"
+                                                                                              th:formaction="'/uploadedfiles'"
+                                                                                              th:method="get"
+                                                                                              th:text="#{userguide.usercsvfiles.ayudabody}" ></button>.
+                        <ul>
+                            <li>
+                                <a th:href="@{/userguide/ctr/csv/copsh/listcsv/getrefl}" th:text="#{userguide.usercsvfiles.copsh.getrefl.ayudadesc}"></a>
+                            </li>
+                            <li>
+                                <a th:href="@{/userguide/ctr/csv/copsh/listcsv/listrefl}" th:text="#{userguide.usercsvfiles.copsh.listrefl.ayudadesc}"></a>
+                            </li>
+
+                            <li>
+                                <a th:href="@{/userguide/ctr/csv/copsh/listcsv/trainml}" th:text="#{userguide.usercsvfiles.copsh.trainml.ayudadesc}"></a>
+                            </li>
+                            <li>
+                                <a th:href="@{/userguide/ctr/csv/copsh/listcsv/getsoc}" th:text="#{userguide.usercsvfiles.copsh.getsoc.ayudadesc}"></a>
+                            </li>
+                        </ul>
+
+                    </li>
+                    <li>
+                        <a th:href="@{/userguide/ctr/copsh/newquery}" th:text="#{userguide.newquery.ayudadesc}"></a>
+                        <button type="submit" value="newquerypage"
+                                                                               class="btn btn-outline-success btn-sm"
+                                                                               th:formaction="'/api/listfiles'"
+                                                                               th:method="get"
+                                                                               th:text="#{userguide.newquery.ayudabody}" ></button>.
+                    </li>
+                    <li>
+                        <a th:href="@{/userguide/ctr/copsh/listqueries}" th:text="#{userguide.myqueries.ayudadesc}"></a>
+                        <button type="submit" value="myqueriespage"
+                                                                                   class="btn btn-outline-success btn-sm"
+                                                                                   th:formaction="'/filtrolistararchivos'"
+                                                                                   th:method="get"
+                                                                                   th:text="#{userguide.myqueries.ayudabody}" ></button>.</li>
+                    <li>
+                        <a th:href="@{/userguide/ctr/copsh/evalsclist}" th:text="#{userguide.myevalscripts.ayudadesc}"></a>
+                        <button type="submit" value="myevalscriptspage"
+                                                                                       class="btn btn-outline-success btn-sm"
+                                                                                       th:formaction="'/evalscript'"
+                                                                                       th:method="get"
+                                                                                       th:text="#{userguide.myevalscripts.ayudabody}" ></button>.</li>
+                    <li>
+                        <a th:href="@{/userguide/ctr/copsh/evalscregistry}" th:text="#{userguide.createevalscript.ayudadesc}"></a>
+                        <button type="submit" value="createevalscriptpage"
+                                                                                        class="btn btn-outline-success btn-sm"
+                                                                                        th:formaction="'/evalscript/registro'"
+                                                                                        th:method="get"
+                                                                                        th:text="#{userguide.createevalscript.ayudabody}" ></button>.</li>
+                    <li>
+                        <a th:href="@{/userguide/ctr/copsh/credentials}" th:text="#{userguide.sentinelcredentials.ayudadesc}"></a>
+                        <button type="submit" value="sentinelcredentialspage"
+                                                                                       class="btn btn-outline-success btn-sm"
+                                                                                       th:formaction="'/api/credentials'"
+                                                                                       th:method="get"
+                                                                                       th:text="#{userguide.sentinelcredentials.ayudabody}" ></button>.</li>
+                </ul>
+            </div>
+
+            <div class="col">
+                <h3 th:text="#{userguide.menu.actions.gee}"></h3>
+                <ul>
+                    <li><a th:href="@{/userguide/ctr/csv/listcsv}" th:text="#{userguide.usercsvfiles.ayudadesc}"></a>
+                        <button type="submit" value="usercsvfilescopshpage"
+                                class="btn btn-outline-success btn-sm"
+                                th:formaction="'/uploadedfiles'"
+                                th:method="get"
+                                th:text="#{userguide.usercsvfiles.ayudabody}" ></button>.
+                        <ul>
+                            <li>
+                                <a th:href="@{/userguide/ctr/csv/gee/listcsv/getrefl}" th:text="#{userguide.usercsvfiles.gee.getrefl.ayudadesc}"></a>
+                            </li>
+                            <li>
+                                <a th:href="@{/userguide/ctr/csv/gee/listcsv/listrefl}" th:text="#{userguide.usercsvfiles.gee.listrefl.ayudadesc}"></a>
+                            </li>
+
+                            <li>
+                                <a th:href="@{/userguide/ctr/csv/gee/listcsv/trainml}" th:text="#{userguide.usercsvfiles.gee.trainml.ayudadesc}"></a>
+                            </li>
+                            <li>
+                                <a th:href="@{/userguide/ctr/csv/gee/listcsv/getsoc}" th:text="#{userguide.usercsvfiles.gee.getsoc.ayudadesc}"></a>
+                            </li>
+                        </ul>
+                </ul>
+            </div>
+        </div>
+    </form>
+</div>
+</body>
+</html>

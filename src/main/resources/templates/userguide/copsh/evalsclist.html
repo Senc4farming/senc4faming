@@ -1,0 +1,42 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sd="http://www.w3.org/1999/xhtml"
+      xmlns:sec="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{/layout/layout}">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{userguide.myevalscripts.title}"></title>
+</head>
+<body>
+<div layout:fragment="cabecera">
+    <h1 th:text="#{userguide.myevalscripts.title}"></h1>
+    <h1 th:if="${ayudatitulo != 'Not found' }"  th:text="${ayudatitulo}"></h1>
+</div>
+<div layout:fragment="contenido">
+    <form class="mx-1 mx-md-4"  role="form"  method="get">
+        <div>
+            <a th:href="@{/userguide/ctr/home}" >Go to user guide main page</a>
+            <div class="field-item even">
+                <p id="buttontoscreen">Evalscript list  access: <button type="submit" value="sentinelcredentialspage"
+                                                                          class="btn btn-outline-success btn-sm"
+                                                                          th:formaction="'/evalscript'"
+                                                                          th:method="get"
+                                                                          th:text="#{userguide.myevalscripts.ayudabody}" ></button>.
+                </p>
+                <p id="introduction">
+                    This screen let users list custom script to download geotiff files from Copernicus Sentinel HUB.
+                    An evalscript (or "custom script") is a piece of Javascript code which defines how the satellite data shall be processed by Sentinel Hub and what values the service shall return.
+                    It does exist a public repository for <a href="https://github.com/sentinel-hub/custom-scripts?tab=readme-ov-file#sentinel-hub-custom-script-repository" > <strong>Sentinel Hub Custom Script</strong> </a>
+                    where there are multiple examples created by researchers, that can be executed on WALGREEN.
+                    Gives users options to get <a th:href="@{/userguide/ctr/copsh/evalscregistry}"><strong>custom script details screen</strong></a>
+                    and delete undesired items.
+                <div class="container-sm py-5">
+                    <img class="img-fluid" id="Picturep" th:src="@{/img/createevalscriptlist.png}"/>
+                </div>
+                </p>
+            </div>
+        </div>
+    </form>
+</div>
+</body>
+</html>

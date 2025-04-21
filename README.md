@@ -1,16 +1,29 @@
 WALGREEN
 =============================================
+WALGREEN(Web-based Analytical Learning for Green Environments).
+This collaborative platform aims to infer and map SOC from remote 
+sensing and in situ data. ML algorithms combine these information 
+sources (remote sensing images, soil surveys, geospatial data) 
+to infer SOC. 
+WALGREEN helps bridge the gap between scientific research and 
+real-world application by providing a comprehensive and user-friendly
+interface for researchers, policymakers, and agricultural stakeholders.
+The collaborative nature of WALGREEN allows users to contribute and 
+access high-quality SOC data.
+
+WALGREEN has two parts, one based on a backend-frontend architecture,
+and an API written in python. 
+
+WebApp backend-frontend
+================================================
 
 
-RESTPie3 - Python REST API Server Starter Kit
-=============================================
+Python REST API Server : pos-restapi_sen4farming 
+================================================
 
 This is a lightweight python3 REST API server that offers
-essential web service features in a simple package. This is not a framework,
-just **a practical and clean codebase that relies on a few core components**
-that do the job well. Fork and create your own REST API server quickly.
+essential web service features in a simple package. 
 
-Open sourced on Sep 2018 after years of production use at multiple sites.
 
 Update Sep 2020: Run in Raspberry with an SQLite database.
 
@@ -53,20 +66,9 @@ A quick list of the features of this Python API server:
 * Robust worker management: restarts, timecapping, max life
 * Background tasks
 * Built-in cron
-* Automatic directory page listing the API methods and their docstrings [Screenshot](#screenshot)
-* Redis as a generic storage with expiring keys, lightweight queues
-* Email & password authentication with secure algorithms
-* User role model and authorization of API methods via simple decorator
-* Logging system with practical data for troubleshooting, detects slow
-  requests, warnings&errors colorized
 * Server reload on code change
-* Database ORM and migrations
-* Database init schemas for PostgreSQL and SQLite
-* Docker image for the "big cloud" and local development
-* Fast rsync deployment of updates to Linux VPS servers
+* Docker image
 * Tests for the API
-* Raspberry compatible
-* Simple UI for login/signup/forgot/reset password [Screenshot](#screenshot2)
 
 
 Building blocks
@@ -78,73 +80,20 @@ I have years of experience of.
 * [Python](http://python.org) is a high-level and versatile scripting language
   that provides powerful features with an exceptionally clear syntax.
 
-  The language is well designed and has received increased fame and
-  popularity over the recent years. Huge number of developers are picking
-  Python in their work. In Sep 2017, a StackOverflow study writes about [The Incredible
-  Growth of Python](https://stackoverflow.blog/2017/09/06/incredible-growth-python/):
-  "Python has a solid claim to being the fastest-growing major programming
-  language." In the [TIOBE index](http://www.tiobe.com/tiobe-index/)
-  Python stands at position 3 as of Sep 2018.
-
-  Having been coding Python professionally for close to two decades, I can say
-  it has boosted my productivity and still is my primary language for many
-  tasks, including developing the business logic in the back-end.
-
-* [Flask](http://flask.pocoo.org/) is the Python web framework. Flask is
-  considered as an unopinionated micro-framework that only provides the
-  essentials of a web framework without enforcing other components (like
-  database, orm, admin interface, sessions etc.) As a webdev veteran I
-  appreciate this flexibility since I do want to pick the best of breed
-  components myself. The core stays but other needs may vary from project to
-  project, from Raspberry to the AWS cloud. The flexibility lets me be in
-  control and simplify.
+* [Flask](http://flask.pocoo.org/) is the Python web framework. 
 
 * [uwsgi](https://uwsgi-docs.readthedocs.io/en/latest/) is the master daemon
-  that runs and supervises the Python worker processes. uwsgi has a list of
-  power features that are essential to a robust back-end: timecapped requests,
-  recycling of workers, background tasks, cron jobs, timers, logging, auto
-  reloads on code change, run-as privileges. uwsgi is configured via the
-  [uwsgi.ini](conf/uwsgi.ini) file.
+  that runs and supervises the Python worker processes. 
 
-* [PostgreSQL](http://postgresql.org) is the main database, "the most advanced
-  open source database" that is getting stronger every year. PostgreSQL is a
-  powerhouse of features with a rock-solid implementation. Personally I enjoy
-  the JSON functionality the most, since it provides good amount of
-  flexibility to the relational model that I still prefer in a master database
-  over the schema-free solutions.
-
-  Someone wrote an article saying [PostgreSQL is the worlds' best database](https://www.2ndquadrant.com/en/blog/postgresql-is-the-worlds-best-database/).
-
-  Note that the code also supports [SQLite](https://www.sqlite.org/index.html)
-  database. SQLite maybe convenient in a lighter setup if the full power of
-  PostgreSQL is not needed such as in a Raspberry.
+* [PostgreSQL](http://postgresql.org) is the main database, 
 
 * [Redis](https://redis.io/) is a persistent in-memory database that is used
   as a storage for server-side session data and as a lightweight caching and
   queueing system. Fast and solid.
 
-* [Peewee](http://docs.peewee-orm.com/en/latest/) is a straightforward
-  database ORM library.  It is small and easy to learn, and has all the
-  necessary features.  I favor the simplicity of the ActiveRecord pattern with
-  1-1 mapping of classes and database, as opposed to more complex data mapper
-  pattern that is followed by the big
-  [SQLAlchemy](https://www.sqlalchemy.org/) library. I know SQL and like to
-  operate at the row level, and have explicit control.
-  Peewee makes database access a breeze and allows you to execute raw
-  SQL if you need the full power of the database. Peewee supports SQLite,
-  MySQL and PostgreSQL.
 
-  For scheme migrations,
-  [Peewee-migrate](https://github.com/klen/peewee_migrate) is an easy choice
-  that fits well with Peewee.
-
-
-If you'd like to replace some of these components, it is possible, this is a
-small codebase.
-
-
-Source files
-------------
+Python API Source files
+-----------------------
 
 The whole of this server fits into a small set of files:
 

@@ -22,10 +22,7 @@ Python REST API Server : pos-restapi_sen4farming
 ================================================
 
 This is a lightweight python3 REST API server that offers
-essential web service features in a simple package. 
-
-
-Update Sep 2020: Run in Raspberry with an SQLite database.
+essential web service features in a simple package.
 
 **Table of contents**
 
@@ -38,8 +35,6 @@ Update Sep 2020: Run in Raspberry with an SQLite database.
 * [Redis storage](#redis-storage)
 * [Background workers & cron](#background-workers--cron)
 * [Tests](#tests)
-* [Security](#security)
-* [Scaling up](#scaling-up)
 * [License](#license)
 
 
@@ -376,66 +371,6 @@ Deploy to Linux server running Docker
 -------------------------------------
 
 To be written. Docker compose, rsync+reload script etc.
-
-
-
-Security
---------
-
-A few words about security practices in this software:
-
-* no secrets are stored in code but in an external configuration file or in
-  environment variables
-* all requests are logged and can be inspected later
-* no secrets are leaked to the log file
-* server based sessions with an opaque uuid cookie
-* no Javascript access to uuid cookie
-* config to require https for cookies (do enable in production)
-* strong algorithms are used for password auth
-* only salt and password hash is stored in the database
-* session can be either permanent or end on browser close
-* sensitive user objects have a random uuid and not an integer id
-* possible to add a fresh cookie check by saving IP+agent string to session
-* database code is not vulnerable to SQL injections
-* authorization is enforced via user roles and function decorator, not
-  requiring complex code
-* uwsgi supports running code as a lower privileged user
-* uwsgi supports SSL certificates (but a load balancer or nginx in front is
-  recommended as SSL endpoint)
-
-Of course the overall security of the service is also heavily dependent on the
-configuration of the server infrastructure and access policies.
-
-
-Scaling up
-----------
-
-While the codebase of this server is small, it has decent muscle. The
-*stateless* design makes it perfectly possible to scale it up to work in a
-bigger environment. There is nothing in the code that "does not scale". The
-smallness and flexibility of the software makes it actually easier to scale,
-allowing easier switch of components in case that is needed. For
-example, you can start with the uwsgi provided background tasks framework and
-replace that later on with, say [Celery](http://www.celeryproject.org/), if
-you see it scales and fits better.
-
-In a traditional setup you first scale up vertically, you "buy a bigger
-server".  This code contains a few measures that helps scaling up
-vertically:
-
-* you can add worker processes to match the single server capacity
-* you can add more background processes if there is a lot of background jobs
-* slow requests are logged so you see when they start to cumulate
-* stuck requests never halt the whole server - stuck workers are killed after
-  20 seconds by default, freeing resources to other workers (harakiri)
-* you can optimize SQL, write raw queries, let the database do work better
-* you can cache data in Redis
-
-When you outgrow the biggest single server, and start adding servers, you
-scale horizontally. The core API server component can be cloned into a cluster
-of servers where each of them operates independently of the others. Scaling
-the API server here is easy, it is the other factors that become harder, like
-database scaling and infra management.
 
 
 License

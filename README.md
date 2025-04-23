@@ -14,12 +14,41 @@ access high-quality SOC data.
 WALGREEN has two parts, one based on a backend-frontend architecture,
 and an API written in python. 
 
+
+
 WebApp backend-frontend
 ================================================
 
+### Run the System
+We can easily run the whole with only a single command:
+```bash
+docker compose -f .\docker-compose-desarrollo.yml up
+docker compose -f .\docker-compose_prod.yml up
+
+```
+
+Docker will pull the MySQL and Spring Boot images (if our machine does not have it before).
+
+The services can be run on the background with command:
+```bash
+docker compose -f .\docker-compose-desarrollo.yml up -d
+docker compose -f .\docker-compose_prod.yml up -d
+```
+
+### Stop the System
+Stopping all the running containers is also simple with a single command:
+```bash
+docker compose down
+```
+
+If you need to stop and remove all containers, networks, and all images used by any service in <em>docker-compose.yml</em> file, use the command:
+```bash
+docker compose down --rmi all
+```
 
 Python REST API Server : pos-restapi_sen4farming 
 ================================================
+
 
 This is a lightweight python3 REST API server that offers
 essential web service features in a simple package.

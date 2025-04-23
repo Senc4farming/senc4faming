@@ -1,0 +1,33 @@
+{
+  "groups": [
+    {
+      "name": "general",
+      "type": "com.example.sen4farming.config.ConfiguationProperties",
+      "sourceType": "com.example.sen4farming.config.ConfiguationProperties"
+    }
+  ],
+  "properties": [
+    {
+      "name": "general.ippythonserver",
+      "type": "java.lang.String",
+      "description": "IP of foo service used to blah.",
+      "sourceType": "com.example.sen4farming.config.ConfiguationProperties"
+    },
+    {
+      "name": "general.kalmandistr",
+      "type": "java.lang.String",
+      "sourceType": "com.example.sen4farming.config.ConfiguationProperties"
+    },
+    {
+      "name": "general.number-of-gee-images",
+      "type": "java.lang.Integer",
+      "sourceType": "com.example.sen4farming.config.ConfiguationProperties"
+    },
+    {
+      "name": "general.offset",
+      "type": "java.lang.String",
+      "sourceType": "com.example.sen4farming.config.ConfiguationProperties"
+    }
+  ],
+  "hints": []
+}

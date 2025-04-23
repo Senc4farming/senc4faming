@@ -1,18 +1,25 @@
 WALGREEN
 =============================================
-WALGREEN(Web-based Analytical Learning for Green Environments).
-This collaborative platform aims to infer and map SOC from remote 
-sensing and in situ data. ML algorithms combine these information 
-sources (remote sensing images, soil surveys, geospatial data) 
-to infer SOC. 
-WALGREEN helps bridge the gap between scientific research and 
-real-world application by providing a comprehensive and user-friendly
-interface for researchers, policymakers, and agricultural stakeholders.
-The collaborative nature of WALGREEN allows users to contribute and 
-access high-quality SOC data.
+Soil organic carbon (SOC) is a key indicator of soil health, fertility, and car-
+bon sequestration, making it essential for sustainable land management and
+climate change mitigation. However, large-scale SOC monitoring remains
+challenging due to spatial variability, temporal dynamics, and multiple in-
+fluencing factors. We present WALGREEN, a platform that enhances SOC
+inference by overcoming limitations of current applications. Leveraging ma-
+chine learning and diverse soil samples, WALGREEN generates predictive
+models using historical public and private data. Built on cloud-based tech-
+nologies, it offers a user-friendly interface for researchers, policymakers, and
+land managers to access carbon data, analyze trends, and support evidence-
+based decision-making. Implemented in Python, Java, and JavaScript, WAL-
+GREEN integrates Google Earth Engine and Sentinel Copernicus via script-
+ing, OpenLayers, and Thymeleaf in a Model-View-Controller framework.
+This paper aims to advance soil science, promote sustainable agriculture,
+and drive critical ecosystem responses to climate change.
+Keywords: Soil organic carbon, machine learning, datasets, Sentinel
+integration, Google Earth Engine integration, TIFF and GeoTIFF, Spring
+Boot Framework, JPA, Python API with Flask, OpenLayers, JavaScript.
 
-WALGREEN has two parts, one based on a backend-frontend architecture,
-and an API written in python. 
+Preprint submitted to Environmental modelling & software April 23, 2025
 
 
 

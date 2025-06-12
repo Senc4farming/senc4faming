@@ -168,19 +168,6 @@ For a serious setup you want to have full PostgreSQL. Do the setup like this:
 To start and stop these docker instances, invoke:
 
 docker run -d --name pos-restpie -p 5432:5432 -e POSTGRES_DB=tmdb -e POSTGRES_USER=tm -e POSTGRES_PASSWORD=eneas postgres:12
- 1789  sudo docker run -d --name pos-restpie -p 5432:5432 -e POSTGRES_DB=tmdb -e POSTGRES_USER=tm -e POSTGRES_PASSWORD=eneas postgres:12
- 1790  sudo docker run -d --name pos-restpie -p 5433:5432 -e POSTGRES_DB=tmdb -e POSTGRES_USER=tm -e POSTGRES_PASSWORD=eneas postgres:12
- 1791  sudo docker run -d --name pos-restsen4farming -p 5433:5432 -e POSTGRES_DB=tmdb -e POSTGRES_USER=tm -e POSTGRES_PASSWORD=eneas postgres:12
- 1792  sudo docker run -d --name pos-restsen4farming -p 5433:5433 -e POSTGRES_DB=tmdb -e POSTGRES_USER=tm -e POSTGRES_PASSWORD=eneas postgres:12
- 1793  sudo docker run -d --name pos-apisen4farming -p 5433:5433 -e POSTGRES_DB=tmdb -e POSTGRES_USER=tm -e POSTGRES_PASSWORD=eneas postgres:12
- 1797  sudo docker run -d --name pos-apisen4farming -p 5434:5434 -e POSTGRES_DB=tmdb -e POSTGRES_USER=tm -e POSTGRES_PASSWORD=eneas postgres:12
- 1798  sudo docker run -d --name pos-restapisen4farming -p 5435:5435 -e POSTGRES_DB=tmdb -e POSTGRES_USER=tm -e POSTGRES_PASSWORD=eneas postgres:12
- 1800  sudo docker run -d --name pos-restapi-sen4farming -p 5435:5432 -e POSTGRES_DB=tmdb -e POSTGRES_USER=tm -e POSTGRES_PASSWORD=eneas postgres:12
- 1801  sudo docker run -d --name pos-restapi-sen4farming -p 5436:5432 -e POSTGRES_DB=tmdb -e POSTGRES_USER=tm -e POSTGRES_PASSWORD=eneas postgres:12
- 1802  sudo docker run -d --name pos-restapi_sen4farming -p 5436:5432 -e POSTGRES_DB=tmdb -e POSTGRES_USER=tm -e POSTGRES_PASSWORD=eneas postgres:12
- 1803  sudo docker run --add-host=host.docker.internal:host-gateway -it --rm --name restpie-dev -p 8100:80 -v `pwd`/:/app/ restpie-dev-image 
-
-
 
     sudo docker start redis
     sudo docker start pos-restpie

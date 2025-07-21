@@ -51,6 +51,6 @@
     "PYSRV_COORDS_DATA": "/app/files/data",
     "PYSRV_USER_ROOT_IMAGE": "/app/files/userfiles",    
     "PYSRV_DATA_UPLOAD": "/app/files/upload",
-    "PYSRV_GEE_CONFIG_FILE": "/app/conf/ee-josemanuelarocafernandez-b74d15199ebb.json"
+    "PYSRV_GEE_CONFIG_FILE": "/app/conf/ee-josemanuelarocafernandez-a33296c5f4f0.json"
 }
 

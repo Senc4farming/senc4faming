@@ -127,6 +127,38 @@ def guardardatoscoordenadasGeeTifffiles(df,version):
 
     cursor.close() 
 
+def guardardatoscoordenadasGeeTifffilesNoHarm(df,version):
+    #conexion a la bbdd
+    conn = psycopg2.connect(user= srvconf['PYSRV_DATABASE_USER'],
+                                    password=srvconf['PYSRV_DATABASE_PASSWORD'],
+                                    host= srvconf['PYSRV_DATABASE_HOST_POSTGRESQL'],
+                                    port=srvconf['PYSRV_DATABASE_PORT'],
+                                    database= srvconf['PYSRV_DATABASE_NAME'])
+    #parametros para procesar datos
+
+    table='tbl_gee_points_bands_reflectance_no_harm'
+    
+    #si se han obtenido datos los insertamos
+    print('Antes de guardar Nº de filas del df: ' )
+    print(len(df.index))
+
+    cursor = conn.cursor()
+    tuples = [tuple(x) for x in df.to_numpy()]
+    print_full(df)
+    cols = ','.join(list(df.columns))
+    print(cols)
+    # SQL query to execute
+    query = "INSERT INTO %s(%s) VALUES %%s" % (table, cols)
+    try:
+        extras.execute_values(cursor, query, tuples)
+        conn.commit()
+        print("the dataframe is inserted")
+    except (Exception, psycopg2.DatabaseError) as error:
+        print("Error: %s" % error)
+        conn.rollback()
+
+    cursor.close() 
+
 def guardardatoscsvpoints(df,version):
     #conexion a la bbdd
     conn = psycopg2.connect(user= srvconf['PYSRV_DATABASE_USER'],
@@ -169,7 +201,7 @@ def checkPuntGeeProcesado(point_id,user_id,satellite,iter):
     #parametros para procesar datos
     table='tbl_gee_points_bands_reflectance'
     cursor = conn.cursor()
-    print("leemos los datos checkPuntGeeProcesado  satellite:" +  table)
+    print("leemos los datos  checkPuntGeeProcesado  satellite:" +  table)
     encontrado = 0
     step = 100
     try:
@@ -206,6 +238,56 @@ def checkPuntGeeProcesado(point_id,user_id,satellite,iter):
                 encontrado = 1
     except (Exception, psycopg2.Error) as error:
         print("checkPuntProcesado: Error while fetching data from PostgreSQL", error,"; step :", step)      
+    cursor.close()
+    return encontrado
+
+def checkPuntGeeProcesadonoHarm(point_id,user_id,satellite,iter):
+    #conexion a la bbdd
+    conn = psycopg2.connect(user= srvconf['PYSRV_DATABASE_USER'],
+                                    password=srvconf['PYSRV_DATABASE_PASSWORD'],
+                                    host= srvconf['PYSRV_DATABASE_HOST_POSTGRESQL'],
+                                    port=srvconf['PYSRV_DATABASE_PORT'],
+                                    database= srvconf['PYSRV_DATABASE_NAME'])
+    #parametros para procesar datos
+    table='tbl_gee_points_bands_reflectance_no_harm'
+    cursor = conn.cursor()
+    print("leemos los datos checkPuntGeeProcesadonoHarm   satellite:" +  table)
+    encontrado = 0
+    step = 100
+    try:
+
+        #Leemos los datos 
+        wherecond = ' where point_id = ' + str(point_id) + ' and user_id = ' + str(user_id) + \
+                    ' and satellite =\'' + str(satellite) + '\' and iter =  ' + str(iter) 
+        
+        query = ( ' select count(1)  , max(cloud_cover_null)   '
+            ' from '
+            ' ( '
+            ' select  point_id,CASE WHEN cloud_cover IS NULL '
+            '            THEN -1 '
+            '            ELSE cloud_cover '
+            '    END AS cloud_cover_null'
+            ' FROM public.tbl_gee_points_bands_reflectance_no_harm a ' 
+        )
+        query  +=  wherecond 
+        query  +=  ' ) t  '
+        
+        print(query)
+        #print(query)
+        step = 33
+        cursor.execute(query) 
+        results = cursor.fetchone()
+        encontrado = 0
+        num_points = results[0]
+        max_cc = results[1]
+        print(num_points)
+        if num_points > 0:
+            if max_cc == -1:
+                print("Punto incompleto se reprocesa manteniendo el registro anterior que tiene el path de la imagen descargada")
+            else:    
+                encontrado = 1
+    except (Exception, psycopg2.Error) as error:
+        print("checkPuntGeeProcesadonoHarm: Error while fetching data from PostgreSQL", error,"; step :", step)      
     cursor.close()
     return encontrado
 
@@ -263,6 +345,13 @@ def getPuntGeeSentinelProcesados(point_id,user_id,satellite,path):
         print("puntosLucas2018Listado: Error while fetching data from PostgreSQL", error,"; step :", step)      
     cursor.close()
     return df
+
+def apply_scale_factors(image):
+  optical_bands = image.select('SR_B.').multiply(0.0000275).add(-0.2)
+  thermal_bands = image.select('ST_B.*').multiply(0.00341802).add(149.0)
+  return image.addBands(optical_bands, None, True).addBands(
+      thermal_bands, None, True
+  )
 
 def getPuntGeeLandsatProcesados(point_id,user_id,satellite,path):
     #conexion a la bbdd

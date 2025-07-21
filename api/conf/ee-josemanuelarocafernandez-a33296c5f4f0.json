@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "ee-josemanuelarocafernandez",
+  "private_key_id": "a33296c5f4f00534ca79fbc05a4f3332065079b6",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCXoYwWpRrD9T2A\nkC+AF4nfFJS+5oZZ8GzT2zJcCINSUAKQRZn3/d4DPE15La5q6IEaj9aGeMiOoPbD\nZkzY7QXr/tmv+ZY/CULfw+CFb+BgIE468m3h77znXJptS/Dwyjuhi2b9JkBHxcW4\nlYy2yA6dD6uWoMsfycF+sDrrAaqEY/fmgHpsJ+Ht+NEvLJdd5t2iGgQag/zV4Nra\nWALJIpIduH6cMsxUNnLPYKhW5RD/VSpO7kbtjhnSn4Utjha5AM36yUfL8zMbPLCy\nL6Hl5dMt9LHX/ZHpPXOuK73eVwMzXaI24wVPMycKbsb5FNdNOe4+nxVaXXoswsxj\nBEKWDUTFAgMBAAECggEAFjVWRgvNEYXmCeI0XtOzwQ1r4tDzPRGKcvYgGFwz1ba7\nxWM4U5rmbT1kEHtJGEXxANGv5zaiE0fOlJxzZXNDwoarXguVfqqN1aXECO8zowig\nRKB0yRp6pb1JrffpNG8+UCERhsLXN9vm42vd9fhzsXvV0yQ+U+vSMArCOmDeV3Du\nHo1gfQ6vV0S9rGPybAITBQIJRg67CAvPKLTVnLmpFh5Hjfo5HnRjwH79UOMCFydC\nolVjyGJc7NqLU+z/qspklmEBn53Tu1B+AdzS3Y70+e8F/bQbV7drTJMimPTOO6Pm\nq1bpHRDX20g1qyT7HXF1/DqwEoKyj9YHSSrXRmG3sQKBgQDNgFIJjNYZ37eDQPsb\nKueeiB/lo59OCscqKFamdjYit+HrzPvq4scbQq5V786KeHmS3aKFQmLCGrmrK8Wx\nWZjvKj0zD8UxJwxFq1lmlqbveJbfdh3UHUNRgPsQyhb4Atd6lMCAolslJzSzZC5R\nHEAXNlvvDr2luYOzWb0NJtLQNQKBgQC85Fuh4xvRMQLCAIabn98PwoEP+S74V5wM\nYwkDXTRNiFpYlOfyokmogoWq8bXyZYLAmUfOZXTS726852rVrER5xjQOXvgJuXSc\nmNch467c9r3eoZYamaneioz7x74ns40FUoyL8YONQXh/0B4XVsJC5QNabiRCLv7E\nI9ThzehUUQKBgGeNQcmOLlTbZp29IMuP0ycPcQNGb//jbnjP2toGt0DHaBBqOoch\nvzL9Ztvm+yzLiHd5N2vvB9THoseeRwAXJfleT3hrefJKuuRgc6w+PeBt45i27FD2\nbfWkCN9s9iYDSJF8Y4RuS39tQiEjWjOFCMapnanYw7e+w56cmacG6TQBAoGAaLAf\nYO+f4SbKon7sG6BVXkSshw/Rym2z3OGegzDK5hWmDOYqTz1GmZANSRrBfmBoQRoy\nw99TCf0NYMDZYycgpGUHQNe9nJYeXRQQV4X6yhguTw87Q+7aSK59SKYBa7uFcue3\nYXAvOsCIaj4MD19UNwL6Asp8afnl1QsO1z7pfqECgYBkFItsHSKIhFwg35C64jPu\nFB0A3CE2ThGCh07H76Da07Op/y+2DiGz4usW7ndktoa9gbh0rMz6y+FxIF/Ca+9g\nWj5F8iPk0vVoGZosIEvAatZR6w2vbj9qAa3xhwTO3CGV8k4lVF8ZPccKQ224a8rA\nMZ+/zN8zxIN8kwy+b/AW5g==\n-----END PRIVATE KEY-----\n",
+  "client_email": "walgreen@ee-josemanuelarocafernandez.iam.gserviceaccount.com",
+  "client_id": "111399215446521443201",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/walgreen%40ee-josemanuelarocafernandez.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

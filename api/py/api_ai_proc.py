@@ -657,6 +657,5 @@ def evalregressionsvr():
 def obtenermodelosai():
     print('obtenermodelosai')
     content = request.json
-    userid = content['userid']
     dfdata = obtenerModelos()
     return dfdata.to_json(),200

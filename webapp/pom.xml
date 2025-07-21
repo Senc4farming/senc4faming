@@ -9,11 +9,27 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.example</groupId>
-	<artifactId>Senc4farming</artifactId>
+	<artifactId>junyper_sentinel</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>Senc4farming</name>
 	<description>Senc4farming</description>
+	<repositories>
 
+		<repository>
+			<id>osgeo</id>
+			<name>OSGeo Release Repository</name>
+			<url>https://repo.osgeo.org/repository/release/</url>
+			<snapshots><enabled>false</enabled></snapshots>
+			<releases><enabled>true</enabled></releases>
+		</repository>
+		<repository>
+			<id>osgeo-snapshot</id>
+			<name>OSGeo Snapshot Repository</name>
+			<url>https://repo.osgeo.org/repository/snapshot/</url>
+			<snapshots><enabled>true</enabled></snapshots>
+			<releases><enabled>false</enabled></releases>
+		</repository>
+	</repositories>
 	<properties>
 		<java.version>17</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -25,6 +41,7 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-websocket</artifactId>
 		</dependency>
+		<!-- Add Log4j2 Dependency -->
 
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -56,7 +73,23 @@
 			<groupId>org.thymeleaf.extras</groupId>
 			<artifactId>thymeleaf-extras-springsecurity6</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>io.rest-assured</groupId>
+			<artifactId>json-schema-validator</artifactId>
+			<version>${restassured.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.fasterxml.jackson.core</groupId>
+					<artifactId>jackson-databind</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 
+		<dependency>
+			<groupId>org.geotools</groupId>
+			<artifactId>gt-geotiff</artifactId>
+			<version>31-SNAPSHOT</version>
+		</dependency>
 		<dependency>
 			<groupId>com.opencsv</groupId>
 			<artifactId>opencsv</artifactId>
@@ -77,7 +110,6 @@
 			<artifactId>junit</artifactId>
 			<version>4.13.2</version> <!-- Or whatever JUnit you're using. -->
 		</dependency>
-
 		<!-- Apache Commons FileUpload -->
 		<dependency>
 			<groupId>commons-fileupload</groupId>
@@ -150,6 +182,10 @@
 			<artifactId>spring-security-core</artifactId>
 			<version>6.0.0</version>
 		</dependency>
+		<dependency>
+			<groupId>org.thymeleaf.extras</groupId>
+			<artifactId>thymeleaf-extras-springsecurity6</artifactId>
+		</dependency>
 		<!-- dependencias para json -->
 		<!-- https://mvnrepository.com/artifact/org.json/json -->
 		<dependency>
@@ -189,12 +225,7 @@
 			<scope>runtime</scope>
 		</dependency>
 
-		<!-- Inicio dependencias mapas -->
-		<dependency>
-			<groupId>com.squareup.okhttp3</groupId>
-			<artifactId>okhttp</artifactId>
-			<version>4.4.0</version>
-		</dependency>
+
 
 
 
@@ -229,10 +260,6 @@
 				<exclusion>
 					<groupId>com.sun.mail</groupId>
 					<artifactId>mailapi</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>com.fasterxml.jackson.core</groupId>
-					<artifactId>jackson-databind</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>

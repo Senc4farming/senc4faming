@@ -191,10 +191,6 @@
 			<artifactId>spring-security-core</artifactId>
 			<version>6.0.0</version>
 		</dependency>
-		<dependency>
-			<groupId>org.thymeleaf.extras</groupId>
-			<artifactId>thymeleaf-extras-springsecurity6</artifactId>
-		</dependency>
 		<!-- dependencias para json -->
 		<!-- https://mvnrepository.com/artifact/org.json/json -->
 		<dependency>
@@ -260,17 +256,6 @@
 			<groupId>com.sun.mail</groupId>
 			<artifactId>jakarta.mail</artifactId>
 			<version>2.0.1</version>
-		</dependency>
-		<dependency>
-			<groupId>io.rest-assured</groupId>
-			<artifactId>json-schema-validator</artifactId>
-			<version>${rest-assured.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>com.sun.mail</groupId>
-					<artifactId>mailapi</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 
 

@@ -1,7 +1,6 @@
 package com.example.sen4farming.dto;
 
-import com.example.sen4farming.model.SentinelQueryFiles;
-import jakarta.persistence.*;
+import com.example.jpa_formacion.model.SentinelQueryFiles;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

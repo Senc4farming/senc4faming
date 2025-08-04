@@ -1,8 +1,7 @@
 package com.example.sen4farming.service.mapper;
 
-import com.example.sen4farming.dto.EvalScriptDto;
-import com.example.sen4farming.dto.PythonScriptDto;
-import com.example.sen4farming.model.PythonScript;
+import com.example.jpa_formacion.dto.PythonScriptDto;
+import com.example.jpa_formacion.model.PythonScript;
 import lombok.NoArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;

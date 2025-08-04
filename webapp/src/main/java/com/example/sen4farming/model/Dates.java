@@ -3,7 +3,7 @@ package com.example.sen4farming.model;
 import java.util.Date;
 
 
-import com.example.sen4farming.util.DateOrderCheck;
+import com.example.jpa_formacion.util.DateOrderCheck;
 import jakarta.validation.constraints.NotNull;
 
 import org.springframework.format.annotation.DateTimeFormat;

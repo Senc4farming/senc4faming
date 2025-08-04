@@ -1,26 +1,26 @@
 package com.example.sen4farming.util;
 
-import com.example.sen4farming.config.details.SuperCustomerUserDetails;
+import com.example.jpa_formacion.config.details.SuperCustomerUserDetails;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.context.ApplicationListener;
 import org.springframework.security.authentication.event.*;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 
     @Component
     public class LoginListener implements ApplicationListener<InteractiveAuthenticationSuccessEvent> {
+        Logger logger = LogManager.getLogger(this.getClass());
         @Override
         public void onApplicationEvent(InteractiveAuthenticationSuccessEvent event)
         {
-            String  username = "vacio";
-            System.out.println(SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString());
             //Comprobamos si hay usuario logeado
             if (SecurityContextHolder.getContext().getAuthentication().getPrincipal().equals("anonymousUser")){
-                System.out.println(this.getClass()+  ", Usario no logeado" + " " +"debug");
+                logger.info("%s: Usario no logeado" ,this.getClass());
             }
             else {
-                username = ((SuperCustomerUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
-                System.out.println(this.getClass()+   "El usuario es:" + username + " " + "debug");
+                logger.info( "%s: El usuario es: %s ", this.getClass(),
+                        ((SuperCustomerUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername());
             }
         }
 

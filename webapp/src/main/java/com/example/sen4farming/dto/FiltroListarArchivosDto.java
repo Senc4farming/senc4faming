@@ -1,6 +1,6 @@
 package com.example.sen4farming.dto;
 
-import com.example.sen4farming.model.Usuario;
+import com.example.jpa_formacion.model.Usuario;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

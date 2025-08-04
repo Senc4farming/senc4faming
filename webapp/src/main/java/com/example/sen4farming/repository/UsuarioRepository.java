@@ -1,7 +1,10 @@
 package com.example.sen4farming.repository;
 
 
-import com.example.sen4farming.model.Usuario;
+import com.example.jpa_formacion.model.Role;
+import com.example.jpa_formacion.model.Usuario;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -23,5 +26,11 @@ public interface UsuarioRepository extends JpaRepository<Usuario,Integer> {
     Optional<Usuario> findUsuarioByEmailAndActiveTrue(String email);
     Optional<Usuario> findUsuarioByEmailAndTokenAndActiveTrue(String email,String token);
     Usuario findUsuarioByEmailAndPassword(String email, String password);
+
+
     //Definir metodo aparte
+    Page<Usuario>  findUsuarioByEmailLike (String email,Pageable pageable);
+
+    Usuario findUsuarioByNombreUsuario(String s);
+
 }

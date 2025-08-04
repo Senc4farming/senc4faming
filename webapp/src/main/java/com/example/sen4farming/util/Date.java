@@ -54,7 +54,7 @@ public class Date {
 			if (isLeapYear(i - 1))
 				numDays++;
 			numDays++;
-			// System.out.println(i + " : " + DAYOFWEEK[numDays % 7]);
+			// logger.info(i + " : " + DAYOFWEEK[numDays % 7]);
 		}
 
 		return numDays % 7;

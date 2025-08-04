@@ -1,6 +1,9 @@
 package com.example.sen4farming.util;
 
 
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -11,7 +14,11 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
 public class FileUploadUtil {
+    static Logger logger = LogManager.getLogger(FileUploadUtil.class);
 
+    private FileUploadUtil() {
+        throw new IllegalStateException("Utility class");
+    }
     public static void saveFile(String uploadDir, String fileName,
                                 MultipartFile multipartFile) throws IOException {
         Path uploadPath = Paths.get(uploadDir);
@@ -19,8 +26,8 @@ public class FileUploadUtil {
         if (!Files.exists(uploadPath)) {
             Files.createDirectories(uploadPath);
         }
-        System.out.println("saveFile: Path creado:"+ uploadDir);
-        System.out.println("saveFile: fileName: "+ fileName);
+        logger.info("saveFile: Path creado:%s", uploadDir);
+        logger.info("saveFile: fileName: %s", fileName);
 
         try (InputStream inputStream = multipartFile.getInputStream()) {
             Path filePath = uploadPath.resolve(fileName);
@@ -31,11 +38,7 @@ public class FileUploadUtil {
     }
     public static boolean checkfile(String uploadDir, String fileName){
         Path fullpath = Paths.get(uploadDir + "/" + fileName);
-        if (Files.exists(fullpath)) {
-            return true;
-        }
-        else
-            return false;
+        return Files.exists(fullpath);
 
     }
 }

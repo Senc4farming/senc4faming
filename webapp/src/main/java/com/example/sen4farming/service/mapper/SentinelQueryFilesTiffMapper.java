@@ -1,12 +1,12 @@
 package com.example.sen4farming.service.mapper;
 
-import com.example.sen4farming.dto.SentinelQueryFilesDto;
-import com.example.sen4farming.dto.SentinelQueryFilesTiffDto;
-import com.example.sen4farming.model.SentinelQueryFiles;
-import com.example.sen4farming.model.SentinelQueryFilesTiff;
+import com.example.jpa_formacion.dto.SentinelQueryFilesTiffDto;
+import com.example.jpa_formacion.model.SentinelQueryFilesTiff;
+import lombok.NoArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+@NoArgsConstructor
 @Service
 public class SentinelQueryFilesTiffMapper extends AbstractServiceMapper<SentinelQueryFilesTiff, SentinelQueryFilesTiffDto> {
     //Convertir de entidad a dtoç
@@ -26,6 +26,4 @@ public class SentinelQueryFilesTiffMapper extends AbstractServiceMapper<Sentinel
         return entidad;
     }
 
-    public SentinelQueryFilesTiffMapper() {
-    }
 }

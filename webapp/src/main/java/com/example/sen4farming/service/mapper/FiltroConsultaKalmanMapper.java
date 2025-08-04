@@ -1,12 +1,12 @@
 package com.example.sen4farming.service.mapper;
 
-import com.example.sen4farming.dto.FiltroConsultaKalmanDto;
-import com.example.sen4farming.dto.FiltroListarArchivosDto;
-import com.example.sen4farming.model.FiltroConsultaKalman;
-import com.example.sen4farming.model.FiltroListarArchivos;
+import com.example.jpa_formacion.dto.FiltroConsultaKalmanDto;
+import com.example.jpa_formacion.model.FiltroConsultaKalman;
+import lombok.NoArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+@NoArgsConstructor
 @Service
 public class FiltroConsultaKalmanMapper extends AbstractServiceMapper<FiltroConsultaKalman, FiltroConsultaKalmanDto> {
     //Convertir de entidad a dtoç
@@ -24,8 +24,5 @@ public class FiltroConsultaKalmanMapper extends AbstractServiceMapper<FiltroCons
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.map(dto,entidad);
         return entidad;
-    }
-
-    public FiltroConsultaKalmanMapper() {
     }
 }

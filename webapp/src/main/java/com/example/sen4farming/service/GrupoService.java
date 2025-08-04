@@ -1,9 +1,9 @@
 package com.example.sen4farming.service;
 
-import com.example.sen4farming.dto.GrupoTrabajoDto;
-import com.example.sen4farming.model.GrupoTrabajo;
-import com.example.sen4farming.repository.GrupoRepository;
-import com.example.sen4farming.service.mapper.GrupoMapper;
+import com.example.jpa_formacion.dto.GrupoTrabajoDto;
+import com.example.jpa_formacion.model.GrupoTrabajo;
+import com.example.jpa_formacion.repository.GrupoRepository;
+import com.example.jpa_formacion.service.mapper.GrupoMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.Iterator;

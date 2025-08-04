@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Map;
+
 
 @Getter
 @Setter
@@ -13,7 +13,7 @@ import java.util.Map;
 @AllArgsConstructor
 public class QuerySocDto {
 
-    String Point_id;
+    String pointId;
     String fechaIni;
     String fechaFin;
     String longitude;

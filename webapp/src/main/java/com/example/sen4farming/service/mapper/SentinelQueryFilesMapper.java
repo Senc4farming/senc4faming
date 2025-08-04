@@ -1,11 +1,13 @@
 package com.example.sen4farming.service.mapper;
 
-import com.example.sen4farming.dto.SentinelQueryFilesDto;
-import com.example.sen4farming.model.SentinelQueryFiles;
+import com.example.jpa_formacion.dto.SentinelQueryFilesDto;
+import com.example.jpa_formacion.model.SentinelQueryFiles;
+import lombok.NoArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
-import com.example.sen4farming.util.DateFormat;
+import com.example.jpa_formacion.util.DateFormat;
 
+@NoArgsConstructor
 @Service
 public class SentinelQueryFilesMapper extends AbstractServiceMapper<SentinelQueryFiles, SentinelQueryFilesDto> {
     //Convertir de entidad a dtoç
@@ -26,6 +28,5 @@ public class SentinelQueryFilesMapper extends AbstractServiceMapper<SentinelQuer
         return entidad;
     }
 
-    public SentinelQueryFilesMapper() {
-    }
+
 }

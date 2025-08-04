@@ -1,6 +1,8 @@
 package com.example.sen4farming.config.details;
 
-import com.example.sen4farming.model.GrupoTrabajo;
+
+import com.example.jpa_formacion.model.GrupoTrabajo;
+import com.example.jpa_formacion.model.Usuario;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,6 +10,8 @@ import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -26,12 +30,12 @@ public class SuperCustomerUserDetails implements UserDetails {
    //Principales atributos de la clase
     private String username;
     private String password;
+    private String tokenjwt;
 
-
-    private String coper_username;
-    private String coper_password;
-    private String coper_client_id;
-    private String coper_client_secret;
+    private String coperUsername;
+    private String coperPassword;
+    private String coperClientId;
+    private String coperClientSecret;
     private Integer userID;
 
     private boolean isActive=true;
@@ -39,6 +43,12 @@ public class SuperCustomerUserDetails implements UserDetails {
     private boolean isAccountNonLocked=true;
     private boolean isCredentialsNonExpired=true;
     private boolean isCopernicusLogged=false;
+
+    private PrivateKey privatekey;
+    private PublicKey publickey;
+
+    private Usuario usuario;
+
     // Carrito
     List<GrupoTrabajo> grupos = new ArrayList<>();
     //Permisos

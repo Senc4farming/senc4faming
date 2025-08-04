@@ -1,16 +1,9 @@
 package com.example.sen4farming.config.service;
 
 
-import com.example.sen4farming.model.Usuario;
-import com.example.sen4farming.repository.UsuarioRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-
+import com.example.jpa_formacion.model.Usuario;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * The type User service.
@@ -18,17 +11,20 @@ import java.util.stream.Collectors;
 @Service
 public class UserServiceImpl implements UserService {
 
-    @Autowired
-    private UsuarioRepository usuarioRepository;
 
-    @Autowired
-    private BCryptPasswordEncoder passwordEncoder;
+
+
+    private final  BCryptPasswordEncoder passwordEncoder;
+
+    public UserServiceImpl( BCryptPasswordEncoder passwordEncoder) {
+
+        this.passwordEncoder = passwordEncoder;
+    }
 
 
     @Override
     public String getEncodedPassword(Usuario usuario) {
         String passwd = usuario.getPassword();
-        String encodedPasswod = passwordEncoder.encode(passwd);
-        return encodedPasswod;
+        return passwordEncoder.encode(passwd);
     }
 }

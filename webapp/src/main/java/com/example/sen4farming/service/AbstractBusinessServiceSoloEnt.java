@@ -1,6 +1,5 @@
 package com.example.sen4farming.service;
 
-import com.example.sen4farming.service.mapper.AbstractServiceMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -21,8 +20,7 @@ public abstract class AbstractBusinessServiceSoloEnt<E, ID,  REPO extends JpaRep
         return  this.repo.findAll();
     }
     public Set<E> buscarEntidadesSet(){
-        Set<E> eSet = new HashSet<E>(this.repo.findAll());
-        return  eSet;
+        return   new HashSet<>(this.repo.findAll());
     }
 
     public Optional<E> encuentraPorIdEntity(ID id){
@@ -36,18 +34,13 @@ public abstract class AbstractBusinessServiceSoloEnt<E, ID,  REPO extends JpaRep
     public Page<E> buscarTodos(Pageable pageable){
         return  repo.findAll(pageable);
     }
-    public Set<E> buscarTodosSet(){
-        Set<E> eSet = new HashSet<E>(this.repo.findAll());
-        return  eSet;
-    }
+
     //Guardar
-    public E guardar(E entidad) throws Exception {
+    public E guardar(E entidad) {
         //Guardo el la base de datos
-        E entidadGuardada =  repo.save(entidad);
-        //Traducir la entidad a DTO para devolver el DTO
-        return entidadGuardada;
+        return repo.save(entidad);
     }
-    public void  guardar(List<E> ents ) throws Exception {
+    public void  guardar(List<E> ents )  {
         Iterator<E> it = ents.iterator();
 
         // mientras al iterador queda proximo juego

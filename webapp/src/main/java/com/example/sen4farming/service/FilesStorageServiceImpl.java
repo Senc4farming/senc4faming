@@ -1,6 +1,9 @@
 package com.example.sen4farming.service;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InterruptedIOException;
+import java.lang.module.FindException;
 import java.net.MalformedURLException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
@@ -14,35 +17,36 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.processing.FilerException;
+
 @Service
 public class FilesStorageServiceImpl implements FilesStorageService {
 
     private final Path root = Paths.get("./src/main/resources/static/imagenes/");
 
     @Override
-    public void init() {
+    public void init() throws FilerException {
         try {
             Files.createDirectories(root);
         } catch (IOException e) {
-            throw new RuntimeException("Could not initialize folder for upload!");
+            throw new FilerException("Could not initialize folder for upload!");
         }
     }
 
     @Override
-    public void save(MultipartFile file) {
+    public void save(MultipartFile file) throws IOException {
         try {
             Files.copy(file.getInputStream(), this.root.resolve(file.getOriginalFilename()));
+        } catch (FileAlreadyExistsException e) {
+                throw new FileAlreadyExistsException("A file of that name already exists.");
         } catch (Exception e) {
-            if (e instanceof FileAlreadyExistsException) {
-                throw new RuntimeException("A file of that name already exists.");
-            }
 
-            throw new RuntimeException(e.getMessage());
+            throw new InterruptedIOException(e.getMessage());
         }
     }
 
     @Override
-    public Resource load(String filename) {
+    public Resource load(String filename) throws MalformedURLException, FileNotFoundException {
         try {
             Path file = root.resolve(filename);
             Resource resource = new UrlResource(file.toUri());
@@ -50,20 +54,20 @@ public class FilesStorageServiceImpl implements FilesStorageService {
             if (resource.exists() || resource.isReadable()) {
                 return resource;
             } else {
-                throw new RuntimeException("Could not read the file!");
+                throw new FileNotFoundException("Could not read the file!");
             }
-        } catch (MalformedURLException e) {
-            throw new RuntimeException("Error: " + e.getMessage());
+        } catch (MalformedURLException | FileNotFoundException e) {
+            throw e;
         }
     }
 
     @Override
-    public boolean delete(String filename) {
+    public boolean delete(String filename) throws FileNotFoundException {
         try {
             Path file = root.resolve(filename);
             return Files.deleteIfExists(file);
         } catch (IOException e) {
-            throw new RuntimeException("Error: " + e.getMessage());
+            throw new FileNotFoundException("Error: " + e.getMessage());
         }
     }
 
@@ -77,7 +81,7 @@ public class FilesStorageServiceImpl implements FilesStorageService {
         try {
             return Files.walk(this.root, 1).filter(path -> !path.equals(this.root)).map(this.root::relativize);
         } catch (IOException e) {
-            throw new RuntimeException("Could not load the files!");
+            throw new FindException("Could not load the files!");
         }
     }
 }

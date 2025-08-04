@@ -1,9 +1,9 @@
 package com.example.sen4farming.repository;
 
 
-import com.example.sen4farming.model.EvalScript;
-import com.example.sen4farming.model.GrupoTrabajo;
-import com.example.sen4farming.model.UploadedFiles;
+import com.example.jpa_formacion.model.EvalScript;
+import com.example.jpa_formacion.model.GrupoTrabajo;
+import com.example.jpa_formacion.model.UploadedFiles;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

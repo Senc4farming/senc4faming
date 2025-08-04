@@ -2,10 +2,9 @@ package com.example.sen4farming.config.service;
 
 
 
-import com.example.sen4farming.model.Usuario;
+import com.example.jpa_formacion.model.Usuario;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 
 
 /**

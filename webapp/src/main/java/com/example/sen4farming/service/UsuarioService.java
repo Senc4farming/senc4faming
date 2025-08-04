@@ -1,12 +1,14 @@
 package com.example.sen4farming.service;
 
 
-import com.example.sen4farming.dto.UsuarioDto;
+import com.example.jpa_formacion.dto.UsuarioDto;
 
-import com.example.sen4farming.dto.UsuarioDtoPsw;
-import com.example.sen4farming.model.Usuario;
-import com.example.sen4farming.repository.UsuarioRepository;
-import com.example.sen4farming.service.mapper.UsuarioMapper;
+import com.example.jpa_formacion.dto.UsuarioDtoPsw;
+import com.example.jpa_formacion.model.Usuario;
+import com.example.jpa_formacion.repository.UsuarioRepository;
+import com.example.jpa_formacion.service.mapper.UsuarioMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import java.util.Iterator;
 import java.util.List;
@@ -24,22 +26,22 @@ public class UsuarioService   extends AbstractBusinessService<Usuario,Integer,Us
         super(repo, serviceMapper);
     }
     public UsuarioDto guardar(UsuarioDto usuarioDto, String password){
-        System.out.println("usuarioDto:" +usuarioDto.getNombreUsuario() );
+        logger.info("usuarioDto:  %s" ,usuarioDto.getNombreUsuario() );
         //Traduzco del dto con datos de entrada a la entidad
         final Usuario entidad = getMapper().toEntity(usuarioDto);
-        System.out.println("Entidad:" +entidad.getNombreUsuario() );
+        logger.info("Entidad:  %s" ,entidad.getNombreUsuario() );
         entidad.setPassword(password);
-        System.out.println("Entidad:" +entidad.getPassword() );
+        logger.info("Entidad: %s" ,entidad.getPassword() );
         //Guardo el la base de datos
         Usuario entidadGuardada =  getRepo().save(entidad);
         //Traducir la entidad a DTO para devolver el DTO
         return getMapper().toDto(entidadGuardada);
     }
     public UsuarioDto guardar(UsuarioDtoPsw usuarioDtoPsw){
-        System.out.println("usuarioDto:" +usuarioDtoPsw.getNombreUsuario() );
+        logger.info("usuarioDto %s" ,usuarioDtoPsw.getNombreUsuario() );
         //Traduzco del dto con datos de entrada a la entidad
         final Usuario entidad = getMapper().toEntityPsw(usuarioDtoPsw);
-        System.out.println("Entidad:" +entidad.getNombreUsuario() );
+        logger.info("Entidad: %s" ,entidad.getNombreUsuario() );
         //Guardo el la base de datos
         Usuario entidadGuardada =  getRepo().save(entidad);
         //Traducir la entidad a DTO para devolver el DTO
@@ -62,5 +64,8 @@ public class UsuarioService   extends AbstractBusinessService<Usuario,Integer,Us
         }
     }
 
+    public Page<UsuarioDto> buscarTodosPorEmail(Pageable pageable, String email){
+        return  getRepo().findUsuarioByEmailLike(email,pageable).map(getMapper()::toDto);
+    }
 
 }

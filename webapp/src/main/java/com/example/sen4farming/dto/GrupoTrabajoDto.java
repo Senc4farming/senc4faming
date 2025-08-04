@@ -1,7 +1,6 @@
 package com.example.sen4farming.dto;
 
 
-import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

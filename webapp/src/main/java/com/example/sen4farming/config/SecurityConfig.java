@@ -1,7 +1,7 @@
 package com.example.sen4farming.config;
 
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -9,26 +9,32 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.core.GrantedAuthorityDefaults;
-
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.session.HttpSessionEventPublisher;
 
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true,
         securedEnabled = true,
         jsr250Enabled = true)
 @Configuration
-public class SecurityConfig {
+public class SecurityConfig   {
 
     /**
      * The User details service.
      */
-    @Autowired
-    public UserDetailsService userDetailsService;
+
+    public final UserDetailsService userDetailsService;
+
+    public SecurityConfig(UserDetailsService userDetailsService, BCryptPasswordEncoder encoder) {
+        this.userDetailsService = userDetailsService;
+        this.encoder = encoder;
+    }
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
@@ -38,8 +44,8 @@ public class SecurityConfig {
         return authenticationProvider;
     }
 
-    @Autowired
-    private BCryptPasswordEncoder encoder;
+
+    private final  BCryptPasswordEncoder encoder;
 
     /*
 
@@ -111,13 +117,15 @@ https://www.baeldung.com/spring-security-csrf
         return new GrantedAuthorityDefaults("ROLE_");
     }
 
-    /*
     @Bean
-    public static BCryptPasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+    public SessionRegistry sessionRegistry() {
+        return new SessionRegistryImpl();
     }
-    */
 
+    @Bean
+    public ServletListenerRegistrationBean<HttpSessionEventPublisher> httpSessionEventPublisher() {
+        return new ServletListenerRegistrationBean<>(new HttpSessionEventPublisher());
+    }
 
 
 }

@@ -1,9 +1,8 @@
 package com.example.sen4farming.util;
 
-import com.example.sen4farming.apiitem.DatosLucas2018Api;
-import com.example.sen4farming.apiitem.DatosUploadCsvApi;
-import com.example.sen4farming.apiitem.UploadedFilesReflectance;
-import com.example.sen4farming.dto.DatosUploadCsvDto;
+import com.example.jpa_formacion.apiitem.DatosLucas2018Api;
+import com.example.jpa_formacion.apiitem.UploadedFilesReflectance;
+import com.example.jpa_formacion.dto.DatosUploadCsvDto;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

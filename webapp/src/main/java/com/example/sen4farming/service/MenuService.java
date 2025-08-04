@@ -1,16 +1,16 @@
 package com.example.sen4farming.service;
 
 
-import com.example.sen4farming.dto.MenuDTO;
-import com.example.sen4farming.model.AyudaUsr;
-import com.example.sen4farming.model.Menu;
-import com.example.sen4farming.model.Role;
-import com.example.sen4farming.model.Usuario;
-import com.example.sen4farming.repository.AyudaUsrRepository;
-import com.example.sen4farming.repository.MenuRepository;
-import com.example.sen4farming.repository.RoleRepository;
-import com.example.sen4farming.repository.UsuarioRepository;
-import com.example.sen4farming.service.mapper.MenuServiceMapper;
+import com.example.jpa_formacion.dto.MenuDTO;
+import com.example.jpa_formacion.model.AyudaUsr;
+import com.example.jpa_formacion.model.Menu;
+import com.example.jpa_formacion.model.Role;
+import com.example.jpa_formacion.model.Usuario;
+import com.example.jpa_formacion.repository.AyudaUsrRepository;
+import com.example.jpa_formacion.repository.MenuRepository;
+import com.example.jpa_formacion.repository.RoleRepository;
+import com.example.jpa_formacion.repository.UsuarioRepository;
+import com.example.jpa_formacion.service.mapper.MenuServiceMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,17 +22,17 @@ import java.util.Optional;
 public class MenuService extends AbstractBusinessService<Menu, Integer, MenuDTO, MenuRepository, MenuServiceMapper> {
 
     private final UsuarioRepository usuarioRepository;
-    private final RoleRepository roleRepository;
+
 
     private final AyudaUsrRepository ayudaUsrRepository;
 
+    private static final String STR_NOT_FOUND = "Not found";
 
     @Autowired
     protected MenuService(MenuRepository repository, MenuServiceMapper serviceMapper,
-                          UsuarioRepository usuarioRepository, RoleRepository roleRepository, AyudaUsrRepository ayudaUsrRepository) {
+                          UsuarioRepository usuarioRepository,  AyudaUsrRepository ayudaUsrRepository) {
         super(repository, serviceMapper);
         this.usuarioRepository = usuarioRepository;
-        this.roleRepository = roleRepository;
         this.ayudaUsrRepository = ayudaUsrRepository;
     }
 
@@ -57,7 +57,7 @@ public class MenuService extends AbstractBusinessService<Menu, Integer, MenuDTO,
         if (ayudaUsrOptional.isPresent()){
             return ayudaUsrOptional.get().getTitle();
         }else {
-            return("Not found");
+            return STR_NOT_FOUND;
         }
     }
     public String ayudadesc (String  url){
@@ -65,7 +65,7 @@ public class MenuService extends AbstractBusinessService<Menu, Integer, MenuDTO,
         if (ayudaUsrOptional.isPresent()){
             return ayudaUsrOptional.get().getDescription();
         }else {
-            return("Not found");
+            return STR_NOT_FOUND;
         }
     }
     public String ayudabody (String  url){
@@ -73,7 +73,7 @@ public class MenuService extends AbstractBusinessService<Menu, Integer, MenuDTO,
         if (ayudaUsrOptional.isPresent()){
             return ayudaUsrOptional.get().getBody();
         }else {
-            return("Not found");
+            return STR_NOT_FOUND;
         }
     }
 }

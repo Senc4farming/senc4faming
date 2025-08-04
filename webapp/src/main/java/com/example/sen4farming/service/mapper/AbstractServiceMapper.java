@@ -1,6 +1,5 @@
 package com.example.sen4farming.service.mapper;
 
-import org.modelmapper.ModelMapper;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -15,10 +14,10 @@ public abstract class AbstractServiceMapper<E,DTO> {
     //Conversion de listas de dtos a entidades
     public List<E>  toEntity(List<DTO> dtos) throws Exception {
         //Recorrer la lista manualmente para gestional las excepciopnes
-        ListIterator it = dtos.listIterator();
+        ListIterator<DTO> it = dtos.listIterator();
         List<E> list = new ArrayList<>();
         while (it.hasNext()){
-            DTO dto = (DTO) it.next();
+            DTO dto = it.next();
             E e = this.toEntity(dto);
             list.add(e);
         }
@@ -26,13 +25,13 @@ public abstract class AbstractServiceMapper<E,DTO> {
     }
     //Conversion de listas de entidades a DTOs
     public List<DTO>  toDto(List<E> e){
-        return e.stream().map(this::toDto).collect(Collectors.toList());
+        return e.stream().map(this::toDto).toList();
     }
 
     //Gestionamos set de datos
     public Set<E> toEntity(Set<DTO> dtos) throws Exception {
-        //return dtos.stream().map(this::toEntity).collect(Collectors.toSet());
-        Set<E> eSet = new HashSet<E>();
+
+        Set<E> eSet = new HashSet<>();
         for (DTO item: dtos) {
             E e = this.toEntity(item);
             eSet.add(e);

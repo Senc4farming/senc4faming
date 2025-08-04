@@ -1,8 +1,8 @@
 package com.example.sen4farming.service.mapper;
 
 
-import com.example.sen4farming.dto.MenuDTO;
-import com.example.sen4farming.model.Menu;
+import com.example.jpa_formacion.dto.MenuDTO;
+import com.example.jpa_formacion.model.Menu;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,8 +34,6 @@ public class MenuServiceMapper extends AbstractServiceMapper<Menu, MenuDTO> {
         final MenuDTO dto = new MenuDTO();
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.map(entidad,dto);
-        //dto.setRoles(this.roleServiceMapper.toDto(entidad.getRoles().stream().collect(Collectors.toList())).stream()
-        //        .collect(Collectors.toSet()));
         return dto;
     }
 

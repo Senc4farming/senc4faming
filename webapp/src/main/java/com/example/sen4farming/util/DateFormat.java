@@ -1,17 +1,24 @@
 package com.example.sen4farming.util;
 
+import lombok.Getter;
+
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+@Getter
 public final class DateFormat {
 
-    static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
-    static final SimpleDateFormat DATE_FORMAT_1 = new SimpleDateFormat("dd/MM/yyyy");
-    static final SimpleDateFormat DATE_TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private DateFormat(){
 
-    static final SimpleDateFormat DATE_TIME_FORMAT_ZULU = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSS'Z'");
+    }
+
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+    private static  final SimpleDateFormat DATE_FORMAT_1 = new SimpleDateFormat("dd/MM/yyyy");
+    private  static  final SimpleDateFormat DATE_TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+    private static final SimpleDateFormat DATE_TIME_FORMAT_ZULU = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSS'Z'");
 
 
     public static Date parseDate(String date) {
@@ -22,7 +29,7 @@ public final class DateFormat {
         }
     }
 
-    public static Date parseDate_1(String date) {
+    public static Date parseDate1(String date) {
         try {
             return new Date(DATE_FORMAT_1.parse(date).getTime());
         } catch (ParseException e) {
@@ -48,7 +55,7 @@ public final class DateFormat {
 
     public static String parseDateZuluStr(String date) {
         try {
-            return new String(DATE_FORMAT_1.format(DATE_TIME_FORMAT_ZULU.parse(date).getTime()));
+            return DATE_FORMAT_1.format(DATE_TIME_FORMAT_ZULU.parse(date).getTime());
         } catch (ParseException e) {
             throw new IllegalArgumentException(e);
         }

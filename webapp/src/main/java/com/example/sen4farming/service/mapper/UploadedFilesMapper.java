@@ -1,11 +1,12 @@
 package com.example.sen4farming.service.mapper;
 
-import com.example.sen4farming.dto.UploadedFilesDto;
-import com.example.sen4farming.model.GrupoTrabajo;
-import com.example.sen4farming.model.UploadedFiles;
+import com.example.jpa_formacion.dto.UploadedFilesDto;
+import com.example.jpa_formacion.model.UploadedFiles;
+import lombok.NoArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+@NoArgsConstructor
 @Service
 public class UploadedFilesMapper extends AbstractServiceMapper<UploadedFiles, UploadedFilesDto> {
     //Convertir de entidad a dtoç
@@ -23,8 +24,5 @@ public class UploadedFilesMapper extends AbstractServiceMapper<UploadedFiles, Up
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.map(dto,entidad);
         return entidad;
-    }
-
-    public UploadedFilesMapper() {
     }
 }

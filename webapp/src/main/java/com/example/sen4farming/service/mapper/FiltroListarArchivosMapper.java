@@ -1,12 +1,13 @@
 package com.example.sen4farming.service.mapper;
 
-import com.example.sen4farming.dto.EvalScriptDto;
-import com.example.sen4farming.dto.FiltroListarArchivosDto;
-import com.example.sen4farming.model.EvalScript;
-import com.example.sen4farming.model.FiltroListarArchivos;
+
+import com.example.jpa_formacion.dto.FiltroListarArchivosDto;
+import com.example.jpa_formacion.model.FiltroListarArchivos;
+import lombok.NoArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+@NoArgsConstructor
 @Service
 public class FiltroListarArchivosMapper extends AbstractServiceMapper<FiltroListarArchivos, FiltroListarArchivosDto> {
     //Convertir de entidad a dtoç
@@ -26,6 +27,5 @@ public class FiltroListarArchivosMapper extends AbstractServiceMapper<FiltroList
         return entidad;
     }
 
-    public FiltroListarArchivosMapper() {
-    }
+
 }

@@ -1,17 +1,11 @@
 package com.example.sen4farming.service;
 
-import com.example.sen4farming.apiitem.Listfiles;
-import com.example.sen4farming.apiitem.Listfilestiff;
-import com.example.sen4farming.dto.SentinelQueryFilesDto;
-import com.example.sen4farming.dto.SentinelQueryFilesTiffDto;
-import com.example.sen4farming.model.FiltroListarArchivos;
-import com.example.sen4farming.model.SentinelQueryFiles;
-import com.example.sen4farming.model.SentinelQueryFilesTiff;
-import com.example.sen4farming.model.Usuario;
-import com.example.sen4farming.repository.SentinelQueryFilesRepository;
-import com.example.sen4farming.repository.SentinelQueryFilesTiffRepository;
-import com.example.sen4farming.service.mapper.SentinelQueryFilesMapper;
-import com.example.sen4farming.service.mapper.SentinelQueryFilesTiffMapper;
+import com.example.jpa_formacion.apiitem.Listfilestiff;
+import com.example.jpa_formacion.dto.SentinelQueryFilesTiffDto;
+import com.example.jpa_formacion.model.SentinelQueryFiles;
+import com.example.jpa_formacion.model.SentinelQueryFilesTiff;
+import com.example.jpa_formacion.repository.SentinelQueryFilesTiffRepository;
+import com.example.jpa_formacion.service.mapper.SentinelQueryFilesTiffMapper;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -27,17 +21,20 @@ import java.util.Optional;
 public class SentinelQueryFilesTiffService extends AbstractBusinessService<SentinelQueryFilesTiff,Integer, SentinelQueryFilesTiffDto,
         SentinelQueryFilesTiffRepository, SentinelQueryFilesTiffMapper>   {
     //
-    private final UsuarioService usuarioService;
+
 
     private final SentinelQueryFilesService sentinelQueryFilesService;
 
     //Acceso a los datos de la bbdd
-    public SentinelQueryFilesTiffService(SentinelQueryFilesTiffRepository repo, SentinelQueryFilesTiffMapper serviceMapper, UsuarioService usuarioService, SentinelQueryFilesService sentinelQueryFilesService) {
+    public SentinelQueryFilesTiffService(SentinelQueryFilesTiffRepository repo,
+                                         SentinelQueryFilesTiffMapper serviceMapper,
+                                         SentinelQueryFilesService sentinelQueryFilesService) {
 
         super(repo, serviceMapper);
-        this.usuarioService = usuarioService;
+
         this.sentinelQueryFilesService = sentinelQueryFilesService;
     }
+    @Override
     public SentinelQueryFilesTiffDto guardar(SentinelQueryFilesTiffDto dto){
         //Traduzco del dto con datos de entrada a la entidad
         final SentinelQueryFilesTiff entidad = getMapper().toEntity(dto);
@@ -62,10 +59,10 @@ public class SentinelQueryFilesTiffService extends AbstractBusinessService<Senti
             getRepo().save(ent);
         }
     }
-    public void  deleteDesdeFiltro(Integer filtroid) throws Exception {
+    public void  deleteDesdeFiltro(Integer filtroid) {
         this.getRepo().deleteSentinelQueryFilesTiffBySentinelQueryFilesfortiff_Id(filtroid);
     }
-    public void  guardarDesdeConsulta(List<Listfilestiff> dtos, Integer id) throws Exception {
+    public void  guardarDesdeConsulta(List<Listfilestiff> dtos, Integer id) {
         Iterator<Listfilestiff> it = dtos.iterator();
 
         // mientras al iterador queda proximo juego
@@ -87,11 +84,4 @@ public class SentinelQueryFilesTiffService extends AbstractBusinessService<Senti
     public Page<SentinelQueryFilesTiffDto> buscarTodosPorFiltroId(PageRequest of, long id) {
         return this.getRepo().findSentinelQueryFilesBySentinelQueryFilesfortiff_IdAndPathLike(of, id,"%.tiff").map(this.getMapper()::toDto);
     }
-
-    public Page<SentinelQueryFilesTiffDto> buscarTodosPorUserId(PageRequest of, long id) {
-        Optional<Usuario> usuario = usuarioService.buscar((int) id);
-
-        return this.getRepo().findSentinelQueryFilesBySentinelQueryFilesfortiff_FiltroListarArchivos_UsuarioFiltro_Id(of, usuario.get().getId()).map(this.getMapper()::toDto);
-    }
-
 }

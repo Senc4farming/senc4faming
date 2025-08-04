@@ -1,18 +1,20 @@
 package com.example.sen4farming.service;
 
-import com.example.sen4farming.dto.UsuarioDto;
-import com.example.sen4farming.model.Usuario;
-import com.example.sen4farming.service.mapper.AbstractServiceMapper;
+import com.example.jpa_formacion.service.mapper.AbstractServiceMapper;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.*;
 
-public abstract class AbstractBusinessService <E, ID, DTO,  REPO extends JpaRepository<E,ID> ,
+public abstract class AbstractBusinessService   <E, ID, DTO,  REPO extends JpaRepository<E,ID> ,
         MAPPER extends AbstractServiceMapper<E,DTO>>  {
     private final REPO repo;
     private final MAPPER serviceMapper;
+
+    Logger logger = LogManager.getLogger(this.getClass());
 
 
     protected AbstractBusinessService(REPO repo, MAPPER mapper) {
@@ -23,6 +25,7 @@ public abstract class AbstractBusinessService <E, ID, DTO,  REPO extends JpaRepo
     public Optional<E> buscar(ID id){return  this.repo.findById(id);}
     //Lista de todos los DTOs buscarTodos devolvera lista y paginas
     public List<DTO> buscarTodos(){
+        logger.info("pepe");
         return  this.serviceMapper.toDto(this.repo.findAll());
     }
 
@@ -30,13 +33,12 @@ public abstract class AbstractBusinessService <E, ID, DTO,  REPO extends JpaRepo
         return  this.repo.findAll();
     }
     public Set<E> buscarEntidadesSet(){
-        Set<E> eSet = new HashSet<E>(this.repo.findAll());
-        return  eSet;
+        return  new HashSet<>(this.repo.findAll());
     }
 
     public Set<DTO> buscarTodosSet(){
-        Set<DTO> dtos = new HashSet<DTO>(this.serviceMapper.toDto(this.repo.findAll()));
-        return  dtos;
+
+        return  new HashSet<>(this.serviceMapper.toDto(this.repo.findAll()));
     }
 
     public Page<DTO> buscarTodos(Pageable pageable){
@@ -45,8 +47,7 @@ public abstract class AbstractBusinessService <E, ID, DTO,  REPO extends JpaRepo
     public Page<DTO> buscarTodosAux(Pageable pageable){
         Page<E> pageEntity;
         pageEntity= repo.findAll(pageable);
-        Page<DTO> pageDTO = pageEntity.map(this.serviceMapper::toDto);
-        return  pageDTO;
+        return  pageEntity.map(this.serviceMapper::toDto);
     }
     public Page<E> buscarTodosAuxEnt(Pageable pageable){
         Page<E> pageEntity;
@@ -68,9 +69,8 @@ public abstract class AbstractBusinessService <E, ID, DTO,  REPO extends JpaRepo
         //Traduzco del dto con datos de entrada a la entidad
         final E entidad = serviceMapper.toEntity(dto);
         //Guardo el la base de datos
-        E entidadGuardada =  repo.save(entidad);
         //Traducir la entidad a DTO para devolver el DTO
-        return serviceMapper.toDto(entidadGuardada);
+        return serviceMapper.toDto(repo.save(entidad));
     }
     //Guardar
     public DTO guardarEntidadDto(E entidad)  {
@@ -80,11 +80,9 @@ public abstract class AbstractBusinessService <E, ID, DTO,  REPO extends JpaRepo
         return serviceMapper.toDto(entidadGuardada);
     }
     //Guardar
-    public E guardarEntidadEntidad(E entidad) throws Exception {
+    public E guardarEntidadEntidad(E entidad)  {
         //Guardo el la base de datos
-        E entidadGuardada =  repo.save(entidad);
-        //Traducir la entidad a DTO para devolver el DTO
-        return entidadGuardada;
+        return repo.save(entidad);
     }
     public void  guardar(List<DTO> dtos) throws Exception {
         Iterator<DTO> it = dtos.iterator();

@@ -1,12 +1,13 @@
 package com.example.sen4farming.service.mapper;
 
-import com.example.sen4farming.dto.EvalScriptDto;
-import com.example.sen4farming.dto.EvalScriptLaunchDto;
-import com.example.sen4farming.model.EvalScript;
-import com.example.sen4farming.model.EvalScriptLaunch;
+
+import com.example.jpa_formacion.dto.EvalScriptLaunchDto;
+import com.example.jpa_formacion.model.EvalScriptLaunch;
+import lombok.NoArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+@NoArgsConstructor
 @Service
 public class EvalScriptLaunchMapper extends AbstractServiceMapper<EvalScriptLaunch, EvalScriptLaunchDto> {
     //Convertir de entidad a dtoç
@@ -26,6 +27,4 @@ public class EvalScriptLaunchMapper extends AbstractServiceMapper<EvalScriptLaun
         return entidad;
     }
 
-    public EvalScriptLaunchMapper() {
-    }
 }

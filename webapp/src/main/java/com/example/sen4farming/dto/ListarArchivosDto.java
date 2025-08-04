@@ -1,14 +1,11 @@
 package com.example.sen4farming.dto;
 
-import com.example.sen4farming.model.GrupoTrabajo;
-import com.example.sen4farming.model.Role;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.HashSet;
-import java.util.Set;
 
 @Getter
 @Setter

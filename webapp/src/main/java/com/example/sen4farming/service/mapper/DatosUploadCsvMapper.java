@@ -1,12 +1,11 @@
 package com.example.sen4farming.service.mapper;
 
-import com.example.sen4farming.dto.DatosLucas2018Dto;
-import com.example.sen4farming.dto.DatosUploadCsvDto;
-import com.example.sen4farming.model.DatosLucas2018;
-import com.example.sen4farming.model.DatosUploadCsv;
+import com.example.jpa_formacion.dto.DatosUploadCsvDto;
+import com.example.jpa_formacion.model.DatosUploadCsv;
+import lombok.NoArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
-
+@NoArgsConstructor
 @Service
 public class DatosUploadCsvMapper extends AbstractServiceMapper<DatosUploadCsv, DatosUploadCsvDto> {
     //Convertir de entidad a dtoç
@@ -26,6 +25,4 @@ public class DatosUploadCsvMapper extends AbstractServiceMapper<DatosUploadCsv, 
         return entidad;
     }
 
-    public DatosUploadCsvMapper() {
-    }
 }

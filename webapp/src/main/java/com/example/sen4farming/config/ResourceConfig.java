@@ -25,13 +25,13 @@ public class ResourceConfig implements WebMvcConfigurer
                 .setCachePeriod(3000)
                 .resourceChain(true)
                 .addResolver(new PathResourceResolver());
-        ;
+
         registry
                 .addResourceHandler("/files/**")
-                .addResourceLocations("file:///../api/")
+                .addResourceLocations("/api/files")
                 .setCachePeriod(0)
                 .resourceChain(false)
                 .addResolver(new PathResourceResolver());
-        ;
+
     }
 }

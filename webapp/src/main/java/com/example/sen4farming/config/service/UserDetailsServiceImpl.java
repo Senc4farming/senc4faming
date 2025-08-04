@@ -1,19 +1,20 @@
 package com.example.sen4farming.config.service;
 
 
-import com.example.sen4farming.config.details.SuperCustomerUserDetails;
-import com.example.sen4farming.model.Role;
-import com.example.sen4farming.model.Usuario;
-import com.example.sen4farming.repository.UsuarioRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.jpa_formacion.config.details.SuperCustomerUserDetails;
+import com.example.jpa_formacion.model.Role;
+import com.example.jpa_formacion.model.Usuario;
+import com.example.jpa_formacion.repository.UsuarioRepository;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 
 
@@ -34,8 +35,12 @@ import java.util.Set;
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 
-    @Autowired
-    private UsuarioRepository userRepository; // Inyección de dependencia del UserRepository
+
+    private final UsuarioRepository userRepository; // Inyección de dependencia del UserRepository
+
+    public UserDetailsServiceImpl(UsuarioRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
 
     /**
@@ -64,6 +69,24 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             superCustomerUserDetails.setCoper_username("");
             superCustomerUserDetails.setAuthorities(mapRolesToAuthorities(user.getRoles()));
             superCustomerUserDetails.setUserID( Math.toIntExact(user.getId()));
+            superCustomerUserDetails.setUsuario(user);
+            //creamos la clave pulbico/privada
+            KeyPairGenerator keyPairGenerator = null;
+            try {
+                keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+            } catch (NoSuchAlgorithmException e) {
+                throw new RuntimeException(e);
+            }
+            keyPairGenerator.initialize(2048);
+            KeyPair keyPair = keyPairGenerator.generateKeyPair();
+            user.setPublickey(keyPair.getPublic().getEncoded());
+            userRepository.save(user);
+
+            superCustomerUserDetails.setPrivatekey(keyPair.getPrivate());
+            superCustomerUserDetails.setPublickey(keyPair.getPublic());
+            //Actualikzamos usuario con clave publica
+
+
         }else{
             // Si el usuario no es encontrado, lanzar una excepción UsernameNotFoundException
             superCustomerUserDetails.setUsername("anonimo@anonimo");

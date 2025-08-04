@@ -1,16 +1,15 @@
 package com.example.sen4farming.service.mapper;
 
 
-import com.example.sen4farming.dto.AyudaUsrDTO;
-import com.example.sen4farming.dto.MenuDTO;
-import com.example.sen4farming.model.AyudaUsr;
-import com.example.sen4farming.model.Menu;
+import com.example.jpa_formacion.dto.AyudaUsrDTO;
+import com.example.jpa_formacion.model.AyudaUsr;
+import lombok.NoArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.stream.Collectors;
 
+@NoArgsConstructor
 @Service
 public class AyudaUsrMapper extends AbstractServiceMapper<AyudaUsr, AyudaUsrDTO> {
 

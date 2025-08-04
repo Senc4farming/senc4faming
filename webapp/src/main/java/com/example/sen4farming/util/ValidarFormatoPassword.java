@@ -5,9 +5,10 @@ import org.springframework.context.annotation.Bean;
 import java.util.regex.Pattern;
 
 public class ValidarFormatoPassword {
+    private ValidarFormatoPassword(){
+
+    }
     // Contraseña de 4-8 caracteres que requiere números y letras de ambos casos
-    private static final String PASSWORD_REGEX =
-            "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{4,8}$";
 
     // Contraseña de 4 a 32 caracteres que requiere al menos 3 de 4 (mayúsculas
     // y letras minúsculas, números y caracteres especiales) y como máximo
@@ -23,13 +24,8 @@ public class ValidarFormatoPassword {
     private static final Pattern PASSWORD_PATTERN =
             Pattern.compile(COMPLEX_PASSWORD_REGEX);
     @Bean
-    public static boolean ValidarFormato(String password){
+    public static boolean validarformato(String password){
         // Validar una contraseña
-        if (PASSWORD_PATTERN.matcher(password).matches()) {
-            return true;
-        }
-        else {
-            return false;
-        }
+        return  PASSWORD_PATTERN.matcher(password).matches();
     }
 }

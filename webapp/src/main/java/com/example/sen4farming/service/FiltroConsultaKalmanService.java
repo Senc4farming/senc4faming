@@ -1,13 +1,13 @@
 package com.example.sen4farming.service;
 
-import com.example.sen4farming.dto.FiltroConsultaKalmanDto;
-import com.example.sen4farming.dto.FiltroListarArchivosDto;
-import com.example.sen4farming.model.FiltroConsultaKalman;
-import com.example.sen4farming.model.FiltroListarArchivos;
-import com.example.sen4farming.repository.FiltroConsultaKalmanRepository;
-import com.example.sen4farming.repository.FiltroListarArchivosRepository;
-import com.example.sen4farming.service.mapper.FiltroConsultaKalmanMapper;
-import com.example.sen4farming.service.mapper.FiltroListarArchivosMapper;
+import com.example.jpa_formacion.dto.FiltroConsultaKalmanDto;
+import com.example.jpa_formacion.dto.FiltroListarArchivosDto;
+import com.example.jpa_formacion.model.FiltroConsultaKalman;
+import com.example.jpa_formacion.model.FiltroListarArchivos;
+import com.example.jpa_formacion.repository.FiltroConsultaKalmanRepository;
+import com.example.jpa_formacion.repository.FiltroListarArchivosRepository;
+import com.example.jpa_formacion.service.mapper.FiltroConsultaKalmanMapper;
+import com.example.jpa_formacion.service.mapper.FiltroListarArchivosMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;

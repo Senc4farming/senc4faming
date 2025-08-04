@@ -1,14 +1,14 @@
 package com.example.sen4farming.service;
 
-import com.example.sen4farming.dto.EvalScriptDto;
-import com.example.sen4farming.dto.FiltroListarArchivosDto;
-import com.example.sen4farming.dto.SentinelQueryFilesDto;
-import com.example.sen4farming.model.EvalScript;
-import com.example.sen4farming.model.FiltroListarArchivos;
-import com.example.sen4farming.repository.EvalScriptRepository;
-import com.example.sen4farming.repository.FiltroListarArchivosRepository;
-import com.example.sen4farming.service.mapper.EvalScriptMapper;
-import com.example.sen4farming.service.mapper.FiltroListarArchivosMapper;
+import com.example.jpa_formacion.dto.EvalScriptDto;
+import com.example.jpa_formacion.dto.FiltroListarArchivosDto;
+import com.example.jpa_formacion.dto.SentinelQueryFilesDto;
+import com.example.jpa_formacion.model.EvalScript;
+import com.example.jpa_formacion.model.FiltroListarArchivos;
+import com.example.jpa_formacion.repository.EvalScriptRepository;
+import com.example.jpa_formacion.repository.FiltroListarArchivosRepository;
+import com.example.jpa_formacion.service.mapper.EvalScriptMapper;
+import com.example.jpa_formacion.service.mapper.FiltroListarArchivosMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;

@@ -2,89 +2,81 @@ package com.example.sen4farming.util;
 
 
 // Data streaming
-import com.example.sen4farming.dto.ListarArchivosDto;
-import jakarta.persistence.criteria.CriteriaBuilder;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
 
 import java.io.*;
 
 // Networking and HTTP/HTTPS
 import java.net.HttpURLConnection;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 
 // Charsets
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 
 // Utilities
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 import java.util.List;
 
 // Constants
 
 public class Request {
-    public String method;
-    public String url;
+    private String method;
     public String output;
     public String errormessage;
-    public HttpURLConnection connection;
-    public Map<String, List<String>> headers;
+    private Map<String, List<String>> headers;
 
+    private static final String STR_APP_JSON = "application/json";
+    private static final String STR_ACCEPT= "Accept";
+    private static final String STR_CONTENT_TYPE = "Content-Type";
+    Logger logger = LogManager.getLogger(this.getClass());
     /**
      * Default constructor that always makes a GET request
      * @param url URL to make a GET request
      */
     public Request(String url) {
-        this.url = url;
         this.method = Constants.GET;
 
-        HttpURLConnection connection;
+        HttpURLConnection urlConnection;
 
         try {
-            connection = (HttpURLConnection) new URL(url).openConnection();
-            this.connection = connection;
+            urlConnection = (HttpURLConnection) new URL(url).openConnection();
 
-            connection.setRequestMethod(this.method);
+            urlConnection.setRequestMethod(this.method);
 
-            connection.setConnectTimeout(Constants.STANDARD_TIMEOUT);
-            connection.setReadTimeout(Constants.STANDARD_TIMEOUT);
+            urlConnection.setConnectTimeout(Constants.STANDARD_TIMEOUT);
+            urlConnection.setReadTimeout(Constants.STANDARD_TIMEOUT);
 
             boolean redirect = false;
 
             // normally, 3xx is redirect
-            int status = connection.getResponseCode();
-            if (status != HttpURLConnection.HTTP_OK) {
-                if (status == HttpURLConnection.HTTP_MOVED_TEMP
+            int status = urlConnection.getResponseCode();
+            if (status != HttpURLConnection.HTTP_OK && (status == HttpURLConnection.HTTP_MOVED_TEMP
                         || status == HttpURLConnection.HTTP_MOVED_PERM
                         || status == HttpURLConnection.HTTP_SEE_OTHER
-                        || status == 308)
+                        || status == 308))
                     redirect = true;
-            }
-            System.out.println("Response Code ... " + status);
+
+            logger.info("Response Code ... %s" , status);
             if (redirect) {
 
                 // get redirect url from "location" header field
-                String newUrl = connection.getHeaderField("Location");
+                String newUrl = urlConnection.getHeaderField("Location");
 
                 // get the cookie if need, for login
-                String cookies = connection.getHeaderField("Set-Cookie");
+                String cookies = urlConnection.getHeaderField("Set-Cookie");
 
                 // open the new connnection again
-                connection = (HttpURLConnection) new URL(newUrl).openConnection();
-                connection.setRequestProperty("Cookie", cookies);
-                connection.setConnectTimeout(Constants.STANDARD_TIMEOUT);
-                connection.setReadTimeout(Constants.STANDARD_TIMEOUT);
+                urlConnection = (HttpURLConnection) new URL(newUrl).openConnection();
+                urlConnection.setRequestProperty("Cookie", cookies);
+                urlConnection.setConnectTimeout(Constants.STANDARD_TIMEOUT);
+                urlConnection.setReadTimeout(Constants.STANDARD_TIMEOUT);
             }
-            this.output = read(connection);
-            this.headers = connection.getHeaderFields();
+            this.output = read(urlConnection);
+            this.headers = urlConnection.getHeaderFields();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -98,69 +90,62 @@ public class Request {
      * @param headers Headers for the request
      */
     public Request(String url, String method, String data, String[][] headers) {
-        this.url = url;
         this.method = method.toUpperCase();
 
         if (data == null) data = "{}";
 
-        HttpURLConnection connection;
+        HttpURLConnection urlConnection;
+        if (headers == null) {
+            Request writable = new Request(url, method, data);
+            this.output = writable.output;
+        } else
+        {
+        if (this.method.equals(Constants.POST) || this.method.equals(Constants.DELETE)
+                    || this.method.equals(Constants.PUT) || this.method.equals(Constants.PATCH)) {
+                 try {
+                        urlConnection = (HttpURLConnection) new URL(url).openConnection();
 
-        if (this.method.equals(Constants.POST) || this.method.equals(Constants.DELETE) || this.method.equals(Constants.PUT) || this.method.equals(Constants.PATCH)) {
-            if (headers == null) {
-                Request writable = new Request(url, method, data);
-                this.output = writable.output;
-            } else {
-                try {
-                    connection = (HttpURLConnection) new URL(url).openConnection();
-                    this.connection = connection;
+                        urlConnection.setRequestMethod(this.method);
 
-                    connection.setRequestMethod(this.method);
+                        urlConnection.setConnectTimeout(Constants.STANDARD_TIMEOUT);
+                        urlConnection.setReadTimeout(Constants.STANDARD_TIMEOUT);
 
-                    connection.setConnectTimeout(Constants.STANDARD_TIMEOUT);
-                    connection.setReadTimeout(Constants.STANDARD_TIMEOUT);
+                        urlConnection.setDoOutput(true);
 
-                    connection.setDoOutput(true);
+                        // Add the headers
+                        setHeaders(urlConnection, headers);
 
-                    // Add the headers
-                    setHeaders(connection, headers);
+                        try {
+                            byte[] bytes = data.getBytes(StandardCharsets.UTF_8);
+                            int length = bytes.length;
+                            urlConnection.setFixedLengthStreamingMode(length);
 
-                    try {
-                        byte[] bytes = data.getBytes(StandardCharsets.UTF_8);
-                        int length = bytes.length;
-                        connection.setFixedLengthStreamingMode(length);
-
-                        OutputStream outputStream = connection.getOutputStream();
-                        outputStream.write(bytes, 0, length);
-                        outputStream.flush();
-                        outputStream.close();
-                    } finally {
-                        this.output = read(connection);
-                        connection.getInputStream().close();
+                            OutputStream outputStream = urlConnection.getOutputStream();
+                            outputStream.write(bytes, 0, length);
+                            outputStream.flush();
+                            outputStream.close();
+                        } finally {
+                            this.output = read(urlConnection);
+                            urlConnection.getInputStream().close();
+                        }
+                        this.headers = urlConnection.getHeaderFields();
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
-                    this.headers = connection.getHeaderFields();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        } else {
-            if (headers == null) {
-                Request readOnly = new Request(url);
-                this.output = readOnly.output;
-            } else {
+                } else {
                 try {
-                    connection = (HttpURLConnection) new URL(url).openConnection();
-                    this.connection = connection;
+                    urlConnection = (HttpURLConnection) new URL(url).openConnection();
 
-                    connection.setRequestMethod(this.method);
+                    urlConnection.setRequestMethod(this.method);
 
-                    connection.setConnectTimeout(Constants.STANDARD_TIMEOUT);
-                    connection.setReadTimeout(Constants.STANDARD_TIMEOUT);
+                    urlConnection.setConnectTimeout(Constants.STANDARD_TIMEOUT);
+                    urlConnection.setReadTimeout(Constants.STANDARD_TIMEOUT);
 
                     // Adds headers
-                    setHeaders(connection, headers);
+                    setHeaders(urlConnection, headers);
 
-                    this.output = read(connection);
-                    this.headers = connection.getHeaderFields();
+                    this.output = read(urlConnection);
+                    this.headers = urlConnection.getHeaderFields();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -175,40 +160,38 @@ public class Request {
      * @param data Data to write to the request
      */
     public Request(String url, String method, String data) {
-        this.url = url;
         this.method = method.toUpperCase();
 
         if (data == null) data = "{}";
 
-        HttpURLConnection connection;
+        HttpURLConnection urlConnection;
 
         if (this.method.equals(Constants.POST) || this.method.equals(Constants.DELETE) || this.method.equals(Constants.PUT) || this.method.equals(Constants.PATCH)) {
             try {
-                connection = (HttpURLConnection) new URL(url).openConnection();
-                this.connection = connection;
+                urlConnection = (HttpURLConnection) new URL(url).openConnection();
 
-                connection.setRequestMethod(this.method);
+                urlConnection.setRequestMethod(this.method);
 
-                connection.setConnectTimeout(Constants.STANDARD_TIMEOUT);
-                connection.setReadTimeout(Constants.STANDARD_TIMEOUT);
+                urlConnection.setConnectTimeout(Constants.STANDARD_TIMEOUT);
+                urlConnection.setReadTimeout(Constants.STANDARD_TIMEOUT);
 
-                connection.setDoOutput(true);
+                urlConnection.setDoOutput(true);
 
                 try {
                     byte[] bytes = data.getBytes(StandardCharsets.UTF_8);
                     int length = bytes.length;
-                    connection.setFixedLengthStreamingMode(length);
+                    urlConnection.setFixedLengthStreamingMode(length);
 
-                    OutputStream outputStream = connection.getOutputStream();
+                    OutputStream outputStream = urlConnection.getOutputStream();
                     outputStream.write(bytes, 0, length);
                     outputStream.flush();
                     outputStream.close();
                 } finally {
-                    this.output = read(connection);
-                    connection.getInputStream().close();
+                    this.output = read(urlConnection);
+                    urlConnection.getInputStream().close();
                 }
 
-                this.headers = connection.getHeaderFields();
+                this.headers = urlConnection.getHeaderFields();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -224,44 +207,42 @@ public class Request {
      * @param jsonobject
      */
     public Request(String url, JSONObject requestParam) {
-        this.url = url;
         this.method = Constants.POST;
 
-        HttpURLConnection connection;
+        HttpURLConnection urlConnection;
 
         try {
-            connection = (HttpURLConnection) new URL(url).openConnection();
-            this.connection = connection;
-            connection.setRequestMethod(this.method);
+            urlConnection = (HttpURLConnection) new URL(url).openConnection();
+            urlConnection.setRequestMethod(this.method);
 
-            connection.setConnectTimeout(Constants.STANDARD_TIMEOUT1);
-            connection.setReadTimeout(Constants.STANDARD_TIMEOUT1);
-            connection.setRequestProperty("Content-Type", "application/json");
-            connection.setRequestProperty("Accept", "application/json");
-            connection.setDoOutput(true);
+            urlConnection.setConnectTimeout(Constants.STANDARD_TIMEOUT1);
+            urlConnection.setReadTimeout(Constants.STANDARD_TIMEOUT1);
+            urlConnection.setRequestProperty(STR_CONTENT_TYPE, STR_APP_JSON);
+            urlConnection.setRequestProperty(STR_ACCEPT, STR_APP_JSON);
+            urlConnection.setDoOutput(true);
 
-            System.out.println("Request(String url, JSONObject requestParam) : " + url + "01");
+            logger.info("Request(String url, JSONObject requestParam) : %s :03 " , url );
 
 
             try {
-                byte[] bytes = requestParam.toString().getBytes("utf-8");
+                byte[] bytes = requestParam.toString().getBytes(StandardCharsets.UTF_8);
                 int length = bytes.length;
-                connection.setFixedLengthStreamingMode(length);
-                OutputStream os = connection.getOutputStream();
+                urlConnection.setFixedLengthStreamingMode(length);
+                OutputStream os = urlConnection.getOutputStream();
                 os.write(bytes, 0, bytes.length);
             } finally {
-                if (connection.getResponseCode() == 200){
-                    this.output = read(connection);
-                    connection.getInputStream().close();
+                if (urlConnection.getResponseCode() == 200){
+                    this.output = read(urlConnection);
+                    urlConnection.getInputStream().close();
                 }
                 else
                 {
-                    this.errormessage = "{\"errormessage\": \""+ connection.getResponseMessage() + "\", \"errorcode\": " + connection.getResponseCode() + "}";
-                    this.output = "{\"errormessage\": \""+ connection.getResponseMessage() + "\", \"errorcode\": " + connection.getResponseCode() + "}";
+                    this.errormessage = "{\"errormessage \": \""+ urlConnection.getResponseMessage() + "\", \" errorcode\": " + urlConnection.getResponseCode() + "}";
+                    this.output = "{\"errormessage  \": \""+ urlConnection.getResponseMessage() + "\", \"errorcode \": " + urlConnection.getResponseCode() + "}";
                 }
             }
 
-            this.headers = connection.getHeaderFields();
+            this.headers = urlConnection.getHeaderFields();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -272,87 +253,49 @@ public class Request {
      * @param jsonobject
      */
     public Request(String url, JSONObject requestParam, Float f) {
-        this.url = url;
         this.method = Constants.POST;
 
-        HttpURLConnection connection;
-
+        HttpURLConnection urlConnection;
+        logger.info(f);
         try {
-            connection = (HttpURLConnection) new URL(url).openConnection();
-            this.connection = connection;
-            connection.setRequestMethod(this.method);
+            urlConnection = (HttpURLConnection) new URL(url).openConnection();
+            urlConnection.setRequestMethod(this.method);
 
-            connection.setConnectTimeout(Constants.STANDARD_TIMEOUT1);
-            connection.setReadTimeout(Constants.STANDARD_TIMEOUT1);
-            connection.setRequestProperty("Content-Type", "application/json");
-            connection.setRequestProperty("Accept", "application/json");
-            connection.setDoOutput(true);
+            urlConnection.setConnectTimeout(Constants.STANDARD_TIMEOUT1);
+            urlConnection.setReadTimeout(Constants.STANDARD_TIMEOUT1);
+            urlConnection.setRequestProperty(STR_CONTENT_TYPE, STR_APP_JSON);
+            urlConnection.setRequestProperty(STR_ACCEPT, STR_APP_JSON);
+            urlConnection.setDoOutput(true);
 
-            System.out.println("Request(String url, JSONObject requestParam) : " + url + "01");
+            logger.info("Request(String url, JSONObject requestParam) :  %s 02",  url );
 
 
             try {
-                byte[] bytes = requestParam.toString().getBytes("utf-8");
+                byte[] bytes = requestParam.toString().getBytes(StandardCharsets.UTF_8);
                 int length = bytes.length;
-                connection.setFixedLengthStreamingMode(length);
-                OutputStream os = connection.getOutputStream();
+                urlConnection.setFixedLengthStreamingMode(length);
+                OutputStream os = urlConnection.getOutputStream();
                 os.write(bytes, 0, bytes.length);
-            }
-            catch (Exception e){
-                System.out.println("Excepcion:" + e.getMessage());
-            }
-            finally {
+            } finally {
 
-                if (connection.getResponseCode() == 200){
-                    this.output = read(connection);
+                if (urlConnection.getResponseCode() == 200){
+                    this.output = read(urlConnection);
                     this.errormessage = "";
-                    connection.getInputStream().close();
+                    urlConnection.getInputStream().close();
                 }
                 else
                 {
-                    this.errormessage = "{\"errormessage\": \""+ connection.getResponseMessage() + "\", \"errorcode\": " + connection.getResponseCode() + "}";
-                    this.output = readerror(connection);
+                    this.errormessage = "{\"errormessage\": \""+ urlConnection.getResponseMessage() + "\", \"errorcode\": " + urlConnection.getResponseCode() + "}";
+                    this.output = readerror(urlConnection);
                 }
             }
-            System.out.println("antes de this.headers  ");
-            this.headers = connection.getHeaderFields();
+            logger.info("antes de this.headers  ");
+            this.headers = urlConnection.getHeaderFields();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-    /**
-     * Overloaded constructor for POST requests only
-     * @param url URL to request
-     * @param jsonobject
-     */
-    public Request(String url, JSONObject jsonObject, Integer proc) {
-        this.url = url;
-        this.method = Constants.POST;
 
-        try {
-
-            byte[] responseBody = null;
-            byte[] request = jsonObject.toString().getBytes();
-
-            var client = HttpClient.newHttpClient();
-
-            var httpRequest = HttpRequest.newBuilder()
-                    .uri(new URI(url))
-                    .version(HttpClient.Version.HTTP_2)
-                    .header("Content-Type", "application/json")
-                    .POST(HttpRequest.BodyPublishers.ofByteArray(request))
-                    .build();
-
-            HttpResponse.BodyHandler<String> bodyHandler = HttpResponse.BodyHandlers.ofString();
-
-            CompletableFuture<HttpResponse<String>> future = client.sendAsync(httpRequest, bodyHandler);
-            future.thenApply(HttpResponse::body)
-                    .thenAccept(System.out::println)
-                    .join();
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
-    }
     /**
      * Overloaded constructor for POST requests only
      * @param url URL to request
@@ -360,41 +303,36 @@ public class Request {
      * @param path on java server
      */
     public Request(String url, JSONObject requestParam, String path) {
-        this.url = url;
         this.method = Constants.POST;
 
-        HttpURLConnection connection;
+        HttpURLConnection urlConnection;
 
         try {
-            connection = (HttpURLConnection) new URL(url).openConnection();
-            this.connection = connection;
-            connection.setRequestMethod(this.method);
+            urlConnection = (HttpURLConnection) new URL(url).openConnection();
+            urlConnection.setRequestMethod(this.method);
 
-            connection.setConnectTimeout(Constants.STANDARD_TIMEOUT);
-            connection.setReadTimeout(Constants.STANDARD_TIMEOUT);
-            connection.setRequestProperty("Content-Type", "application/json");
-            connection.setRequestProperty("Accept", "application/json");
-            connection.setDoOutput(true);
+            urlConnection.setConnectTimeout(Constants.STANDARD_TIMEOUT);
+            urlConnection.setReadTimeout(Constants.STANDARD_TIMEOUT);
+            urlConnection.setRequestProperty(STR_CONTENT_TYPE, STR_APP_JSON);
+            urlConnection.setRequestProperty(STR_ACCEPT, STR_APP_JSON);
+            urlConnection.setDoOutput(true);
 
-            System.out.println("Request(String url, JSONObject requestParam , String action) : " + url + "01");
+            logger.info("Request(String url, JSONObject requestParam , String action) : %s 01",url);
 
             // This will get input data from the server
             InputStream inputStream = null;
 
-            // This will read the data from the server;
+            // This will read the data from the server
             OutputStream outputStream = null;
             try {
-                byte[] bytes = requestParam.toString().getBytes("utf-8");
-                int length_json = bytes.length;
-                connection.setFixedLengthStreamingMode(length_json);
-                OutputStream os = connection.getOutputStream();
+                byte[] bytes = requestParam.toString().getBytes(StandardCharsets.UTF_8);
+                int lengthJson = bytes.length;
+                urlConnection.setFixedLengthStreamingMode(lengthJson);
+                OutputStream os = urlConnection.getOutputStream();
                 os.write(bytes, 0, bytes.length);
 
                 // Requesting input data from server
-                inputStream = connection.getInputStream();
-
-                //get the path from input parameter
-                //String pathdir =  path.substring(0,path.lastIndexOf("/"));
+                inputStream = urlConnection.getInputStream();
 
                 // Open local file writer
                 outputStream = new FileOutputStream(path);
@@ -410,11 +348,9 @@ public class Request {
                     // Writing data
                     outputStream.write(bufferout, 0, length);
                 }
-            } catch (Exception ex) {
-                System.out.println("error al descargar archivo:" + ex);
             } finally {
-                this.output = read(connection);
-                connection.getInputStream().close();
+                this.output = read(urlConnection);
+                urlConnection.getInputStream().close();
             }
             // closing used resources
             // The computer will not be able to use the image
@@ -423,7 +359,7 @@ public class Request {
             outputStream.close();
             inputStream.close();
 
-            this.headers = connection.getHeaderFields();
+            this.headers = urlConnection.getHeaderFields();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -434,37 +370,35 @@ public class Request {
      * @param data Data to post
      */
     public Request(String url, String data) {
-        this.url = url;
         this.method = Constants.POST;
 
-        HttpURLConnection connection;
+        HttpURLConnection urlConnection;
 
         try {
-            connection = (HttpURLConnection) new URL(url).openConnection();
-            this.connection = connection;
+            urlConnection = (HttpURLConnection) new URL(url).openConnection();
 
-            connection.setRequestMethod(this.method);
+            urlConnection.setRequestMethod(this.method);
 
-            connection.setConnectTimeout(Constants.STANDARD_TIMEOUT);
-            connection.setReadTimeout(Constants.STANDARD_TIMEOUT);
+            urlConnection.setConnectTimeout(Constants.STANDARD_TIMEOUT);
+            urlConnection.setReadTimeout(Constants.STANDARD_TIMEOUT);
 
-            connection.setDoOutput(true);
+            urlConnection.setDoOutput(true);
 
             try {
                 byte[] bytes = data.getBytes(StandardCharsets.UTF_8);
                 int length = bytes.length;
-                connection.setFixedLengthStreamingMode(length);
+                urlConnection.setFixedLengthStreamingMode(length);
 
-                OutputStream outputStream = connection.getOutputStream();
+                OutputStream outputStream = urlConnection.getOutputStream();
                 outputStream.write(bytes, 0, length);
                 outputStream.flush();
                 outputStream.close();
             } finally {
-                this.output = read(connection);
-                connection.getInputStream().close();
+                this.output = read(urlConnection);
+                urlConnection.getInputStream().close();
             }
 
-            this.headers = connection.getHeaderFields();
+            this.headers = urlConnection.getHeaderFields();
         } catch (IOException e) {
             e.printStackTrace();
         }

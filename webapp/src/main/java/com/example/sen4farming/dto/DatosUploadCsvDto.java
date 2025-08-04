@@ -20,6 +20,6 @@ public class DatosUploadCsvDto {
     private String userid;
     private String reflectance;
     private String band;
-    private String survey_date;
+    private String surveyDate;
     private String oc;
 }

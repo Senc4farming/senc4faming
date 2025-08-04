@@ -1,10 +1,6 @@
 package com.example.sen4farming.dto;
 
-import com.example.sen4farming.model.FiltroListarArchivos;
-import jakarta.persistence.Column;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import com.example.jpa_formacion.model.FiltroListarArchivos;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

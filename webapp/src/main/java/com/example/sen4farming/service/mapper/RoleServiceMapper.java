@@ -1,15 +1,14 @@
 package com.example.sen4farming.service.mapper;
 
 
-import com.example.sen4farming.dto.RoleDTO;
-import com.example.sen4farming.model.Role;
+import com.example.jpa_formacion.dto.RoleDTO;
+import com.example.jpa_formacion.model.Role;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class RoleServiceMapper extends AbstractServiceMapper<Role, RoleDTO> {

@@ -1,7 +1,7 @@
 package com.example.sen4farming.dto;
 
-import com.example.sen4farming.model.GrupoTrabajo;
-import com.example.sen4farming.model.Role;
+import com.example.jpa_formacion.model.GrupoTrabajo;
+import com.example.jpa_formacion.model.Role;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

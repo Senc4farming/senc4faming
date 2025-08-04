@@ -1,8 +1,8 @@
 package com.example.sen4farming.repository;
 
 
-import com.example.sen4farming.model.Menu;
-import com.example.sen4farming.model.Role;
+import com.example.jpa_formacion.model.Menu;
+import com.example.jpa_formacion.model.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Collection;

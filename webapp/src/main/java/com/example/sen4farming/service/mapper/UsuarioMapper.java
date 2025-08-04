@@ -1,11 +1,13 @@
 package com.example.sen4farming.service.mapper;
 
-import com.example.sen4farming.dto.UsuarioDto;
-import com.example.sen4farming.dto.UsuarioDtoPsw;
-import com.example.sen4farming.model.Usuario;
+import com.example.jpa_formacion.dto.UsuarioDto;
+import com.example.jpa_formacion.dto.UsuarioDtoPsw;
+import com.example.jpa_formacion.model.Usuario;
+import lombok.NoArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+@NoArgsConstructor
 @Service
 public class UsuarioMapper extends AbstractServiceMapper<Usuario,UsuarioDto> {
     //Convertir de entidad a dtoç
@@ -30,8 +32,5 @@ public class UsuarioMapper extends AbstractServiceMapper<Usuario,UsuarioDto> {
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.map(dto,entidad);
         return entidad;
-    }
-
-    public UsuarioMapper() {
     }
 }

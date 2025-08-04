@@ -1,12 +1,11 @@
 package com.example.sen4farming.service;
 
-import com.example.sen4farming.apiitem.Listfiles;
-import com.example.sen4farming.dto.SentinelQueryFilesDto;
-import com.example.sen4farming.model.FiltroListarArchivos;
-import com.example.sen4farming.model.SentinelQueryFiles;
-import com.example.sen4farming.model.Usuario;
-import com.example.sen4farming.repository.SentinelQueryFilesRepository;
-import com.example.sen4farming.service.mapper.SentinelQueryFilesMapper;
+import com.example.jpa_formacion.apiitem.Listfiles;
+import com.example.jpa_formacion.dto.SentinelQueryFilesDto;
+import com.example.jpa_formacion.model.FiltroListarArchivos;
+import com.example.jpa_formacion.model.SentinelQueryFiles;
+import com.example.jpa_formacion.repository.SentinelQueryFilesRepository;
+import com.example.jpa_formacion.service.mapper.SentinelQueryFilesMapper;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -21,18 +20,17 @@ import java.util.Optional;
 @Transactional
 public class SentinelQueryFilesService extends AbstractBusinessService<SentinelQueryFiles,Integer, SentinelQueryFilesDto,
         SentinelQueryFilesRepository, SentinelQueryFilesMapper>   {
-    //
-    private final UsuarioService usuarioService;
 
     private final FiltroListarArchivosService filtroListarArchivosService;
 
     //Acceso a los datos de la bbdd
-    public SentinelQueryFilesService(SentinelQueryFilesRepository repo, SentinelQueryFilesMapper serviceMapper, UsuarioService usuarioService, FiltroListarArchivosService filtroListarArchivosService) {
+    public SentinelQueryFilesService(SentinelQueryFilesRepository repo, SentinelQueryFilesMapper serviceMapper
+            , FiltroListarArchivosService filtroListarArchivosService) {
 
         super(repo, serviceMapper);
-        this.usuarioService = usuarioService;
         this.filtroListarArchivosService = filtroListarArchivosService;
     }
+    @Override
     public SentinelQueryFilesDto guardar(SentinelQueryFilesDto dto){
         //Traduzco del dto con datos de entrada a la entidad
         final SentinelQueryFiles entidad = getMapper().toEntity(dto);
@@ -57,11 +55,11 @@ public class SentinelQueryFilesService extends AbstractBusinessService<SentinelQ
             getRepo().save(ent);
         }
     }
-    public void  deleteDesdeFiltro(Integer filtroid) throws Exception {
+    public void  deleteDesdeFiltro(Integer filtroid)  {
 
         this.getRepo().deleteSentinelQueryFilesByFiltroListarArchivos_Id(filtroid);
     }
-    public void  guardarDesdeConsulta(List<Listfiles> dtos,Integer filtroid) throws Exception {
+    public void  guardarDesdeConsulta(List<Listfiles> dtos,Integer filtroid) {
         Iterator<Listfiles> it = dtos.iterator();
 
         // mientras al iterador queda proximo juego
@@ -73,8 +71,6 @@ public class SentinelQueryFilesService extends AbstractBusinessService<SentinelQ
             ent.setName(listfiles.getName());
             ent.setOnline(listfiles.getOnline());
             ent.setPublicationDate(listfiles.getPublicationDate());
-            //System.out.println("list files ent id:" + ent.getSentinelId());
-            //System.out.println("list files listfile getFootprint:" + listfiles.getFootprint());
             ent.setFootprint(listfiles.getFootprint());
             ent.setGeofootprint(listfiles.getGeofootprint());
             Optional<FiltroListarArchivos> filtroListarArchivos =
@@ -91,9 +87,4 @@ public class SentinelQueryFilesService extends AbstractBusinessService<SentinelQ
         return this.getRepo().findSentinelQueryFilesByFiltroListarArchivos_Id(of, id).map(this.getMapper()::toDto);
     }
 
-    public Page<SentinelQueryFilesDto> buscarTodosPorUserId(PageRequest of, long id) {
-        Optional<Usuario> usuario = usuarioService.buscar((int) id);
-
-        return this.getRepo().findSentinelQueryFilesByFiltroListarArchivos_UsuarioFiltro_Id(of, usuario.get().getId()).map(this.getMapper()::toDto);
-    }
 }

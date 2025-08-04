@@ -17,7 +17,7 @@ import org.apache.commons.io.FileUtils;
 public class Unzip {
 
     private final File input;
-    private List<File> output = new ArrayList();
+    private List<File> output = new ArrayList<>();
     private String outputFolder = "C:\\KMZ_TEMP";
 
     public Unzip(File file) {
@@ -48,7 +48,7 @@ public class Unzip {
      * @param zipFile input zip file
      * @throws java.lang.Exception
      */
-    public void unZipIt() throws Exception {
+    public void unZipIt() throws IOException {
 
         byte[] buffer = new byte[1024];
 
@@ -109,7 +109,7 @@ public class Unzip {
             FileUtils.deleteDirectory(new File(outputFolder));
 
             return true;
-        } catch (Exception e) {
+        } catch (IOException e) {
             return false;
         }
 

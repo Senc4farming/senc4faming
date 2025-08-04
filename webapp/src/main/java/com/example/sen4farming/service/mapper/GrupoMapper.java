@@ -1,10 +1,12 @@
 package com.example.sen4farming.service.mapper;
 
-import com.example.sen4farming.dto.GrupoTrabajoDto;
-import com.example.sen4farming.model.GrupoTrabajo;
+import com.example.jpa_formacion.dto.GrupoTrabajoDto;
+import com.example.jpa_formacion.model.GrupoTrabajo;
+import lombok.NoArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+@NoArgsConstructor
 @Service
 public class GrupoMapper extends AbstractServiceMapper<GrupoTrabajo, GrupoTrabajoDto> {
     //Convertir de entidad a dtoç
@@ -24,6 +26,4 @@ public class GrupoMapper extends AbstractServiceMapper<GrupoTrabajo, GrupoTrabaj
         return entidad;
     }
 
-    public GrupoMapper() {
-    }
 }

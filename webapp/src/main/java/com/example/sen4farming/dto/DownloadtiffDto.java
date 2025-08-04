@@ -1,6 +1,6 @@
 package com.example.sen4farming.dto;
 
-import com.example.sen4farming.model.EvalScript;
+import com.example.jpa_formacion.model.EvalScript;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

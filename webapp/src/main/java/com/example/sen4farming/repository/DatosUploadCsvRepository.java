@@ -1,7 +1,7 @@
 package com.example.sen4farming.repository;
 
-import com.example.sen4farming.model.DatosLucas2018;
-import com.example.sen4farming.model.DatosUploadCsv;
+import com.example.jpa_formacion.model.DatosLucas2018;
+import com.example.jpa_formacion.model.DatosUploadCsv;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

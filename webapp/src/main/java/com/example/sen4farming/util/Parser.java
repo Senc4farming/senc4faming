@@ -1,9 +1,9 @@
 package com.example.sen4farming.util;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.RandomAccessFile;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.io.*;
 import java.util.Arrays;
 import java.util.List;
 
@@ -16,10 +16,12 @@ public class Parser {
     private final File file;
     private FileType type;
 
+    Logger logger = LogManager.getLogger(Parser.class);
+
     /**
      * 0x504B0304, 0x504B0506, 0x504B050 are 3 possible file signatures (Magic Numbers) for the ZIP format.
      **/
-    final List validKMZsignatures = Arrays.asList(0x504B0304, 0x504B0506, 0x504B050);
+    final List<Integer> validKMZsignatures = Arrays.asList(0x504B0304, 0x504B0506, 0x504B050);
 
     public enum FileType {
         KMZ("kmz"), KML("kml");
@@ -74,7 +76,7 @@ public class Parser {
      * @return boolean indicating if it is a KML file
      * @throws Exception
      */
-    private boolean checkKML(File file) throws Exception {
+    private boolean checkKML(File file) throws   IOException {
         try(
                 BufferedReader br = new BufferedReader(new FileReader(file));
         ) {
@@ -84,7 +86,10 @@ public class Parser {
             String line2 = br.readLine();
 
             return line.contains("xml") && line2.contains("kml");
+        } catch (IOException e) {
+            throw  new IOException();
         }
+
     }
 
     /**
@@ -93,21 +98,23 @@ public class Parser {
      * @return boolean indicating if it is a KMZ file
      * @throws Exception
      */
-    private boolean checkKMZ() throws Exception {
+    private boolean checkKMZ() throws IOException {
 
         try( RandomAccessFile raf = new RandomAccessFile(file, "r"); ) {
 
             Integer n = raf.readInt();
 
             return (validKMZsignatures.contains(n));
+        } catch (IOException e) {
+            throw e ;
         }
     }
 
     /**
-     * TODO change return type and add to javadoc
+     * parse
      * parses the file
      */
-    public void parse() throws Exception {
+    public void parse() throws  Exception {
 
         switch(type) {
 
@@ -128,7 +135,7 @@ public class Parser {
     /**
      * Unzips the KMZ file and then parses the KML file inside it.
      */
-    private void parseKMZ() throws Exception {
+    private void parseKMZ() throws  Exception {
 
         Unzip unzip = new Unzip(file);
         unzip.unZipIt();
@@ -142,13 +149,12 @@ public class Parser {
     }
 
     /**
-     * TODO update with output coordinates
+     *parseKML
      * @param file
      */
     private void parseKML(File file) {
 
-        // TODO parse XML
-        System.out.println(file.getName());
+        logger.info(file.getName());
 
     }
 

@@ -19,6 +19,6 @@ public class DatosLucas2018Dto {
     private String path;
     private String reflectance;
     private String band;
-    private String survey_date;
+    private String ssurveyDate;
     private String oc;
 }

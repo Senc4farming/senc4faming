@@ -19,8 +19,8 @@ public class MiUserDetails implements UserDetails {
     //Campos propios de UserDetails
     private String username;
     private String password;
-    private String coper_username;
-    private String coper_password;
+    private String coperUsername;
+    private String coperPassword;
 
 
     private boolean isActive=true;

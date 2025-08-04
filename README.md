@@ -136,13 +136,47 @@ Postgres and Redis for first time are:
     # Run and build api
     docker stop restpie-dev
     ./build.sh
-    docker run --add-host=host.docker.internal:host-gateway -it --rm --name restpie-dev -p 8100:80  -v `pwd`/:/app/ -v /mnt/hgfs/solovmwarewalgreen/solovmwarewalgreen/projecto/SEN4CFARMING/api/files/:/app/files/   restpie-dev-image
-
+    docker run --add-host=host.docker.internal:host-gateway -it --rm --name restpie-dev -p 8100:80  -v `pwd`/:/app/ -v /mnt/hgfs/solovmwarewalgreen/solovmwarewalgreen/projecto/SEN4CFARMING/api/files/:/app/files/   restpie-dev-imag
 The rest of the times we just need to run 3 commands to prepare API:
+=======
+    # start RESTPie3
+    ./run.sh
+
+    # in another term, create initial database schema
+    docker exec -it restpie-dev bash -l -c 'python /app/scripts/dbmigrate.py'
+
+
+If all went OK, RESTPie3 + Redis are running and you should be able to list
+the REST API at http://localhost:8100/api/list
+
+The SQLite database is empty at this point so empty lists are returned from
+the API.  You are also logged out so some of the API end-points can't be
+accessed. To quickly test the API, you can invoke this example script which
+uses curl to do a signup and insert a new movie in the database:
+
+    ./test/quick.sh
+
+For a serious setup you want to have full PostgreSQL. Do the setup like this:
+
+    # download latest postgresql version 12.x
+    docker pull postgres:12
+
+    # create + start a postgres instance - use your own db + password!
+    # the params here must match the ones in conf/server-config.json
+    docker run -d --name pos-restpie -p 5432:5432 -e POSTGRES_DB=tmdb -e POSTGRES_USER=tm -e POSTGRES_PASSWORD=MY_PASSWORD postgres:12
+
+    # activate the uuid extension
+    docker exec -it pos-restpie psql -U tm -d tmdb -c 'create extension "uuid-ossp"'
+
+    # and then in server-config.json
+    # set PYSRV_DATABASE_HOST (see PYSRV_DATABASE_HOST_POSTGRESQL)
+    docker run -d --name pos-restpie -p 5432:5432 -e POSTGRES_DB=tmdb -e POSTGRES_USER=tm -e POSTGRES_PASSWORD=eneas postgres:12
+
+To start these docker instances, invoke:
     sudo docker start redis
     sudo docker start pos-restapi_sen4farming
     sudo docker start restpie-dev
-To stop API:
+To stop these docker instances, invoke:
     docker stop redis
     docker stop pos-restpie
     docker stop restpie-dev

@@ -43,7 +43,7 @@ jobs:
           java-version: 21
           distribution: 'zulu'
           cache: 'maven'
-          cache-dependency-path: './ReservApp/pom.xml'
+          cache-dependency-path: './webapp/pom.xml'
       
       - name: Cache Maven packages
         uses: actions/cache@v4
@@ -63,13 +63,13 @@ jobs:
         with:
           fetch-depth: 0
       
-      - name: Set up JDK 21
+      - name: Set up JDK 19
         uses: actions/setup-java@v4
         with:
-          java-version: 21
+          java-version: 19
           distribution: 'zulu'
           cache: 'maven'
-          cache-dependency-path: './ReservApp/pom.xml'
+          cache-dependency-path: './webapp/pom.xml'
       
       - name: Restore Maven cache
         uses: actions/cache@v4

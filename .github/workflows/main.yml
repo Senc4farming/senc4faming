@@ -79,15 +79,15 @@ jobs:
           restore-keys: ${{ runner.os }}-m2
       
       - name: Clean and build (skip tests requiring DB)
-        run: cd ReservApp && mvn clean install -DskipTests
+        run: cd webapp && mvn clean install -DskipTests
       
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: build-artifacts
           path: |
-            ReservApp/target/
-            !ReservApp/target/dependency-check/
+            webapp/target/
+            !webapp/target/dependency-check/
           retention-days: 1
 
   # Job 4: Configuración de caché SonarQube
@@ -135,7 +135,7 @@ jobs:
           java-version: 21
           distribution: 'zulu'
           cache: 'maven'
-          cache-dependency-path: './ReservApp/pom.xml'
+          cache-dependency-path: './webapp/pom.xml'
       
       - name: Restore Maven cache
         uses: actions/cache@v4
@@ -155,16 +155,16 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: build-artifacts
-          path: ReservApp/target/
+          path: webapp/target/
       
       - name: Build and analyze with SonarQube (includes tests)
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           mvn -B clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
-            -Dsonar.projectKey=ReservApp \
+            -Dsonar.projectKey=walgreen \
             -Dsonar.branch.name=main
-        working-directory: ./ReservApp
+        working-directory: ./webapp
 
   # Job 6: Reporte final (opcional)
   report:

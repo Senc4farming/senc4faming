@@ -1,17 +1,17 @@
 TFG-ReservApp
 =================================================
 [![CI](https://github.com/Senc4farming/senc4faming/actions/workflows/maven.yml/badge.svg)](https://github.com/Senc4farming/senc4faming/actions/workflows/maven.yml)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=walgreen&metric=alert_status&token=e4b031bbfe58f2fd43281031c769da93e80c6bd2)](https://sonarcloud.io/summary/overall?id=ReservApp)
-[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=ReservApp&metric=security_rating&token=e4b031bbfe58f2fd43281031c769da93e80c6bd2)](https://sonarcloud.io/summary/overall?id=ReservApp)
-[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=ReservApp&metric=reliability_rating&token=e4b031bbfe58f2fd43281031c769da93e80c6bd2)](https://sonarcloud.io/summary/overall?id=ReservApp)
-[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=ReservApp&metric=sqale_rating&token=e4b031bbfe58f2fd43281031c769da93e80c6bd2)](https://sonarcloud.io/summary/overall?id=ReservApp)
-[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=ReservApp&metric=vulnerabilities&token=e4b031bbfe58f2fd43281031c769da93e80c6bd2)](https://sonarcloud.io/summary/overall?id=ReservApp)
-[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=ReservApp&metric=ncloc&token=e4b031bbfe58f2fd43281031c769da93e80c6bd2)](https://sonarcloud.io/summary/overall?id=ReservApp)
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=ReservApp&metric=coverage&token=e4b031bbfe58f2fd43281031c769da93e80c6bd2)](https://sonarcloud.io/summary/overall?id=ReservApp)
-[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=ReservApp&metric=bugs&token=e4b031bbfe58f2fd43281031c769da93e80c6bd2)](https://sonarcloud.io/summary/overall?id=ReservApp)
-[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=ReservApp&metric=code_smells&token=e4b031bbfe58f2fd43281031c769da93e80c6bd2)](https://sonarcloud.io/summary/overall?id=ReservApp)
-[![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=ReservApp&metric=duplicated_lines_density&token=e4b031bbfe58f2fd43281031c769da93e80c6bd2)](https://sonarcloud.io/summary/overall?id=ReservApp)
-[![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=ReservApp&metric=sqale_index&token=e4b031bbfe58f2fd43281031c769da93e80c6bd2)](https://sonarcloud.io/summary/overall?id=ReservApp)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=walgreen&metric=alert_status&token=e4b031bbfe58f2fd43281031c769da93e80c6bd2)](https://sonarcloud.io/summary/overall?id=walgreen)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=ReservApp&metric=security_rating&token=e4b031bbfe58f2fd43281031c769da93e80c6bd2)](https://sonarcloud.io/summary/overall?id=walgreen)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=ReservApp&metric=reliability_rating&token=e4b031bbfe58f2fd43281031c769da93e80c6bd2)](https://sonarcloud.io/summary/overall?id=walgreen)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=ReservApp&metric=sqale_rating&token=e4b031bbfe58f2fd43281031c769da93e80c6bd2)](https://sonarcloud.io/summary/overall?id=walgreen)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=ReservApp&metric=vulnerabilities&token=e4b031bbfe58f2fd43281031c769da93e80c6bd2)](https://sonarcloud.io/summary/overall?id=walgreen)
+[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=ReservApp&metric=ncloc&token=e4b031bbfe58f2fd43281031c769da93e80c6bd2)](https://sonarcloud.io/summary/overall?id=walgreen)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=ReservApp&metric=coverage&token=e4b031bbfe58f2fd43281031c769da93e80c6bd2)](https://sonarcloud.io/summary/overall?id=walgreen)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=ReservApp&metric=bugs&token=e4b031bbfe58f2fd43281031c769da93e80c6bd2)](https://sonarcloud.io/summary/overall?id=walgreen)
+[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=ReservApp&metric=code_smells&token=e4b031bbfe58f2fd43281031c769da93e80c6bd2)](https://sonarcloud.io/summary/overall?id=walgreen)
+[![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=ReservApp&metric=duplicated_lines_density&token=e4b031bbfe58f2fd43281031c769da93e80c6bd2)](https://sonarcloud.io/summary/overall?id=walgreen)
+[![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=ReservApp&metric=sqale_index&token=e4b031bbfe58f2fd43281031c769da93e80c6bd2)](https://sonarcloud.io/summary/overall?id=walgreen)
 
 WALGREEN
 =============================================
@@ -315,15 +315,15 @@ secondary in nature and does not belong to the master database).
 The module [red.py](py/red.py) provides simple methods for using Redis:
 
 ```python
-    # store a value into Redis (here value is a dict but can be anything)
-    value = {"type":"cat", "name":"Sophia"}
-    red.set_keyval("mykey", value)
+# store a value into Redis (here value is a dict but can be anything)
+value = {"type":"cat", "name":"Sophia"}
+red.set_keyval("mykey", value)
 
-    # get a value
-    value = red.get_keyval("mykey")
+# get a value
+value = red.get_keyval("mykey")
 
-    # store a value that will expire/disappear after 70 minutes:
-    red.set_keyval("cron_calculation_cache", value, 70*60)
+# store a value that will expire/disappear after 70 minutes:
+red.set_keyval("cron_calculation_cache", value, 70*60)
 ```
 
 To append data into a list:
@@ -377,11 +377,11 @@ every hour or every night. uwsgi has an easy built-in support for crons. To
 have a nightly task you simple code:
 
 ```python
-    @cron(0,2,-1,-1,-1)
-    #(minute, hour, day, month, weekday) - in server local time
-    def daily(num):
-        """Runs every night at 2:00AM."""
-        #...code here...
+@cron(0,2,-1,-1,-1)
+#(minute, hour, day, month, weekday) - in server local time
+def daily(num):
+    """Runs every night at 2:00AM."""
+    #...code here...
 ```
 
 

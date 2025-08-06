@@ -51,7 +51,7 @@
                             <td th:text="${elemento.pointid}"></td>
                             <td th:text="${#numbers.formatDecimal(elemento.reflectance, 1, 4, 'COMMA')}"></td>
                             <td th:text="${elemento.band}"></td>
-                            <td th:text="${elemento.survey_date}"></td>
+                            <td th:text="${elemento.getSurveyDate}"></td>
                             <td th:text="${elemento.oc}"></td>
                             <td style="display:none" th:text="${elemento.id}"></td>
                         </tr>

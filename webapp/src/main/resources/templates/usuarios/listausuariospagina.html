@@ -30,11 +30,11 @@
                         <td th:text="${elemento.nombreUsuario}"></td>
                         <td th:text="${elemento.email}"></td>
                         <td  sec:authorize="hasRole('ADMIN')" >
-                            <button th:if="${elemento.active == 'true'}" type="submit"  class="btn btn-success"  value="habilitar"
-                                    th:text="#{general.habilitar}"
-                                    th:formaction="'/usuarios/'+ ${elemento.id} +'/deshabilitar'"></button>
-                            <button th:unless="${elemento.active  == 'true'}" type="submit"  class="btn btn-success"  value="deshabilitar"
+                            <button th:if="${elemento.active == 'true'}" type="submit"  class="btn btn-success"  value="deshabilitar"
                                     th:text="#{general.deshabilitar}"
+                                    th:formaction="'/usuarios/'+ ${elemento.id} +'/habilitar'"></button>
+                            <button th:unless="${elemento.active  == 'true'}" type="submit"  class="btn btn-success"  value="habilitar"
+                                    th:text="#{general.habilitar}"
                                     th:formaction="'/usuarios/'+ ${elemento.id} +'/habilitar'"></button>
                         </td>
                         <td>

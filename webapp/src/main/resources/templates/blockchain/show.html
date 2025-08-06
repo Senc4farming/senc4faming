@@ -1,0 +1,52 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sd="http://www.w3.org/1999/xhtml" xmlns:h1th="http://www.w3.org/1999/html"
+      layout:decorate="~{/layout/layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>Blockchain</title>
+</head>
+<body>
+    <div layout:fragment="cabecera">
+        Ejemplo blockchain
+    </div>
+    <div layout:fragment="contenido" >
+        <div class="alert" th:classappend="${valida} ? 'alert-success' : 'alert-danger'" role="alert">
+            <strong th:text="${valida} ? '✅ La cadena es válida' : '❌ La cadena ha sido alterada'"></strong>
+        </div>
+        <div class="mb-4">
+            <form th:action="@{/blockchain/agregar}" method="post" class="row g-3">
+                <div class="col-md-9">
+                    <input type="text" name="datos" class="form-control" placeholder="Datos del nuevo bloque..." required>
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-success w-100">Agregar bloque</button>
+                </div>
+            </form>
+        </div>
+        <div class="accordion" id="blockchainAccordion">
+            <div th:each="bloque, iterStat : ${blockchain}" class="accordion-item">
+                <h2 class="accordion-header" th:id="'heading' + ${iterStat.index}">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                            th:attr="data-bs-target='#collapse' + ${iterStat.index}"
+                            th:attrappend="aria-controls='collapse' + ${iterStat.index}"
+                            aria-expanded="false">
+                        Bloque [[${iterStat.index}]]
+                    </button>
+                </h2>
+                <div class="accordion-collapse collapse"
+                     th:id="'collapse' + ${iterStat.index}"
+                     th:attr="aria-labelledby='heading' + ${iterStat.index}"
+                     data-bs-parent="#blockchainAccordion">
+                    <div class="accordion-body">
+                        <strong>Hash:</strong> [[${bloque.hash}]]<br>
+                        <strong>Hash Anterior:</strong> [[${bloque.hashAnterior}]]<br>
+                        <strong>Datos:</strong> [[${bloque.getdatosbyte()}]]
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>

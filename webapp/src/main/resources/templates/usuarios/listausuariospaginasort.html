@@ -1,0 +1,155 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sd="http://www.w3.org/1999/xhtml"
+      xmlns:sec="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{/layout/layout}">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{usuarios.list.title}"></title>
+    <script type="text/javascript">
+        function changePageSize() {
+            $("#userform").submit();
+        }
+    </script>
+</head>
+<body>
+<div layout:fragment="cabecera">
+    <h1 th:text="#{usuarios.list.title}"></h1>
+</div>
+<div layout:fragment="contenido">
+    <div class="box-body">
+        Show <span sd:page-size-selector="javascript"></span> entries
+
+        <form action="#" th:action="@{/usuariossort}"  id="userform">
+            <div class="row d-flex">
+                <div class="col-md-6 mt-2">
+                    <div class="search">
+                        <i class="fa fa-search"></i>
+                        <input id="keyword" type="search" name="keyword" th:value="${keyword}" required class="form-control"
+                               placeholder="Enter keyword">
+                        <button type="submit" class="btn btn-secondary">Search</button>
+                    </div>
+                </div>
+                <div class="col-md-3 input-group mt-2">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="pageSize">Items per page:</label>
+                    </div>
+                    <select form="userform" name="size" th:value="${pageSize}" onchange="changePageSize()" class="size-select"
+                            id="pageSize">
+                        <option th:each="s : ${ {3, 6, 9} }" th:value="${s}" th:text="${s}" th:selected="${s == pageSize}"></option>
+                    </select>
+                </div>
+                <div class="col-md-1 mt-2">
+                    <button id="btnClear" class="btn btn-info">Clear</button>
+                </div>
+            </div>
+            <div id="tableusers" class="table-responsive">
+            <!-- Opcion 1 : tabla con contenido ( recomandable en caso de listas-->
+                <table class="table table-bordered table-hover">
+                    <tr>
+                        <th th:replace="~{fragments/sort :: sorting('nombreUsuario',#{usuarios.list.Usuario})}"></th>
+                        <th th:replace="~{fragments/sort :: sorting('email',#{usuarios.list.email})}"></th>
+                        <th id="enable" sec:authorize="hasRole('ADMIN')" th:text="#{usuarios.list.enable}"></th>
+                        <th>&nbsp</th>
+                        <th id="action" th:text="#{usuarios.list.action}"></th>
+                    </tr>
+                    <tr th:each="elemento , posicion : ${listausuarios}">
+                        <td th:text="${elemento.nombreUsuario}"></td>
+                        <td th:text="${elemento.email}"></td>
+                        <td  sec:authorize="hasRole('ADMIN')" >
+                            <button th:if="${elemento.active == 'true'}" type="submit"  class="btn btn-success"  value="deshabilitar"
+                                    th:text="#{general.deshabilitar}"
+                                    th:formaction="'/usuarios/'+ ${elemento.id} +'/habilitar'"></button>
+                            <button th:unless="${elemento.active  == 'true'}" type="submit"  class="btn btn-success"  value="habilitar"
+                                    th:text="#{general.habilitar}"
+                                    th:formaction="'/usuarios/'+ ${elemento.id} +'/habilitar'"></button>
+                        </td>
+                        <td>
+                            <!-- meter un link para ver  con texto "ver"-->
+                            <a th:href="@{'/usuarios/'+ ${elemento.id}}"
+                               th:text="#{general.detalles}"></a>
+                        </td>
+                        <td>
+                            <!-- meter un boton para borrar  con un boton-->
+                            <button type="submit" value="Eliminar" class="btn btn-success"
+                                    th:text="#{general.eliminar}"
+                                    th:formaction="'/usuarios/'+ ${elemento.id} +'/delete'"></button>
+                        </td>
+                    </tr>
+                    <!--Mostramos una ultima fila con inormación cuando no hay registros -->
+                    <tr th:if="${listausuarios ==null or  listausuarios.empty}">
+                        <td colspan="13" class="text-center">No hay usuarios</td>
+                    </tr>
+                </table>
+            </div>
+        </form>
+    </div>
+    <!-- preparamos el div para poner los numeros de pagina-->
+    <div  th:if="${listausuarios!=null and !listausuarios.empty}" >
+        <div class="text-center">
+            <nav>
+                <ul class="pagination justify-content-center">
+                    <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
+                        <a th:replace="fragments/paging :: paging(1, '<<', 'First Page')"></a>
+                    </li>
+                    <li class="page-item font-weight-bold" th:classappend="${currentPage == 1} ? 'disabled'">
+                        <a th:replace="fragments/paging :: paging(${currentPage - 1}, 'Prev', 'Previous Page')"></a>
+                    </li>
+                    <li class="page-item disabled" th:if="${currentPage - 2 > 1}">
+                        <a class="page-link" href="#">...</a>
+                    </li>
+                    <li class="page-item" th:classappend="${page == currentPage} ? 'active'"
+                        th:each="page : ${#numbers.sequence(currentPage > 2 ? currentPage - 2 : 1, currentPage + 2 < totalPages ? currentPage + 2 : totalPages)}">
+                        <a th:replace="fragments/paging :: paging(${page}, ${page}, 'Page ' + ${page})"></a>
+                    </li>
+                    <li class="page-item disabled" th:if="${currentPage + 2 < totalPages}">
+                        <a class="page-link" href="#">...</a>
+                    </li>
+                    <li class="page-item font-weight-bold" th:classappend="${currentPage == totalPages} ? 'disabled'">
+                        <a th:replace="fragments/paging :: paging(${currentPage + 1},'Next', 'Next Page')"></a>
+                    </li>
+                    <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
+                        <a th:replace="fragments/paging :: paging(${totalPages}, '>>', 'Last Page')"></a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+<div layout:fragment="turorial">
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            let steps = [{
+                title: "WALGREEN",
+                intro: "Welcome to user's list tutorial."
+            },
+                {
+                    element: '#tableusers',
+                    intro: "User's list is shown with main users details and 2 actions, Enable/disable and Delete"
+                },
+                {
+                    element: '#enable',
+                    intro: "For each user, if is disable 'Enable' button will be shown, if enable 'Disable' button will be shown."
+                },
+                {
+                    element: '#action',
+                    intro: "Despite of it is not recommended, a user can be deleted."
+                }
+            ];
+
+            document.getElementById('inicio_tutorial').addEventListener('click', function () {
+                this.style.animation = "none";
+                introJs().setOptions({
+                    steps: steps,
+                    'nextLabel': "Next",
+                    'prevLabel': "Previous",
+                    'doneLabel': "Done",
+                }).start();
+            });
+        });
+
+    </script>
+</div>
+</body>
+</html>
+

@@ -1,0 +1,34 @@
+package com.example.senc4farming.repository;
+
+
+import com.example.senc4farming.model.Usuario;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
+import java.util.Optional;
+
+public interface UsuarioRepository extends JpaRepository<Usuario,Integer> {
+
+    @Query("Select count(id) from Usuario where email= ?1 and password = ?2")
+    Integer repValidarPassword(String email, String password);
+
+    Usuario findUsuarioByNombreUsuarioIs(String name);
+    Usuario findByEmailAndActiveTrue(String name);
+
+    Usuario findByNombreUsuarioAndActiveTrue(String name);
+
+
+
+    Optional<Usuario> findUsuarioByEmailAndActiveTrue(String email);
+    Optional<Usuario> findUsuarioByEmailAndTokenAndActiveTrue(String email,String token);
+    Usuario findUsuarioByEmailAndPassword(String email, String password);
+
+
+    //Definir metodo aparte
+    Page<Usuario>  findUsuarioByEmailLike (String email,Pageable pageable);
+
+    Usuario findUsuarioByNombreUsuario(String s);
+
+}

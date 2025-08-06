@@ -2,16 +2,16 @@ TFG-ReservApp
 =================================================
 [![CI](https://github.com/Senc4farming/senc4faming/actions/workflows/maven.yml/badge.svg)](https://github.com/Senc4farming/senc4faming/actions/workflows/maven.yml)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=walgreen&metric=alert_status&token=e4b031bbfe58f2fd43281031c769da93e80c6bd2)](https://sonarcloud.io/summary/overall?id=walgreen)
-[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=ReservApp&metric=security_rating&token=e4b031bbfe58f2fd43281031c769da93e80c6bd2)](https://sonarcloud.io/summary/overall?id=walgreen)
-[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=ReservApp&metric=reliability_rating&token=e4b031bbfe58f2fd43281031c769da93e80c6bd2)](https://sonarcloud.io/summary/overall?id=walgreen)
-[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=ReservApp&metric=sqale_rating&token=e4b031bbfe58f2fd43281031c769da93e80c6bd2)](https://sonarcloud.io/summary/overall?id=walgreen)
-[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=ReservApp&metric=vulnerabilities&token=e4b031bbfe58f2fd43281031c769da93e80c6bd2)](https://sonarcloud.io/summary/overall?id=walgreen)
-[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=ReservApp&metric=ncloc&token=e4b031bbfe58f2fd43281031c769da93e80c6bd2)](https://sonarcloud.io/summary/overall?id=walgreen)
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=ReservApp&metric=coverage&token=e4b031bbfe58f2fd43281031c769da93e80c6bd2)](https://sonarcloud.io/summary/overall?id=walgreen)
-[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=ReservApp&metric=bugs&token=e4b031bbfe58f2fd43281031c769da93e80c6bd2)](https://sonarcloud.io/summary/overall?id=walgreen)
-[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=ReservApp&metric=code_smells&token=e4b031bbfe58f2fd43281031c769da93e80c6bd2)](https://sonarcloud.io/summary/overall?id=walgreen)
-[![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=ReservApp&metric=duplicated_lines_density&token=e4b031bbfe58f2fd43281031c769da93e80c6bd2)](https://sonarcloud.io/summary/overall?id=walgreen)
-[![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=ReservApp&metric=sqale_index&token=e4b031bbfe58f2fd43281031c769da93e80c6bd2)](https://sonarcloud.io/summary/overall?id=walgreen)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=walgreen&metric=security_rating&token=e4b031bbfe58f2fd43281031c769da93e80c6bd2)](https://sonarcloud.io/summary/overall?id=walgreen)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=walgreen&metric=reliability_rating&token=e4b031bbfe58f2fd43281031c769da93e80c6bd2)](https://sonarcloud.io/summary/overall?id=walgreen)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=walgreen&metric=sqale_rating&token=e4b031bbfe58f2fd43281031c769da93e80c6bd2)](https://sonarcloud.io/summary/overall?id=walgreen)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=walgreen&metric=vulnerabilities&token=e4b031bbfe58f2fd43281031c769da93e80c6bd2)](https://sonarcloud.io/summary/overall?id=walgreen)
+[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=walgreen&metric=ncloc&token=e4b031bbfe58f2fd43281031c769da93e80c6bd2)](https://sonarcloud.io/summary/overall?id=walgreen)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=walgreen&metric=coverage&token=e4b031bbfe58f2fd43281031c769da93e80c6bd2)](https://sonarcloud.io/summary/overall?id=walgreen)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=walgreen&metric=bugs&token=e4b031bbfe58f2fd43281031c769da93e80c6bd2)](https://sonarcloud.io/summary/overall?id=walgreen)
+[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=walgreen&metric=code_smells&token=e4b031bbfe58f2fd43281031c769da93e80c6bd2)](https://sonarcloud.io/summary/overall?id=walgreen)
+[![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=walgreen&metric=duplicated_lines_density&token=e4b031bbfe58f2fd43281031c769da93e80c6bd2)](https://sonarcloud.io/summary/overall?id=walgreen)
+[![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=walgreen&metric=sqale_index&token=e4b031bbfe58f2fd43281031c769da93e80c6bd2)](https://sonarcloud.io/summary/overall?id=walgreen)
 
 WALGREEN
 =============================================

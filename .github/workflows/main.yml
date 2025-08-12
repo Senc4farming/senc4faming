@@ -102,7 +102,7 @@ jobs:
           path: ~/.sonar/cache
           key: ${{ needs.setup.outputs.cache-key-sonar }}
           restore-keys: ${{ runner.os }}-sonar
-  # Job 5: Análisis de código con SonarQube
+  # Job 4.99: check_vars
   check_vars:
     environment: desarrollo
     name: check vars
@@ -111,10 +111,10 @@ jobs:
       MYSQLDB_LOCAL_PORT: ${{ vars.MYSQLDB_LOCAL_PORT }}
       MYSQLDB_DOCKER_PORT: ${{ vars.MYSQLDB_DOCKER_PORT }}
     steps:
-      - name: Port values
-        run: echo "MYSQLDB_LOCAL_PORT is ${{ vars.MYSQLDB_LOCAL_PORT }}"
-      - name: Port values
-        run: echo "MYSQLDB_DOCKER_PORT is ${{ vars.MYSQLDB_DOCKER_PORT }}"
+      - name: Port values MYSQLDB_LOCAL_PORT
+        run: echo "MYSQLDB_LOCAL_PORT is ${{ env.MYSQLDB_LOCAL_PORT }}"
+      - name: Port values MYSQLDB_DOCKER_PORT
+        run: echo "MYSQLDB_DOCKER_PORT is ${{ env.MYSQLDB_DOCKER_PORT }}"
   # Job 5: Análisis de código con SonarQube
   sonar-analysis:
     environment: desarrollo

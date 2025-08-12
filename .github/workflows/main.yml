@@ -105,14 +105,18 @@ jobs:
 
   # Job 5: Análisis de código con SonarQube
   sonar-analysis:
+    environment: desarrollo
     name: SonarQube Code Analysis
     runs-on: ubuntu-latest
+    env:
+      MYSQLDB_LOCAL_PORT: ${{ vars.MYSQLDB_LOCAL_PORT }}
+      MYSQLDB_DOCKER_PORT: ${{ vars.MYSQLDB_DOCKER_PORT }}
     needs: [setup, build, sonar-cache-setup]
     services:
       mysql:
         image: mysql:8.4.5
         ports:
-          - 3306:3306
+          - $MYSQLDB_DOCKER_PORT:$MYSQLDB_LOCAL_PORT
         env:
           MYSQL_ROOT_PASSWORD: ${{ vars.MYSQL_ROOT_PASSWORD }}
           MYSQL_DATABASE: ${{ vars.MYSQL_DATABASE }}

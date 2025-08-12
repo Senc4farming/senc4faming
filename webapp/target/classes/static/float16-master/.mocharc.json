@@ -1,6 +1,0 @@
-{
-  "require": [
-    "source-map-support/register",
-    "./test/lib/setup"
-  ]
-}

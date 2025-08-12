@@ -111,12 +111,18 @@ jobs:
     env:
       MYSQLDB_LOCAL_PORT: ${{ vars.MYSQLDB_LOCAL_PORT }}
       MYSQLDB_DOCKER_PORT: ${{ vars.MYSQLDB_DOCKER_PORT }}
+    steps:
+      - name: Port values
+        run: echo "MYSQLDB_LOCAL_PORT is ${{ vars.MYSQLDB_LOCAL_PORT }}"
+        
+      
+      
     needs: [setup, build, sonar-cache-setup]
     services:
       mysql:
         image: mysql:8.4.5
         ports:
-          - $MYSQLDB_DOCKER_PORT:$MYSQLDB_LOCAL_PORT
+          - ${{ vars.MYSQLDB_DOCKER_PORT }}:${{ vars.MYSQLDB_LOCAL_PORT }}
         env:
           MYSQL_ROOT_PASSWORD: ${{ vars.MYSQL_ROOT_PASSWORD }}
           MYSQL_DATABASE: ${{ vars.MYSQL_DATABASE }}

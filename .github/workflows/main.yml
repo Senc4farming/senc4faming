@@ -112,7 +112,7 @@ jobs:
       mysql:
         image: mysql:8.0.2
         ports:
-          - ${{ vars.MYSQLDB_LOCAL_PORT }}:${{ vars.MYSQLDB_DOCKER_PORT }}
+          - 3306:3306
         env:
           MYSQL_ROOT_PASSWORD: ${{ vars.MYSQL_ROOT_PASSWORD }}
           MYSQL_DATABASE: ${{ vars.MYSQL_DATABASE }}

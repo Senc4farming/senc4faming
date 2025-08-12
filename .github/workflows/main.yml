@@ -41,7 +41,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: 17
-          distribution: 'Amazon Corretto'
+          distribution: 'Zulu'
           cache: 'maven'
           cache-dependency-path: './webapp/pom.xml'
       

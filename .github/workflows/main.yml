@@ -110,7 +110,7 @@ jobs:
     needs: [setup, build, sonar-cache-setup]
     services:
       mysql:
-        image: mysql:8.0.2
+        image: mysql:8.4.5
         ports:
           - 3306:3306
         env:

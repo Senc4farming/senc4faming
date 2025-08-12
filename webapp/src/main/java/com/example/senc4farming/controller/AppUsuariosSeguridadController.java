@@ -71,7 +71,7 @@ public class AppUsuariosSeguridadController extends AbstractController <UsuarioD
             String encodedPasswod = userService.getEncodedPassword(usuario);
             usuarioDtoPsw.setPassword(encodedPasswod);
             //Se anulan los grupos
-            usuarioDtoPsw.setGrupoTrabajo(this.grupoService.buscar(1).get());
+            usuarioDtoPsw.setGrupoTrabajo(this.grupoService.buscarSinOpt(1));
             //El usuario se guarda como no autorizado
             //Guardo la password
             try {

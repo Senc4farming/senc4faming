@@ -143,6 +143,13 @@ def guardardatosbusquedaSentinel(df,table,idpeticion,userid, groupid):
 
   
 def descargarzip(uuid):
+    THRESHOLD_ENTRIES = 10000
+    THRESHOLD_SIZE = 1000000000
+    THRESHOLD_RATIO = 10
+
+    totalSizeArchive = 0;
+    totalEntryArchive = 0;
+
     #eliminamos todos los archivos antes de descargar
     print('En descargarzip entrada:' + uuid )
     source = srvconf['PYSRV_SRC_ROOT_DATA_DIR' ]
@@ -170,8 +177,6 @@ def descargarzip(uuid):
 
 
     #zip file with folder
-    zipfilestr = "/"
-    basename = "1"
     for file in os.listdir(source):
         if os.path.isfile(os.path.join(source, file)):
             zipfilestr = source + "/" +  file
@@ -182,11 +187,45 @@ def descargarzip(uuid):
                     print('Already extracted')
                 else:
                     zipf = zipfile.ZipFile(zipfilestr)
-                    zipf.extractall(data_safe)
-                    print("Extracting Done")
+                    secureZip = 1
+                    for zinfo in zipf.infolist():
+                        print('File', zinfo.filename)
+                        data = zipf.read(zinfo)
+
+                        totalEntryArchive += 1
+
+                        totalSizeArchive = totalSizeArchive + len(data)
+                        ratio = len(data) / zinfo.compress_size
+                        if ratio > THRESHOLD_RATIO:
+                            # ratio between compressed and uncompressed data is highly suspicious, looks like a Zip Bomb Attack
+                            secureZip = 0
+                            break
+
+                        if totalSizeArchive > THRESHOLD_SIZE:
+                            # the uncompressed data size is too much for the application resource capacity
+                            secureZip = 0
+                            break
+
+                        if totalEntryArchive > THRESHOLD_ENTRIES:
+                            # too much entries in this archive, can lead to inodes exhaustion of the system
+                            secureZip = 0
+                            break
+                    if secureZip == 1:
+                        zipf.extractall(data_safe)
+                        print("Extracting Done")
+                    else:
+                        print("Extracting Not Done")
+                    zipf.close()
     return dicthub
 
 def descomprimirzip(uuid):
+    THRESHOLD_ENTRIES = 10000
+    THRESHOLD_SIZE = 1000000000
+    THRESHOLD_RATIO = 10
+
+    totalSizeArchive = 0;
+    totalEntryArchive = 0;
+
     print('En descomprimirzip entrada:' + uuid )
     #eliminamos todos los archivos antes de descargar
 
@@ -209,8 +248,35 @@ def descomprimirzip(uuid):
                 print('Already extracted')
             else:
                 zipf = zipfile.ZipFile(zipfilestr)
-                zipf.extractall(data_safe)
-                print("Extracting Done")
+                secureZip = 1
+                for zinfo in zipf.infolist():
+                    print('File', zinfo.filename)
+                    data = zipf.read(zinfo)
+
+                    totalEntryArchive += 1
+
+                    totalSizeArchive = totalSizeArchive + len(data)
+                    ratio = len(data) / zinfo.compress_size
+                    if ratio > THRESHOLD_RATIO:
+                        # ratio between compressed and uncompressed data is highly suspicious, looks like a Zip Bomb Attack
+                        secureZip = 0
+                        break
+
+                    if totalSizeArchive > THRESHOLD_SIZE:
+                        # the uncompressed data size is too much for the application resource capacity
+                        secureZip = 0
+                        break
+
+                    if totalEntryArchive > THRESHOLD_ENTRIES:
+                        # too much entries in this archive, can lead to inodes exhaustion of the system
+                        secureZip = 0
+                        break
+                if secureZip == 1:
+                    zipf.extractall(data_safe)
+                    print("Extracting Done")
+                else:
+                    print("Extracting Not Done")
+                zipf.close()
     print('end list files')
 
     return 1

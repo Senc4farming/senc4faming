@@ -33,7 +33,7 @@ public class DatosLucas2018 {
     @Column
     private String band;
     @Column
-    private String survey_date;
+    private String surveyDate;
     @Column
     private String oc;
 }

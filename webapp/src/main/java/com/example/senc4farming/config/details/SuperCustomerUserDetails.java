@@ -32,10 +32,10 @@ public class SuperCustomerUserDetails implements UserDetails {
     private String password;
     private String tokenjwt;
 
-    private String coper_username;
-    private String coper_password;
-    private String coper_client_id;
-    private String coper_client_secret;
+    private String coperUsername;
+    private String coperPassword;
+    private String coperClientId;
+    private String coperClientSecret;
     private Integer userID;
 
     private boolean isActive=true;
@@ -50,7 +50,7 @@ public class SuperCustomerUserDetails implements UserDetails {
     private Usuario usuario;
 
     // Carrito
-    List<GrupoTrabajo> grupos = new ArrayList<>();
+    private List<GrupoTrabajo> grupos = new ArrayList<>();
     //Permisos
     private Collection<? extends GrantedAuthority> authorities;
 

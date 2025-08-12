@@ -33,11 +33,11 @@ public class STOMPMessageController {
     /**
      * The Simp messaging template.
      */
-    @Autowired
+
     SimpMessagingTemplate simpMessagingTemplate;
-    @Autowired
+
     MessagingService messagingService;
-    @Autowired
+
     NotificacionRepositorio notificacionRepositorio;
 
     private final  UsuarioServiceFacade service;
@@ -72,14 +72,14 @@ public class STOMPMessageController {
                 message.getTo(),
                 "/specific",
                 message,
-                createHeaders(message.getTo(),
+                createHeaders(
                         String.valueOf(notificacion.getId()))
         );
         log.info("Mensaje enviado a: " + message.getTo());
         log.info("Notificación creada con ID: " + notificacion.getId());
     }
 
-    private MessageHeaders createHeaders(String recipient, String notificationID) {
+    private MessageHeaders createHeaders(String notificationID) {
         SimpMessageHeaderAccessor headerAccessor = SimpMessageHeaderAccessor.create(SimpMessageType.MESSAGE);
         headerAccessor.addNativeHeader("notificationID",notificationID);
         return headerAccessor.getMessageHeaders();

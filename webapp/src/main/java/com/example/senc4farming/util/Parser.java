@@ -100,14 +100,11 @@ public class Parser {
      */
     private boolean checkKMZ() throws IOException {
 
-        try( RandomAccessFile raf = new RandomAccessFile(file, "r"); ) {
 
+            RandomAccessFile raf = new RandomAccessFile(file, "r");
             Integer n = raf.readInt();
 
             return (validKMZsignatures.contains(n));
-        } catch (IOException e) {
-            throw e ;
-        }
     }
 
     /**

@@ -14,16 +14,16 @@ public final class DateFormat {
 
     }
 
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
-    private static  final SimpleDateFormat DATE_FORMAT_1 = new SimpleDateFormat("dd/MM/yyyy");
-    private  static  final SimpleDateFormat DATE_TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private static final SimpleDateFormat dateFormat0= new SimpleDateFormat("yyyy-MM-dd");
+    private static final SimpleDateFormat dateFormat1 = new SimpleDateFormat("dd/MM/yyyy");
+    private static final SimpleDateFormat dateFormat2 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-    private static final SimpleDateFormat DATE_TIME_FORMAT_ZULU = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSS'Z'");
+    private static final SimpleDateFormat dateFormat3 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSS'Z'");
 
 
     public static Date parseDate(String date) {
         try {
-            return new Date(DATE_FORMAT.parse(date).getTime());
+            return new Date(dateFormat0.parse(date).getTime());
         } catch (ParseException e) {
             throw new IllegalArgumentException(e);
         }
@@ -31,7 +31,7 @@ public final class DateFormat {
 
     public static Date parseDate1(String date) {
         try {
-            return new Date(DATE_FORMAT_1.parse(date).getTime());
+            return new Date(dateFormat1.parse(date).getTime());
         } catch (ParseException e) {
             throw new IllegalArgumentException(e);
         }
@@ -39,7 +39,7 @@ public final class DateFormat {
 
     public static Timestamp parseTimestamp(String timestamp) {
         try {
-            return new Timestamp(DATE_TIME_FORMAT.parse(timestamp).getTime());
+            return new Timestamp(dateFormat2.parse(timestamp).getTime());
         } catch (ParseException e) {
             throw new IllegalArgumentException(e);
         }
@@ -47,7 +47,7 @@ public final class DateFormat {
 
     public static Date parseDateZulu(String date) {
         try {
-            return new Date(DATE_TIME_FORMAT_ZULU.parse(date).getTime());
+            return new Date(dateFormat3.parse(date).getTime());
         } catch (ParseException e) {
             throw new IllegalArgumentException(e);
         }
@@ -55,7 +55,7 @@ public final class DateFormat {
 
     public static String parseDateZuluStr(String date) {
         try {
-            return DATE_FORMAT_1.format(DATE_TIME_FORMAT_ZULU.parse(date).getTime());
+            return dateFormat1.format(dateFormat3.parse(date).getTime());
         } catch (ParseException e) {
             throw new IllegalArgumentException(e);
         }

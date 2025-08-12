@@ -49,7 +49,7 @@
 
                                                         </option>
                                                         <th:block th:each="roleitem: ${listaRoles}" >
-                                                            <option th:value="${roleitem.id}" th:text="${roleitem.roleName_en}"></option>
+                                                            <option th:value="${roleitem.id}" th:text="${roleitem.getRoleNameEn}"></option>
                                                         </th:block>
 
                                                     </select>
@@ -61,7 +61,7 @@
 
                                                         </option>
                                                         <th:block th:each="roleitem: ${listaRoles}" >
-                                                            <option th:value="${roleitem.id}" th:text="${roleitem.roleName_es}"></option>
+                                                            <option th:value="${roleitem.id}" th:text="${roleitem.getRoleNameEs}"></option>
                                                         </th:block>
 
                                                     </select>
@@ -73,7 +73,7 @@
 
                                                         </option>
                                                         <th:block th:each="roleitem: ${listaRoles}" >
-                                                            <option th:value="${roleitem.id}" th:text="${roleitem.roleName_fr}"></option>
+                                                            <option th:value="${roleitem.id}" th:text="${roleitem.getRoleNameFr}"></option>
                                                         </th:block>
 
                                                     </select>

@@ -40,6 +40,12 @@ public class AppUsuariosController extends AbstractController <UsuarioDto> {
 
     private final AuthenticatedUsersService authenticatedUsersService;
 
+    private static final String STR_ANONIMOUSUSER = "anonymousUser" ;
+    private static final String STR_ANONIMO_ANONIMO = "anonimo@anonimo" ;
+    private static final String STR_MENULIST = "menuList" ;
+    private static final String STR_NO_ENCONTRADO = "usuarios/detallesusuarionoencontrado";
+    private static final String STR_LOGIN= "usuarios/login";
+
     public AppUsuariosController(MenuService menuService, UsuarioServiceFacade service, AuthenticatedUsersService authenticatedUsersService) {
         super(menuService);
         this.service = service;
@@ -48,63 +54,59 @@ public class AppUsuariosController extends AbstractController <UsuarioDto> {
     @GetMapping("/")
     public String vistaHome( ModelMap interfazConPantalla){
 
-        String  userName = "no informado";
-        logger.info(SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString());
+        String  userName = "";
         //Comprobamos si hay usuario logeado
-        if (SecurityContextHolder.getContext().getAuthentication().getPrincipal().equals("anonymousUser")){
-            userName = "anonimo@anonimo";
+        if (SecurityContextHolder.getContext().getAuthentication().getPrincipal().equals(STR_ANONIMOUSUSER )){
+            userName = STR_ANONIMO_ANONIMO ;
         }
         else {
             userName = ((SuperCustomerUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
         }
 
-        interfazConPantalla.addAttribute("menuList", this.menuService.getMenuForEmail(userName));
+        interfazConPantalla.addAttribute(STR_MENULIST, this.menuService.getMenuForEmail(userName));
         return "index";
     }
     @GetMapping("/privacy")
     public String vistaPrivacy( ModelMap interfazConPantalla){
 
-        String  userName = "no informado";
-        logger.info(SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString());
+        String  userName = "";
         //Comprobamos si hay usuario logeado
-        if (SecurityContextHolder.getContext().getAuthentication().getPrincipal().equals("anonymousUser")){
-            userName = "anonimo@anonimo";
+        if (SecurityContextHolder.getContext().getAuthentication().getPrincipal().equals(STR_ANONIMOUSUSER )){
+            userName = STR_ANONIMO_ANONIMO ;
         }
         else {
             userName = ((SuperCustomerUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
         }
 
-        interfazConPantalla.addAttribute("menuList", this.menuService.getMenuForEmail(userName));
+        interfazConPantalla.addAttribute(STR_MENULIST, this.menuService.getMenuForEmail(userName));
         return "privacy";
     }
     @GetMapping("/termsandconditions")
     public String vistaTermAndConditions( ModelMap interfazConPantalla){
 
-        String  userName = "no informado";
-        logger.info(SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString());
+        String  userName = "";
         //Comprobamos si hay usuario logeado
-        if (SecurityContextHolder.getContext().getAuthentication().getPrincipal().equals("anonymousUser")){
-            userName = "anonimo@anonimo";
+        if (SecurityContextHolder.getContext().getAuthentication().getPrincipal().equals(STR_ANONIMOUSUSER )){
+            userName = STR_ANONIMO_ANONIMO ;
         }
         else {
             userName = ((SuperCustomerUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
         }
-        interfazConPantalla.addAttribute("menuList", this.menuService.getMenuForEmail(userName));
+        interfazConPantalla.addAttribute(STR_MENULIST, this.menuService.getMenuForEmail(userName));
         return "termsandconditions";
     }
     @GetMapping("/project")
     public String vistaProject( ModelMap interfazConPantalla){
 
-        String  userName = "no informado";
-        logger.info(SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString());
+        String  userName = "";
         //Comprobamos si hay usuario logeado
-        if (SecurityContextHolder.getContext().getAuthentication().getPrincipal().equals("anonymousUser")){
-            userName = "anonimo@anonimo";
+        if (SecurityContextHolder.getContext().getAuthentication().getPrincipal().equals(STR_ANONIMOUSUSER )){
+            userName = STR_ANONIMO_ANONIMO ;
         }
         else {
             userName = ((SuperCustomerUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
         }
-        interfazConPantalla.addAttribute("menuList", this.menuService.getMenuForEmail(userName));
+        interfazConPantalla.addAttribute(STR_MENULIST, this.menuService.getMenuForEmail(userName));
         return "projectoeuropeo";
     }
     @GetMapping("/usuarios")
@@ -116,8 +118,6 @@ public class AppUsuariosController extends AbstractController <UsuarioDto> {
         //tenemos que leer la lista de usuarios
         //Que elemento me la ofrece?
         //listaUsrTodos
-        //List<UsuarioDto>  lusrdto = this.service.listaUsrTodos();
-        //interfazConPantalla.addAttribute("listausuarios", lusrdto);
         //Obetenemos el objeto Page del servicio
         Integer pagina = 0;
         if (page.isPresent()) {
@@ -157,8 +157,6 @@ public class AppUsuariosController extends AbstractController <UsuarioDto> {
         //tenemos que leer la lista de usuarios
         //Que elemento me la ofrece?
         //listaUsrTodos
-        //List<UsuarioDto>  lusrdto = this.service.listaUsrTodos();
-        //interfazConPantalla.addAttribute("listausuarios", lusrdto);
         //Obetenemos el objeto Page del servicio
         Integer pagina = 0;
         if (page.isPresent()) {
@@ -168,9 +166,7 @@ public class AppUsuariosController extends AbstractController <UsuarioDto> {
         if (size.isPresent()) {
             maxelementos = size.get();
         }
-
-        //Page<UsuarioDto> usuarioDtoPage =
-        //        this.service.buscarTodos(PageRequest.of(pagina,maxelementos,Sort.by(order)));
+        
 
         //Ahora las claves
         Page<UsuarioDto> usuarioDtoPage;
@@ -213,7 +209,7 @@ public class AppUsuariosController extends AbstractController <UsuarioDto> {
             return "usuarios/edit";
         } else{
             //Mostrar página usuario no existe
-            return "usuarios/detallesusuarionoencontrado";
+            return STR_NO_ENCONTRADO;
         }
     }
 
@@ -230,7 +226,7 @@ public class AppUsuariosController extends AbstractController <UsuarioDto> {
             return "redirect:/usuarios";
         } else{
             //Mostrar página usuario no existe
-            return "usuarios/detallesusuarionoencontrado";
+            return STR_NO_ENCONTRADO;
         }
     }
     @PostMapping("/usuarios/{idusr}/habilitar")
@@ -241,16 +237,13 @@ public class AppUsuariosController extends AbstractController <UsuarioDto> {
         //¿Debería comprobar si hay datos?
         if (usuario.isPresent()){
             Usuario attr = usuario.get();
-            if (attr.isActive())
-                attr.setActive(false);
-            else
-                attr.setActive(true);
+            attr.setActive(attr.isActive());
             this.service.getService().getRepo().save(attr);
             //Mostrar listado de usuarios
             return "redirect:/usuarios";
         } else{
             //Mostrar página usuario no existe
-            return "usuarios/detallesusuarionoencontrado";
+            return STR_NO_ENCONTRADO;
         }
     }
 
@@ -280,27 +273,26 @@ public class AppUsuariosController extends AbstractController <UsuarioDto> {
             return String.format("redirect:/usuarios/%s", id);
         } else {
             //Mostrar página usuario no existe
-            return "usuarios/detallesusuarionoencontrado";
+            return STR_NO_ENCONTRADO;
         }
     }
 
     //Controlador de Login
     @GetMapping("/usuarios/login")
     public String vistaLogin(){
-        return "usuarios/login";
+        return STR_LOGIN;
     }
     @PostMapping("/usuarios/login")
     public String validarPasswordPst(@ModelAttribute(name = "loginForm" ) LoginDto loginDto) {
         String usr = loginDto.getUsername();
-        logger.info("usr :" + usr);
+        logger.info("usr :%s" , usr);
         String password = loginDto.getPassword();
-        logger.info("pass :" + password);
         //¿es correcta la password?
         if (service.getService().getRepo().repValidarPassword(usr, service.getPasswordEncoder().encode(password) ) > 0)
         {
             return "index";
         }else {
-            return "usuarios/login";
+            return STR_LOGIN;
         }
     }
 
@@ -314,7 +306,6 @@ public class AppUsuariosController extends AbstractController <UsuarioDto> {
 
             if (usuario.isPresent()) {
                 String token = usuario.get().getToken();
-                logger.info("------------------------- --------------"+ email + " token: "  + token);
 
                 Email correoCambioContrasenia = new Email();
                 correoCambioContrasenia.setFrom("notificaciones@agestturnos.es");
@@ -325,7 +316,6 @@ public class AppUsuariosController extends AbstractController <UsuarioDto> {
                 service.getEmailService().sendMail(correoCambioContrasenia);
 
             } else {
-                email=null;
                 return "redirect:/usuarios/hasOlvidadoTuPassword";
             }
 
@@ -338,7 +328,7 @@ public class AppUsuariosController extends AbstractController <UsuarioDto> {
     @GetMapping("/usuarios/resetpass/{email}/{token}")
     public String cambiopass(@PathVariable("email") String email, @PathVariable("token") String token, ModelMap intefrazConPantalla) {
         Optional<Usuario> usuario = service.getService().getRepo().findUsuarioByEmailAndTokenAndActiveTrue(email,token );
-        logger.info(email + ":" + token );
+        logger.info("email %s : token %s ",email , token );
         UsuarioDtoPsw usuarioCambioPsw = new UsuarioDtoPsw();
 
         if (usuario.isPresent()){
@@ -350,7 +340,7 @@ public class AppUsuariosController extends AbstractController <UsuarioDto> {
         }else {
 
             //Mostrar página usuario no existe
-            return "usuarios/detallesusuarionoencontrado";
+            return STR_NO_ENCONTRADO;
         }
     }
 
@@ -358,7 +348,7 @@ public class AppUsuariosController extends AbstractController <UsuarioDto> {
     public String saveListaUsuariuos(@ModelAttribute  UsuarioDtoPsw  dto,
                                      @ModelAttribute UsuarioDto usuarioDTO,
                                      @RequestParam(value = "lang", required = false) String lang,
-                                     Model model) throws Exception {
+                                     Model model) throws MessagingException {
         String language = "en";
         if (lang!= null) {
             language = lang;
@@ -375,7 +365,7 @@ public class AppUsuariosController extends AbstractController <UsuarioDto> {
             String tokenNuevo = UUID.randomUUID().toString();
             usuario.setToken(tokenNuevo);
             //Guardo el usuario
-            Usuario usuarioguarado = service.getService().guardarEntidadEntidad(usuario);
+            service.getService().guardarEntidadEntidad(usuario);
 
             Email correoCambioContrasenia = new Email();
             correoCambioContrasenia.setFrom(messages.getString("principal.email.from"));
@@ -388,9 +378,7 @@ public class AppUsuariosController extends AbstractController <UsuarioDto> {
             return "redirect:/login";
         }else {
 
-            /// Si las pass no coinciden
-            //model.addAttribute("error", true);
-            //return "/resetpass";
+            // Si las pass no coinciden
             return "usuarios/resetearpasswordlogin";
 
         }
@@ -405,7 +393,7 @@ public class AppUsuariosController extends AbstractController <UsuarioDto> {
         return "usuarios/cambiopassword";
     }
     @PostMapping("/usuarios/cambiopass")
-    public String cambioPasswordPst(@ModelAttribute(name="datos")CambioPswDto cambioPswDto) throws Exception {
+    public String cambioPasswordPst(@ModelAttribute(name="datos")CambioPswDto cambioPswDto) {
         //Obtenemos los datos del usuario
         Integer userId = ((SuperCustomerUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserID();
 
@@ -413,15 +401,15 @@ public class AppUsuariosController extends AbstractController <UsuarioDto> {
         if (usuario.isPresent()){
             Usuario usuariomod = usuario.get();
             //Encriptamos las passwords
-            logger.info("/usuarios/cambiopass ant:" + cambioPswDto.getPasswordant() + "---- Nueva:" + cambioPswDto.getPasswordnueva() );
+            logger.info("/usuarios/cambiopass ant: %s ---- Nueva: %s" , cambioPswDto.getPasswordant() , cambioPswDto.getPasswordnueva() );
             String passwordAnt =  service.getPasswordEncoder().encode(cambioPswDto.getPasswordant());
             String passwordNueva =  service.getPasswordEncoder().encode(cambioPswDto.getPasswordnueva());
-            logger.info("/usuarios/cambiopass ant:" + passwordAnt );
+            logger.info("/usuarios/cambiopass ant: %s" , passwordAnt );
             //Modificicamos la passsword
             usuariomod.setPassword(passwordNueva);
             logger.info("/usuarios/cambiopass antes de guardar ");
             //Guardamos el usuario
-            Usuario usuario1 = service.getService().guardarEntidadEntidad(usuariomod);
+            service.getService().guardarEntidadEntidad(usuariomod);
             return "redirect:/logout";
         }
         else {
@@ -447,7 +435,7 @@ public class AppUsuariosController extends AbstractController <UsuarioDto> {
             }
         }
         model.addAttribute("errorMessage", errorMessage);
-        return "usuarios/login";
+        return STR_LOGIN;
     }
 
 

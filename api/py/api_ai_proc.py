@@ -1,9 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# api.py: REST API for senc4farming
-#   - this module is just demonstrating how to handle basic CRUD
-#   - GET operations are available for visitors, editing requires login
+# api_ai_proc.py: REST API for senc4farming
+#   - this module is used to process  csv files for trainig AI Hethods
+#   -
 
 # Author: José Manuel Aroca
 from oauthlib.oauth2 import BackendApplicationClient
@@ -23,7 +23,7 @@ from datetime import date , datetime, timedelta
 
 import json
 import ee
-from gee_util import mask_s2_clouds, functn_scale_bands , functn_Clip, functn_ResemapleSentinel2,puntosUploadCsvAiModel
+from gee_util import mask_s2_clouds, functn_scale_bands , functn_clip, functn_resemaple_sentinel2,puntos_upload_csv_ai_model
 
 import requests
 import io
@@ -60,24 +60,25 @@ corrfilestitlearray = ['Correlacion 10 dias ',
  'Correlacion 60 dias',
  'Correlacion todos dias']
 
+# first load config from a json file,
+srvconf = json.load(open(os.environ["PYSRV_CONFIG_PATH"]))
 
 #cv value
-cv_param=11
+cv_param=srvconf['PYSRV_AI_CV_PARAM']
 #select csv item
-#elem = 11
-elem_corr = [5]
+elem_corr = srvconf['PYSRV_AI_ELEM_CORR']
 #Bands to use 1 all 2 rgb
-opt_band = 1
+opt_band = srvconf['PYSRV_AI_OPT_BAND']
 #AI items to run
-exec_rf = 0
-exec_knn = 1
-exec_svr = 1
+exec_rf = srvconf['PYSRV_AI_EXEC_RF']
+exec_knn = srvconf['PYSRV_AI_EXEC_KNN']
+exec_svr = srvconf['PYSRV_AI_EXEC_SVR']
 #outliers
-min_outl = 0 
-max_outl = 20
-outliers = 0
+min_outl = srvconf['PYSRV_AI_MIN_OUTL']
+max_outl = srvconf['PYSRV_AI_MAX_OUTL']
+outliers = srvconf['PYSRV_AI_OUTLIERS']
 #csv predict val
-elem_val_pred = 12
+elem_val_pred = srvconf['PYSRV_AI_ELEM_VAR_PRED']
 
 
 
@@ -87,8 +88,7 @@ CWD = os.getcwd()
 https://developers.google.com/earth-engine/tutorials/community/sentinel-2-s2cloudless
 https://gis.stackexchange.com/questions/457847/downloading-sentinel-2-float32-image-as-npy-array-in-gee-python-api
 '''
-# first load config from a json file,
-srvconf = json.load(open(os.environ["PYSRV_CONFIG_PATH"]))
+
 
 band_array_min_ndiv_30d = ['04','07','08','08A','NDVI']
 band_array_min_ndiv_45d = ['NDVI']
@@ -101,9 +101,9 @@ descdf_all = "Use full df"
 descdf_mean = "Use mean values for df"
 descdf_median = "Use median values for df"
 
-if opt_band == 1:
-    band_array_usar = band_array_min_ndiv_todosd 
-elif opt_band == 2:
+
+band_array_usar = band_array_min_ndiv_todosd
+if opt_band == 2:
     band_array_usar = band_array_min_ndiv_rgb_d 
 elif opt_band == 3:
     band_array_usar = band_array_min_ndiv_grp1d 
@@ -191,8 +191,7 @@ def getPredValueknn():
         print('Cloud cover:')
         print(cloud_cover)
         timeStamp_itm_file = ee.Date(imageitm.get('system:time_start')).format().slice(0,10); # get the time stamp of each frame. This can be any string. Date, Years, Hours, etc.
-        timeStamp_itm_file = ee.String('Date: ').cat(ee.String(timeStamp_itm_file)); #convert time stamp to string 
-        timeStamp_itm_file_txt = timeStamp_itm_file.getInfo()
+        timeStamp_itm_file = ee.String('Date: ').cat(ee.String(timeStamp_itm_file)); #convert time stamp to string
         bestCloudImageCloudMasked = imageitm 
         print('Detalles de la imagen  :')
         #inicio codigo prueba 
@@ -207,11 +206,11 @@ def getPredValueknn():
         print('Scaling done')
 
         print('Resampling the masked and scaled image') 
-        bestCloudImageCloudMaskedScaledResampled = functn_ResemapleSentinel2(bestCloudImageCloudMaskedScaled) #reseampled to 10m 
+        bestCloudImageCloudMaskedScaledResampled = functn_resemaple_sentinel2(bestCloudImageCloudMaskedScaled) #reseampled to 10m 
         print('Resampling done')
 
         print('Clipping the image') 
-        bestCloudImageCloudMaskedScaledResampledClipped = functn_Clip(bestCloudImageCloudMaskedScaledResampled,roi_point) #clipped to aoi
+        bestCloudImageCloudMaskedScaledResampledClipped = functn_clip(bestCloudImageCloudMaskedScaledResampled,roi_point) #clipped to aoi
         print('clipping done.')
 
         selectedbands = ['B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B8A', 'B9', 'B11', 'B12']
@@ -296,7 +295,7 @@ def getPredValueknn():
         return "Punto no encontrado",200
 
 @app.route('/api/ai/pred/svr', methods = ['POST'])
-def getPredValuesvr():
+def get_pred_valuesvr():
     print('en /api/ai/pred/svr ')
     content = request.json 
     #Gee credentials
@@ -367,27 +366,24 @@ def getPredValuesvr():
         print('Cloud cover:')
         print(cloud_cover)
         timeStamp_itm_file = ee.Date(imageitm.get('system:time_start')).format().slice(0,10); # get the time stamp of each frame. This can be any string. Date, Years, Hours, etc.
-        timeStamp_itm_file = ee.String('Date: ').cat(ee.String(timeStamp_itm_file)); #convert time stamp to string 
-        timeStamp_itm_file_txt = timeStamp_itm_file.getInfo()
+        timeStamp_itm_file = ee.String('Date: ').cat(ee.String(timeStamp_itm_file)); #convert time stamp to string
         bestCloudImageCloudMasked = imageitm 
         print('Detalles de la imagen  :')
-        #inicio codigo prueba 
-        bandnames = bestCloudImageCloudMasked.bandNames() # Retrieving the bandnames 
         #Scaling the selected bands
         failedBands = []
         selectedbands = ['B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B8A', 'B9', 'B11', 'B12']
-        # scale_factor = 1 # Define the scale factor
-        scale_factor = 0.0001 # Define the scale factor
+        # Define the scale factor
+        scale_factor = srvconf['PYSRV_SCALE_FACTOR'] # Define the scale factor
         print('Scaling the bands',selectedbands, 'by factor', scale_factor)
         bestCloudImageCloudMaskedScaled = functn_scale_bands(bestCloudImageCloudMasked, selectedbands, scale_factor) # Scaling the selected layers of cloudmasked image
         print('Scaling done')
 
         print('Resampling the masked and scaled image') 
-        bestCloudImageCloudMaskedScaledResampled = functn_ResemapleSentinel2(bestCloudImageCloudMaskedScaled) #reseampled to 10m 
+        bestCloudImageCloudMaskedScaledResampled = functn_resemaple_sentinel2(bestCloudImageCloudMaskedScaled) #reseampled to 10m 
         print('Resampling done')
 
         print('Clipping the image') 
-        bestCloudImageCloudMaskedScaledResampledClipped = functn_Clip(bestCloudImageCloudMaskedScaledResampled,roi_point) #clipped to aoi
+        bestCloudImageCloudMaskedScaledResampledClipped = functn_clip(bestCloudImageCloudMaskedScaledResampled,roi_point) #clipped to aoi
         print('clipping done.')
 
         selectedbands = ['B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B8A', 'B9', 'B11', 'B12']
@@ -399,7 +395,7 @@ def getPredValuesvr():
         projection =  bestCloudImageCloudMaskedScaled.select('B8').projection()
         crs = projection.crs()
 
-        path = imageitm.getDownloadUrl({ 
+        path = imageitm.getDownloadUrl({
         'scale': 10,  
         'crs': crs,
         'region': roi_point}) 
@@ -480,7 +476,7 @@ def getPredValuesvr():
     
 
 @app.route('/api/ai/pred/csv/knn', methods = ['POST'])
-def getPredValueCsvknn():
+def get_pred_value_csvknn():
     print('en /api/ai/pred/csv/knn')
    
     content = request.json
@@ -498,7 +494,7 @@ def getPredValueCsvknn():
     #para todos los valores
     display_func(1,"Inicio KNN ") 
     #read data from db
-    df = puntosUploadCsvAiModel(user_id,path)
+    df = puntos_upload_csv_ai_model(user_id,path)
     
     if outliers == 1:  
         #Quito los outliers despues de normalizar
@@ -522,7 +518,7 @@ def getPredValueCsvknn():
     return "evalregressionknn :" ,200
 
 @app.route('/api/ai/pred/csv/svr', methods = ['POST'])
-def getPredValueCsvSvr():
+def get_pred_value_csv_svr():
     print('en /api/ai/pred/csv/knn')
    
     content = request.json
@@ -536,7 +532,7 @@ def getPredValueCsvSvr():
     #para todos los valores
     display_func(1,"Inicio SVR ") 
     #read data from db
-    df = puntosUploadCsvAiModel(user_id,path)
+    df = puntos_upload_csv_ai_model(user_id,path)
     
     if outliers == 1:  
         #Quito los outliers despues de normalizar
@@ -656,7 +652,5 @@ def evalregressionsvr():
 @app.route('/api/ai/models', methods = ['POST'])
 def obtenermodelosai():
     print('obtenermodelosai')
-    content = request.json
-    userid = content['userid']
     dfdata = obtenerModelos()
     return dfdata.to_json(),200

@@ -63,10 +63,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
             superCustomerUserDetails.setUsername(email);
             superCustomerUserDetails.setPassword(user.getPassword());
-            superCustomerUserDetails.setCoper_client_secret("");
-            superCustomerUserDetails.setCoper_client_id("");
-            superCustomerUserDetails.setCoper_password("");
-            superCustomerUserDetails.setCoper_username("");
+            superCustomerUserDetails.setCoperClientSecret("");
+            superCustomerUserDetails.setCoperClientId("");
+            superCustomerUserDetails.setCoperPassword("");
+            superCustomerUserDetails.setCoperUsername("");
             superCustomerUserDetails.setAuthorities(mapRolesToAuthorities(user.getRoles()));
             superCustomerUserDetails.setUserID( Math.toIntExact(user.getId()));
             superCustomerUserDetails.setUsuario(user);
@@ -77,7 +77,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             } catch (NoSuchAlgorithmException e) {
                 throw new RuntimeException(e);
             }
-            keyPairGenerator.initialize(512);
+            keyPairGenerator.initialize(2048);
             KeyPair keyPair = keyPairGenerator.generateKeyPair();
             user.setPublickey(keyPair.getPublic().getEncoded());
             userRepository.save(user);
@@ -90,10 +90,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         }else{
             // Si el usuario no es encontrado, lanzar una excepción UsernameNotFoundException
             superCustomerUserDetails.setUsername("anonimo@anonimo");
-            superCustomerUserDetails.setCoper_client_secret("");
-            superCustomerUserDetails.setCoper_client_id("");
-            superCustomerUserDetails.setCoper_password("");
-            superCustomerUserDetails.setCoper_username("");
+            superCustomerUserDetails.setCoperClientSecret("");
+            superCustomerUserDetails.setCoperClientId("");
+            superCustomerUserDetails.setCoperPassword("");
+            superCustomerUserDetails.setCoperUsername("");
         }
         return superCustomerUserDetails;
     }

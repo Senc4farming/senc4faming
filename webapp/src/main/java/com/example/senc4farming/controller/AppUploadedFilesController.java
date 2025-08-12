@@ -9,7 +9,6 @@ import com.example.senc4farming.model.Dates;
 import com.example.senc4farming.service.*;
 import com.example.senc4farming.util.Constants;
 import jakarta.validation.Valid;
-import jakarta.xml.bind.JAXBException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,16 +16,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -38,10 +30,15 @@ import static com.example.senc4farming.util.DateFormat.parseDate1;
 public class AppUploadedFilesController extends AbstractController <UploadedFilesDto> {
 
     private final UploadedFilesService service;
-    private final UsuarioService usuarioService;
     private final DatesService datesService;
     private final ConfiguationProperties configuationProperties;
     private final FiltroConsultaKalmanService filtroConsultaKalmanService;
+
+
+    private static final String STR_LISTA = "lista";
+    private static final String STR_VISOR = "visor/imagesuploaded";
+    private static final String STR_UPLOAD_NO_ENC = "upload/detallesnoencontrado";
+    private static final String STR_PATH_SENC4FARMING_API =  "/solovmwarewalgreen/projecto/SEN4CFARMING/api";
     public static String  roundDoubleValue(double value, int places) {
         if (places < 0) throw new IllegalArgumentException();
 
@@ -53,10 +50,9 @@ public class AppUploadedFilesController extends AbstractController <UploadedFile
     }
 
 
-    public AppUploadedFilesController(MenuService menuService, UploadedFilesService service, UsuarioService usuarioService, DatesService datesService, ConfiguationProperties configuationProperties, FiltroConsultaKalmanService filtroConsultaKalmanService) {
+    public AppUploadedFilesController(MenuService menuService, UploadedFilesService service, DatesService datesService, ConfiguationProperties configuationProperties, FiltroConsultaKalmanService filtroConsultaKalmanService) {
         super(menuService);
         this.service = service;
-        this.usuarioService = usuarioService;
         this.datesService = datesService;
         this.configuationProperties = configuationProperties;
         this.filtroConsultaKalmanService = filtroConsultaKalmanService;
@@ -71,8 +67,6 @@ public class AppUploadedFilesController extends AbstractController <UploadedFile
         //tenemos que leer la lista de usuarios
         //Que elemento me la ofrece?
         //listaUsrTodos
-        //List<UsuarioDto>  lusrdto = this.service.listaUsrTodos();
-        //interfazConPantalla.addAttribute("listausuarios", lusrdto);
         //Obetenemos el objeto Page del servicio
         Integer pagina = 0;
         if (page.isPresent()) {
@@ -88,7 +82,7 @@ public class AppUploadedFilesController extends AbstractController <UploadedFile
         Page<UploadedFilesDto> dtoPage =
                 this.service.buscarTodosPorUsuarioId(PageRequest.of(pagina,maxelementos),userId);
         interfazConPantalla.addAttribute(pageNumbersAttributeKey,dameNumPaginas(dtoPage));
-        interfazConPantalla.addAttribute("lista", dtoPage);
+        interfazConPantalla.addAttribute(STR_LISTA, dtoPage);
         return "upload/listauploadpagina";
     }
 
@@ -98,33 +92,27 @@ public class AppUploadedFilesController extends AbstractController <UploadedFile
         Optional<UploadedFilesDto> optdto = this.service.encuentraPorId(id);
         //Genero el objeto que me premite consultar kalman en las dos opciones csv y lucas
         //Obtenemos los datos del usuario de la sesión
-        String userName = "no informado";
         SuperCustomerUserDetails superCustomerUserDetails = (SuperCustomerUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         //¿Debería comprobar si hay datos?
         if (optdto.isPresent()){
-            logger.info("El tipo es:" +optdto.get().getType() );
+            logger.info("El tipo es:%s"  ,optdto.get().getType() );
             if (optdto.get().getType().equals("csv")){
-                String path_python = optdto.get().getPath();
-                String path_webapp = path_python.replace("/app","/solovmwarewalgreen/projecto/SEN4CFARMING/api");
+                String pathPython = optdto.get().getPath();
+                String pathWebapp = pathPython.replace("/app",STR_PATH_SENC4FARMING_API);
                 //Como encontré datos, leo el csv solo las 100 primeras filas
                 List<UploadedFilesContentDto> csvitemslist = new ArrayList<>();
                 String splitBy = ";";
                 LineNumberReader reader =
                         new LineNumberReader
-                                (new InputStreamReader(new FileInputStream(path_webapp +"/"+ optdto.get().getDescription()), "UTF-8"));
+                                (new InputStreamReader(new FileInputStream(pathWebapp +"/"+ optdto.get().getDescription()), StandardCharsets.UTF_8));
 
                 try{
                     String line;
                     while (((line = reader.readLine()) != null) && reader.getLineNumber() <= 500) {
                         //If line is empty nothing is done
-                        //logger.info(line);
-                        if (line.contains("Depth")){
-                            logger.info("cabecera");
-
-                        }else if ( line.length() > 5){
+                        if ( line.length() > 5){
                             // split on comma(',')
-                            //logger.info(line);
                             String[] datosCsv = line.split(splitBy);
                             // create car object to store values
                             UploadedFilesContentDto dto = new UploadedFilesContentDto();
@@ -168,18 +156,18 @@ public class AppUploadedFilesController extends AbstractController <UploadedFile
                 logger.info("path");
                 logger.info(optdto.get().getPath());
                 FiltroConsultaKalmanDto filtroConsultaKalmanDto =   filtroConsultaKalmanService.guardar(dtofiltroConsultaKanlam);
-                interfazConPantalla.addAttribute("lista",csvitemslist);
+                interfazConPantalla.addAttribute(STR_LISTA,csvitemslist);
                 interfazConPantalla.addAttribute("filtro",filtroConsultaKalmanDto);
             }
             else {
                 List<UploadedFilesContentDto> csvitemslist1 = new ArrayList<>();
                 //Asigno atributos y muestro
-                interfazConPantalla.addAttribute("lista",csvitemslist1);
+                interfazConPantalla.addAttribute(STR_LISTA,csvitemslist1);
             }
             return "upload/view";
         } else{
             //Mostrar página usuario no existe
-            return "upload/detallesnoencontrado";
+            return STR_UPLOAD_NO_ENC;
         }
     }
 
@@ -187,33 +175,28 @@ public class AppUploadedFilesController extends AbstractController <UploadedFile
     public String mapDatosGrupo(@PathVariable("id") Integer id, ModelMap interfazConPantalla, Dates dates) throws IOException {
         //Con el id tengo que buscar el registro a nivel de entidad
         Optional<UploadedFilesDto> optdto = this.service.encuentraPorId(id);
-        String kml2 = Constants.kml2;
-        String kmlfinal = Constants.kml1;
+        String kml2 = Constants.KML2;
+        String kmlfinal = Constants.KML1;
         Double latitude = 42.29511966573258;
         Double longitude = -3.683528642004319;
         //¿Debería comprobar si hay datos?
         if (optdto.isPresent()) {
             UploadedFilesDto uploadedFilesDto = optdto.get();
-            logger.info("El tipo es:" + optdto.get().getType());
+            logger.info("El tipo es: %s" , optdto.get().getType());
             if (optdto.get().getType().equals("csv")) {
-                String path_python = optdto.get().getPath();
-                String path_webapp = path_python.replace("/app", "/solovmwarewalgreen/projecto/SEN4CFARMING/api");
-                List<UploadedFilesContentDto> csvitemslist = new ArrayList<>();
+                String pathPython = optdto.get().getPath();
+                String pathWebapp = pathPython.replace("/app", STR_PATH_SENC4FARMING_API);
                 String splitBy = ";";
                 LineNumberReader reader =
                         new LineNumberReader
-                                (new InputStreamReader(new FileInputStream(path_webapp + "/" + optdto.get().getDescription()), "UTF-8"));
+                                (new InputStreamReader(new FileInputStream(pathWebapp + "/" + optdto.get().getDescription()), StandardCharsets.UTF_8));
                 try{
                     String line;
-                    Integer num_line = 0;
+                    Integer numLine = 0;
                     while (((line = reader.readLine()) != null) && reader.getLineNumber() <= 500) {
                         //If line is empty nothing is done
-                        //logger.info(line);
-                        if (line.contains("Depth")){
-                            logger.info("cabecera");
-
-                        }else if ( line.length() > 5){
-                            num_line += 1;
+                        if ( line.length() > 5){
+                            numLine += 1;
                             // split on comma(',')
                             String[] datosCsv = line.split(splitBy);
                             // create car object to store values
@@ -240,25 +223,25 @@ public class AppUploadedFilesController extends AbstractController <UploadedFile
                             dto.setDesc2(datosCsv[8]);
                             dto.setDesc3(datosCsv[9]);
                             // creating kml content
-                            String kml_placemark = "<Placemark id=\"" + num_line + "\">";
-                            kml_placemark += """
+                            String kmlPlacemark = "<Placemark id=\"" + numLine + "\">";
+                            kmlPlacemark += """
                                     <name></name><styleUrl>#style-cropland</styleUrl>
-                                    		<Snippet maxLines="0">empty</Snippet>
-                                    		<description><![CDATA[<table cellpadding="1" cellspacing="1">
+                                    <Snippet maxLines="0">empty</Snippet>
+                                    <description><![CDATA[<table cellpadding="1" cellspacing="1">
                                     """;
-                            kml_placemark += "<tr><td>survey_date:</td><td>";
-                            kml_placemark += dto.getSurveydate();
-                            kml_placemark += "</td><td>SOC:</td><td>";
-                            kml_placemark += dto.getSoc();
-                            kml_placemark += "</td><td>lc0_desc:</td><td>";
-                            kml_placemark += dto.getDesc1();
-                            kml_placemark += "</td><td>lc1_desc:</td><td>";
-                            kml_placemark += dto.getDesc2();
-                            kml_placemark += "</td><td>lu1_desc:</td><td>";
-                            kml_placemark += dto.getDesc3();
-                            kml_placemark += "</td></tr></table>]]></description><Point><coordinates>";
-                            kml_placemark += dto.getLongitude() + "," + dto.getLatitude()  +  ",0</coordinates></Point></Placemark>";
-                            kmlfinal += kml_placemark;
+                            kmlPlacemark += "<tr><td>survey_date:</td><td>";
+                            kmlPlacemark += dto.getSurveydate();
+                            kmlPlacemark += "</td><td>SOC:</td><td>";
+                            kmlPlacemark += dto.getSoc();
+                            kmlPlacemark += "</td><td>lc0_desc:</td><td>";
+                            kmlPlacemark += dto.getDesc1();
+                            kmlPlacemark += "</td><td>lc1_desc:</td><td>";
+                            kmlPlacemark += dto.getDesc2();
+                            kmlPlacemark += "</td><td>lu1_desc:</td><td>";
+                            kmlPlacemark += dto.getDesc3();
+                            kmlPlacemark += "</td></tr></table>]]></description><Point><coordinates>";
+                            kmlPlacemark += dto.getLongitude() + "," + dto.getLatitude()  +  ",0</coordinates></Point></Placemark>";
+                            kmlfinal += kmlPlacemark;
                         }
                     }
                 }finally{
@@ -266,14 +249,14 @@ public class AppUploadedFilesController extends AbstractController <UploadedFile
                 }
                 kmlfinal += kml2;
                 //Remove file if exists
-                String path_kml = path_webapp + "/kmlgen.kml";
-                File kmlfile = new File(path_kml);
+                String pathKml = pathWebapp + "/kmlgen.kml";
+                File kmlfile = new File(pathKml);
                 if(kmlfile.exists()) {
-                    kmlfile.delete();
+                    Files.delete(kmlfile.toPath());
                 }
 
                 //Write string to file
-                try (PrintWriter out = new PrintWriter(path_kml)) {
+                try (PrintWriter out = new PrintWriter(pathKml)) {
                     out.println(kmlfinal);
                 }
                 uploadedFilesDto.setDescription("kmlgen.kml");
@@ -282,22 +265,22 @@ public class AppUploadedFilesController extends AbstractController <UploadedFile
                 logger.info("uploadedFilesDto.setLongitude(longitude);");
                 logger.info(longitude);
                 interfazConPantalla.addAttribute("file", uploadedFilesDto);
-                return "visor/imagesuploaded";
+                return STR_VISOR;
             } else {
                 uploadedFilesDto.setLatitude(latitude);
                 uploadedFilesDto.setLongitude(longitude);
                 interfazConPantalla.addAttribute("file", uploadedFilesDto);
-                return "visor/imagesuploaded";
+                return STR_VISOR;
             }
         } else {
             //Mostrar página usuario no existe
-            return "upload/detallesnoencontrado";
+            return STR_UPLOAD_NO_ENC;
         }
     }
 
 
     @PostMapping("/uploadedfiles/map/{id}")
-    public String mapDatosGrupoPost(@PathVariable("id") Integer id, ModelMap interfazConPantalla, @Valid Dates dates, BindingResult result) throws IOException, JAXBException, ParserConfigurationException, SAXException {
+    public String mapDatosGrupoPost(@PathVariable("id") Integer id, ModelMap interfazConPantalla, @Valid Dates dates, BindingResult result) throws IOException {
         if (result.hasErrors()) {
             return String.format("redirect:/uploadedfiles/map/%s", id);
         }
@@ -307,33 +290,31 @@ public class AppUploadedFilesController extends AbstractController <UploadedFile
         logger.info(interval);
         //Con el id tengo que buscar el registro a nivel de entidad
         Optional<UploadedFilesDto> optdto = this.service.encuentraPorId(id);
-        String kml2 = Constants.kml2;
-        String kmlfinal = Constants.kml1;
+        String kml2 = Constants.KML2;
+        String kmlfinal = Constants.KML1;
         Double latitude = 42.29511966573258;
         Double longitude = -3.683528642004319;
         //¿Debería comprobar si hay datos?
         if (optdto.isPresent()) {
             UploadedFilesDto uploadedFilesDto = optdto.get();
-            logger.info("El tipo es:" + optdto.get().getType());
+            logger.info("El tipo es: %s" , optdto.get().getType());
             if (optdto.get().getType().equals("csv")) {
-                String path_python = optdto.get().getPath();
-                String path_webapp = path_python.replace("/app", "/solovmwarewalgreen/projecto/SEN4CFARMING/api");
-                List<UploadedFilesContentDto> csvitemslist = new ArrayList<>();
+                String pathPython = optdto.get().getPath();
+                String pathWebapp = pathPython.replace("/app", STR_PATH_SENC4FARMING_API);
                 String splitBy = ";";
                 LineNumberReader reader =
                         new LineNumberReader
-                                (new InputStreamReader(new FileInputStream(path_webapp + "/" + optdto.get().getDescription()), "UTF-8"));
+                                (new InputStreamReader(new FileInputStream(pathWebapp + "/" + optdto.get().getDescription()), StandardCharsets.UTF_8));
                 try{
                     String line;
-                    Integer num_line = 0;
+                    Integer numLine = 0;
                     while (((line = reader.readLine()) != null) && reader.getLineNumber() <= 500) {
                         //If line is empty nothing is done
-                        //logger.info(line);
                         if (line.contains("Depth")){
                             logger.info("cabecera");
 
                         }else if ( line.length() > 5){
-                            num_line += 1;
+                            numLine += 1;
                             // split on comma(',')
                             String[] datosCsv = line.split(splitBy);
                             // create car object to store values
@@ -366,29 +347,25 @@ public class AppUploadedFilesController extends AbstractController <UploadedFile
                                 logger.info(dto.getSurveydate());
                                 logger.info(surveydate);
                                 // creating kml content
-                                String kml_placemark = "<Placemark id=\"" + num_line + "\">";
-                                kml_placemark += """
-                                    <name>P</name><styleUrl>#style-cropland</styleUrl>
-                                    		<Snippet maxLines="0">empty</Snippet>
-                                    		<description><![CDATA[<table cellpadding="1" cellspacing="1">
+                                String kmlPlacemark = "<Placemark id=\"" + numLine + "\">";
+                                kmlPlacemark += """
+                                    <name>P</name><styleUrl>#style-cropland</styleUrl><Snippet maxLines="0">
+                                    empty</Snippet><description><![CDATA[<table cellpadding="1" cellspacing="1">
                                     """;
-                                kml_placemark += "<tr><td>survey_date:</td><td>";
-                                kml_placemark += dto.getSurveydate();
-                                kml_placemark += "</td><td>SOC:</td><td>";
-                                kml_placemark += dto.getSoc();
-                                kml_placemark += "</td><td>lc0_desc:</td><td>";
-                                kml_placemark += dto.getDesc1();
-                                kml_placemark += "</td><td>lc1_desc:</td><td>";
-                                kml_placemark += dto.getDesc2();
-                                kml_placemark += "</td><td>lu1_desc:</td><td>";
-                                kml_placemark += dto.getDesc3();
-                                kml_placemark += "</td></tr></table>]]></description><Point><coordinates>";
-                                kml_placemark += dto.getLongitude() + "," + dto.getLatitude()  +  ",0</coordinates></Point></Placemark>";
-                                kmlfinal += kml_placemark;
-
+                                kmlPlacemark += "<tr><td>survey_date:</td><td>";
+                                kmlPlacemark += dto.getSurveydate();
+                                kmlPlacemark += "</td><td>SOC:</td><td>";
+                                kmlPlacemark += dto.getSoc();
+                                kmlPlacemark += "</td><td>lc0_desc:</td><td>";
+                                kmlPlacemark += dto.getDesc1();
+                                kmlPlacemark += "</td><td>lc1_desc:</td><td>";
+                                kmlPlacemark += dto.getDesc2();
+                                kmlPlacemark += "</td><td>lu1_desc:</td><td>";
+                                kmlPlacemark += dto.getDesc3();
+                                kmlPlacemark += "</td></tr></table>]]></description><Point><coordinates>";
+                                kmlPlacemark += dto.getLongitude() + "," + dto.getLatitude()  +  ",0</coordinates></Point></Placemark>";
+                                kmlfinal += kmlPlacemark;
                             }
-
-
                         }
                     }
                 }finally{
@@ -396,14 +373,14 @@ public class AppUploadedFilesController extends AbstractController <UploadedFile
                 }
                 kmlfinal += kml2;
                 //Remove file if exists
-                String path_kml = path_webapp + "/kmlgen.kml";
-                File kmlfile = new File(path_kml);
+                String pathKml = pathWebapp + "/kmlgen.kml";
+                File kmlfile = new File(pathKml);
                 if(kmlfile.exists()) {
-                    kmlfile.delete();
+                   Files.delete(kmlfile.toPath());
                 }
 
                 //Write string to file
-                try (PrintWriter out = new PrintWriter(path_kml)) {
+                try (PrintWriter out = new PrintWriter(pathKml)) {
                     out.println(kmlfinal);
                 }
                 uploadedFilesDto.setDescription("kmlgen.kml");
@@ -412,37 +389,16 @@ public class AppUploadedFilesController extends AbstractController <UploadedFile
                 logger.info("uploadedFilesDto.setLongitude(longitude);");
                 logger.info(longitude);
                 interfazConPantalla.addAttribute("file", uploadedFilesDto);
-                return "visor/imagesuploaded";
+                return STR_VISOR;
             } else {
-                String path_python1 = optdto.get().getPath();
-
-                String path_webapp1 = path_python1.replace("/app/","/solovmwarewalgreen/projecto/SEN4CFARMING/api/");
-
-                String file = path_webapp1 + "/" + optdto.get().getDescription();
-
-                DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-                DocumentBuilder db = dbf.newDocumentBuilder();
-                Document dom = db.parse(file);
-                Element docEle = dom.getDocumentElement();
-                NodeList nl = docEle.getChildNodes();
-                int length = nl.getLength();
-                logger.info(length);
-                for (int i = 0; i < length; i++) {
-                    logger.info(nl.item(i).getNodeType());
-                    if (nl.item(i).getNodeType() == Node.ELEMENT_NODE) {
-                        Element el = (Element) nl.item(i);
-                        logger.info(el.toString());
-
-                    }
-                }
                 uploadedFilesDto.setLatitude(latitude);
                 uploadedFilesDto.setLongitude(longitude);
                 interfazConPantalla.addAttribute("file", uploadedFilesDto);
-                return "visor/imagesuploaded";
+                return STR_VISOR;
             }
         } else {
             //Mostrar página usuario no existe
-            return "upload/detallesnoencontrado";
+            return STR_UPLOAD_NO_ENC;
         }
     }
 
@@ -458,14 +414,14 @@ public class AppUploadedFilesController extends AbstractController <UploadedFile
             return "redirect:/upload";
         } else{
             //Mostrar página usuario no existe
-            return "upload/detallesnoencontrado";
+            return STR_UPLOAD_NO_ENC;
         }
     }
 
 
     //Postmaping para guardar
     @PostMapping("/uploadedfiles/{idusr}")
-    public String guardarEdicionDatosGrupo(@PathVariable("idusr") Integer id, UploadedFilesDto dtoEntrada) throws Exception {
+    public String guardarEdicionDatosGrupo(@PathVariable("idusr") Integer id, UploadedFilesDto dtoEntrada)  {
         //Cuidado que la password no viene
         //Necesitamos copiar la información que llega menos la password
         //Con el id tengo que buscar el registro a nivel de entidad

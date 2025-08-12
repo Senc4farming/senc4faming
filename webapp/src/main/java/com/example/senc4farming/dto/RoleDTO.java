@@ -11,9 +11,9 @@ public class RoleDTO implements Serializable {
     private Long id;
     private String roleName;
 
-    private String roleName_en;
-    private String roleName_es;
-    private String roleName_fr;
+    private String roleNameEn;
+    private String roleNameEs;
+    private String roleNameFr;
     private String roleName_01;
     private String roleName_02;
     private String roleName_03;

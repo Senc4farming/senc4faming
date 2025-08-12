@@ -16,7 +16,7 @@ import java.util.stream.IntStream;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 //Esta clase abstracta admite cualuiertipode objeto DTO o entidad
-public abstract class   AbstractController<DTO> {
+public abstract class   AbstractController<D> {
 
     MenuService menuService;
     Logger logger = LogManager.getLogger(this.getClass());
@@ -29,7 +29,7 @@ public abstract class   AbstractController<DTO> {
     }
 
     //Metodo para obtener los numeros de pagina
-    protected List<Integer> dameNumPaginas(Page<DTO>  obj){
+    protected List<Integer> dameNumPaginas(Page<D>  obj){
         List<Integer> pageNumbers = new ArrayList<>();
         int totalPages = obj.getTotalPages();
         if (totalPages > 0) {

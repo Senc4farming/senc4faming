@@ -21,6 +21,7 @@ public class GrupoService extends AbstractBusinessService<GrupoTrabajo,Integer, 
 
         super(repo, serviceMapper);
     }
+    @Override
     public GrupoTrabajoDto guardar(GrupoTrabajoDto grupoTrabajoDto){
         //Traduzco del dto con datos de entrada a la entidad
         final GrupoTrabajo entidad = getMapper().toEntity(grupoTrabajoDto);
@@ -45,6 +46,7 @@ public class GrupoService extends AbstractBusinessService<GrupoTrabajo,Integer, 
             getRepo().save(grupo);
         }
     }
+
 
 
 }

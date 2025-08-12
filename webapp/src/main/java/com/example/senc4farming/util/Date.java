@@ -1,12 +1,24 @@
 package com.example.senc4farming.util;
 
+import lombok.Getter;
+
 /**
  * 
  * @author rutpatel
  *
  */
-
+@Getter
 public class Date {
+
+
+
+	private final static int REFYEAR = 1990;
+
+	private int day;
+	private int intMonth;
+	private int year;
+	private int dow;
+	private boolean isHoliday;
 
 	// DAYOFWEEK[1] gives MON, DAYOFWEEK[7] gives SUN...
 	public static final String[] DAYOFWEEK = { "SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN" };
@@ -15,24 +27,16 @@ public class Date {
 	public static final String[] MONTH = { "EMPTY", "JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP",
 			"OCT", "NOV", "DEC" };
 
-	private final static int REFYEAR = 1990;
-
-	private int day;
-	private int month;
-	private int year;
-	private int dow;
-	private boolean isHoliday;
-
 	public Date(int month, int day, int year) {
 		this.day = day;
-		this.month = month;
+		this.intMonth = month;
 		this.year = year;
 		this.isHoliday = false;
 	}
 
 	public Date(int month, int day, int year, Date prev1st, int prevMonthDays) {
 		this.day = day;
-		this.month = month;
+		this.intMonth = month;
 		this.year = year;
 		this.dow = (prev1st.getDow() + prevMonthDays) % 7;
 		this.isHoliday = false;
@@ -54,7 +58,6 @@ public class Date {
 			if (isLeapYear(i - 1))
 				numDays++;
 			numDays++;
-			// logger.info(i + " : " + DAYOFWEEK[numDays % 7]);
 		}
 
 		return numDays % 7;
@@ -78,8 +81,8 @@ public class Date {
 	/**
 	 * @return the month
 	 */
-	public int getMonth() {
-		return month;
+	public int getIntMonth() {
+		return intMonth;
 	}
 
 	/**
@@ -102,8 +105,7 @@ public class Date {
 
 	@Override
 	public String toString() {
-		String retval = month + "/" + day + "/" + year + " " + Date.DAYOFWEEK[dow];
-		return retval;
+		return intMonth + "/" + day + "/" + year + " " + Date.DAYOFWEEK[dow];
 	}
 
 }

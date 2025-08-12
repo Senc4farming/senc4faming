@@ -47,17 +47,13 @@ public class FilesStorageServiceImpl implements FilesStorageService {
 
     @Override
     public Resource load(String filename) throws MalformedURLException, FileNotFoundException {
-        try {
-            Path file = root.resolve(filename);
-            Resource resource = new UrlResource(file.toUri());
+        Path file = root.resolve(filename);
+        Resource resource = new UrlResource(file.toUri());
 
-            if (resource.exists() || resource.isReadable()) {
-                return resource;
-            } else {
-                throw new FileNotFoundException("Could not read the file!");
-            }
-        } catch (MalformedURLException | FileNotFoundException e) {
-            throw e;
+        if (resource.exists() || resource.isReadable()) {
+            return resource;
+        } else {
+            throw new FileNotFoundException("Could not read the file!");
         }
     }
 

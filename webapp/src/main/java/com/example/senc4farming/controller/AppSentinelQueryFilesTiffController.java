@@ -217,17 +217,17 @@ public class AppSentinelQueryFilesTiffController extends AbstractController <Sen
 
 
         InputStream is = url.openStream();
-        OutputStream os = new FileOutputStream("response.tiff");
+        try (OutputStream os = new FileOutputStream("response.tiff")) {
 
-        byte[] b = new byte[2048];
-        int length;
+            byte[] b = new byte[2048];
+            int length;
 
-        while ((length = is.read(b)) != -1) {
-            os.write(b, 0, length);
+            while ((length = is.read(b)) != -1) {
+                os.write(b, 0, length);
+            }
+        } finally {
+            is.close();
         }
-
-        is.close();
-        os.close();
         return STR_NO_ENCONTRADO;
     }
 

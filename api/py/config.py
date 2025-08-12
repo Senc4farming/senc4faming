@@ -26,7 +26,6 @@ IS_PRODUCTION = bool(srvconf['PYSRV_IS_PRODUCTION'] or False)
 
 # local dev flag
 IS_LOCAL_DEV = os.environ.get("FLASK_ENV") == "development" and not IS_PRODUCTION
-# IS_LOCAL_DEV = False
 
 print("\nCONFIG: prod={},localdev={} ({})\n".format(
     IS_PRODUCTION, IS_LOCAL_DEV, srvconf["name"]))

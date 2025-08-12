@@ -23,11 +23,11 @@ public class GrupoTrabajo implements Serializable {
     @Column (name ="descripcion",length = 250)
     private String descripcion;
     @Column(nullable = false,length = 250)
-    private String description_es;
+    private String descriptionEs;
     @Column(nullable = false,length = 250)
-    private String description_en;
+    private String descriptionEn;
     @Column(nullable = false,length = 250)
-    private String description_fr;
+    private String descriptionFr;
     @Column(length = 250)
     private String description_01="defaulf";
     @Column(length = 250)

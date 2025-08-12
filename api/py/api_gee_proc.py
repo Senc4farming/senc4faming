@@ -34,10 +34,11 @@ import ee
 import os
 import requests
 import pandas as pd
-from gee_util import mask_s2_clouds, functn_scale_bands , functn_Clip, functn_ResemapleSentinel2,\
-        cloudMaskingBasedonSCL,guardardatoscoordenadasGeeTifffiles,checkPuntGeeProcesado,guardardatoscsvpoints,\
-        puntosUploadCsvOC,deletePuntGeeProcesado,getPuntGeeLandsatProcesados,getPuntGeeSentinelProcesados
-import random
+from gee_util import mask_s2_clouds, functn_scale_bands , functn_clip, functn_resemaple_sentinel2,\
+        cloud_masking_basedon_scl,guardardatoscoordenadas_gee_tifffiles,checkPuntGeeProcesado,guardardatoscsvpoints, \
+    puntos_upload_csv_oc,get_punt_gee_landsat_procesados,get_punt_gee_sentinel_procesados, \
+    guardardatoscoordenadas_gee_tifffiles_no_harm,checkPuntGeeProcesadonoHarm,apply_scale_factors
+
 import time 
 import io
 import csv
@@ -52,6 +53,18 @@ https://gis.stackexchange.com/questions/457847/downloading-sentinel-2-float32-im
 # first load config from a json file,
 srvconf = json.load(open(os.environ["PYSRV_CONFIG_PATH"]))
 gee_credentials = "."
+
+def random_int(max_value):
+    # Calculate bytes needed to cover the range
+    byte_count = (max_value.bit_length() + 7) // 8
+    while True:
+        # Generate random bytes and convert to int
+        random_bytes = os.urandom(byte_count)
+        num = int.from_bytes(random_bytes, 'big')
+        
+        # Ensure the number is within range
+        if num < max_value:
+            return num
 
 @app.route('/api/gee/proc/test/', methods = ['GET'])
 def testprocgee():
@@ -131,7 +144,7 @@ def geedownload():
             buscarpunto = checkPuntGeeProcesado(point_id,user_id,satellite,-1) 
             if buscarpunto == 0:
                 
-                sleepsecp = random.randint(10,20) 
+                sleepsecp = random_int(10) 
                 print('Esperando punto:' + str(sleepsecp) + ', segundos')
                 time.sleep(sleepsecp)
                 
@@ -170,7 +183,7 @@ def geedownload():
                     bestCloudImage = images.sort('CLOUDY_PIXEL_PERCENTAGE',True).first() # Sorting the image on cloudcover and taking the best image
                     #CloudMasking
                     print('Applying cloud mask')
-                    bestCloudImageCloudMasked = cloudMaskingBasedonSCL(bestCloudImage) # applying the cloud mask
+                    bestCloudImageCloudMasked = cloud_masking_basedon_scl(bestCloudImage) # applying the cloud mask
                     print('Applying cloud mask done')
 
                     #check if user forder exists
@@ -234,11 +247,11 @@ def geedownload():
                         print('Scaling done')
 
                         print('Resampling the masked and scaled image') 
-                        bestCloudImageCloudMaskedScaledResampled = functn_ResemapleSentinel2(bestCloudImageCloudMaskedScaled) #reseampled to 10m 
+                        bestCloudImageCloudMaskedScaledResampled = functn_resemaple_sentinel2(bestCloudImageCloudMaskedScaled) #reseampled to 10m 
                         print('Resampling done')
 
                         print('Clipping the image') 
-                        bestCloudImageCloudMaskedScaledResampledClipped = functn_Clip(bestCloudImageCloudMaskedScaledResampled,roi_point) #clipped to aoi
+                        bestCloudImageCloudMaskedScaledResampledClipped = functn_clip(bestCloudImageCloudMaskedScaledResampled,roi_point) #clipped to aoi
                         print('clipping done.')
 
                         selectedbands = ['B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B8A', 'B9', 'B11', 'B12']
@@ -252,9 +265,9 @@ def geedownload():
                         transform_image = projection.transform()
 
                         path = imageitm.getDownloadUrl({ 
-                        'scale': 10,  
                         'crs': crs,
-                        'region': roi_point}) 
+                        'crs_transform':transform_image
+                        }) 
                         #print('path')
                         #print(path)
                         new_row = pd.DataFrame({'point_id':point_id, 'gee_path':path,'internal_path': tiffuserfolder, 'imageid':str(i),
@@ -265,11 +278,15 @@ def geedownload():
                         for band in selectedbands:
                             print(band)
                             thisBand = bestCloudImageCloudMaskedScaledResampledClipped_SB_f.select(band)   
+                            #Some meta info of the image that will be useful for later calculatiosn
+                            #This was not before
+                            projection =  thisBand.projection()
+                            crs = projection.crs()  
+                            transform_image = projection.transform()
                             try:
                                 urlNumpy = thisBand.getDownloadUrl({
-                                    'scale': 10,
                                     'crs': crs,
-                                    'region': roi_point,
+                                    'crs_transform':transform_image,
                                     'format': 'NPY'
                                 })
                                 responseNumpy= requests.get(urlNumpy)
@@ -285,7 +302,7 @@ def geedownload():
                         print(dffiles)
                     #insert data frame into database
                     if len(dffiles) > 0:
-                        guardardatoscoordenadasGeeTifffiles(dffiles,0)  
+                        guardardatoscoordenadas_gee_tifffiles(dffiles)
                         print(dffiles)
                         dffiles.drop(dffiles.index,inplace=True)
                     else:
@@ -361,7 +378,7 @@ def geedownloadkalman():
                 buscarpunto = checkPuntGeeProcesado(point_id,user_id,satellite,num) 
                 if buscarpunto == 0:
                     
-                    sleepsecp = random.randint(3,5) 
+                    sleepsecp = random_int(10)  
                     print('Esperando punto:' + str(sleepsecp) + ', segundos')
                     time.sleep(sleepsecp)
                     
@@ -400,7 +417,7 @@ def geedownloadkalman():
                         bestCloudImage = images.sort('CLOUDY_PIXEL_PERCENTAGE',True).first() # Sorting the image on cloudcover and taking the best image
                         #CloudMasking
                         print('Applying cloud mask')
-                        bestCloudImageCloudMasked = cloudMaskingBasedonSCL(bestCloudImage) # applying the cloud mask
+                        bestCloudImageCloudMasked = cloud_masking_basedon_scl(bestCloudImage) # applying the cloud mask
                         print('Applying cloud mask done')
 
                         #check if user forder exists
@@ -464,11 +481,11 @@ def geedownloadkalman():
                             print('Scaling done')
 
                             print('Resampling the masked and scaled image') 
-                            bestCloudImageCloudMaskedScaledResampled = functn_ResemapleSentinel2(bestCloudImageCloudMaskedScaled) #reseampled to 10m 
+                            bestCloudImageCloudMaskedScaledResampled = functn_resemaple_sentinel2(bestCloudImageCloudMaskedScaled) #reseampled to 10m 
                             print('Resampling done')
 
                             print('Clipping the image') 
-                            bestCloudImageCloudMaskedScaledResampledClipped = functn_Clip(bestCloudImageCloudMaskedScaledResampled,roi_point) #clipped to aoi
+                            bestCloudImageCloudMaskedScaledResampledClipped = functn_clip(bestCloudImageCloudMaskedScaledResampled,roi_point) #clipped to aoi
                             print('clipping done.')
 
                             selectedbands = ['B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B8A', 'B9', 'B11', 'B12']
@@ -479,12 +496,12 @@ def geedownloadkalman():
                             #Some meta info of the image that will be useful for later calculatiosn
                             projection =  bestCloudImageCloudMaskedScaled.select('B8').projection()
                             crs = projection.crs()
-                            #transform_image = projection.transform()
+                            transform_image = projection.transform()
 
                             path = imageitm.getDownloadUrl({ 
-                            'scale': 10,  
                             'crs': crs,
-                            'region': roi_point}) 
+                            'crs_transform':transform_image
+                            }) 
                             #print('path')
                             #print(path)
                             new_row = pd.DataFrame({'point_id':point_id, 'gee_path':path,'internal_path': tiffuserfolder, 'imageid':str(i),
@@ -495,11 +512,15 @@ def geedownloadkalman():
                             for band in selectedbands:
                                 print(band)
                                 thisBand = bestCloudImageCloudMaskedScaledResampledClipped_SB_f.select(band)   
+                                #Some meta info of the image that will be useful for later calculatiosn
+                                #This was not before
+                                projection =  thisBand.projection()
+                                crs = projection.crs()  
+                                transform_image = projection.transform()
                                 try:
                                     urlNumpy = thisBand.getDownloadUrl({
-                                        'scale': 10,
                                         'crs': crs,
-                                        'region': roi_point,
+                                        'crs_transform':transform_image,
                                         'format': 'NPY'
                                     })
                                     responseNumpy= requests.get(urlNumpy)
@@ -515,7 +536,7 @@ def geedownloadkalman():
                             print(dffiles)
                         #insert data frame into database
                         if len(dffiles) > 0:
-                            guardardatoscoordenadasGeeTifffiles(dffiles,0)  
+                            guardardatoscoordenadas_gee_tifffiles(dffiles)
                             print(dffiles)
                             dffiles.drop(dffiles.index,inplace=True)
                         else:
@@ -587,7 +608,7 @@ def geedownloadcsv():
         #check in point has alredy values
         buscarpunto = checkPuntGeeProcesado(point_id,user_id,satellite,-1) 
         if buscarpunto == 0:
-            sleepsecp = random.randint(5,10) 
+            sleepsecp = random_int(10) 
             print('Esperando punto:' + str(sleepsecp) + ', segundos' + ',' + satellite)
             time.sleep(sleepsecp)
             
@@ -615,7 +636,7 @@ def geedownloadcsv():
                     bestCloudImage = images.sort('CLOUDY_PIXEL_PERCENTAGE',True).first() # Sorting the image on cloudcover and taking the best image
                     #CloudMasking
                     print('Applying cloud mask')
-                    bestCloudImageCloudMasked = cloudMaskingBasedonSCL(bestCloudImage) # applying the cloud mask
+                    bestCloudImageCloudMasked = cloud_masking_basedon_scl(bestCloudImage) # applying the cloud mask
                     print('Applying cloud mask done')
 
                     #check if user forder exists
@@ -679,11 +700,11 @@ def geedownloadcsv():
                         print('Scaling done')
 
                         print('Resampling the masked and scaled image') 
-                        bestCloudImageCloudMaskedScaledResampled = functn_ResemapleSentinel2(bestCloudImageCloudMaskedScaled) #reseampled to 10m 
+                        bestCloudImageCloudMaskedScaledResampled = functn_resemaple_sentinel2(bestCloudImageCloudMaskedScaled) #reseampled to 10m 
                         print('Resampling done')
 
                         print('Clipping the image') 
-                        bestCloudImageCloudMaskedScaledResampledClipped = functn_Clip(bestCloudImageCloudMaskedScaledResampled,roi_point) #clipped to aoi
+                        bestCloudImageCloudMaskedScaledResampledClipped = functn_clip(bestCloudImageCloudMaskedScaledResampled,roi_point) #clipped to aoi
                         print('clipping done.')
 
                         selectedbands = ['B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B8A', 'B9', 'B11', 'B12']
@@ -697,9 +718,9 @@ def geedownloadcsv():
                         transform_image = projection.transform()
 
                         path = imageitm.getDownloadUrl({ 
-                        'scale': 10,  
                         'crs': crs,
-                        'region': roi_point}) 
+                        'crs_transform':transform_image
+                        }) 
                         #print('path')
                         #print(path)
                         new_row = pd.DataFrame({'point_id':point_id, 'gee_path':path,'internal_path': tiffuserfolder, 'imageid':str(i),
@@ -710,11 +731,15 @@ def geedownloadcsv():
                         for band in selectedbands:
                             print(band)
                             thisBand = bestCloudImageCloudMaskedScaledResampledClipped_SB_f.select(band)   
+                            #Some meta info of the image that will be useful for later calculatiosn
+                            #This was not before
+                            projection =  thisBand.projection()
+                            crs = projection.crs()  
+                            transform_image = projection.transform()
                             try:
                                 urlNumpy = thisBand.getDownloadUrl({
-                                    'scale': 10,
                                     'crs': crs,
-                                    'region': roi_point,
+                                    'crs_transform':transform_image,
                                     'format': 'NPY'
                                 })
                                 responseNumpy= requests.get(urlNumpy)
@@ -730,29 +755,255 @@ def geedownloadcsv():
                         print(dffiles)
                     #insert data frame into database
                     if len(dffiles) > 0:
-                        guardardatoscoordenadasGeeTifffiles(dffiles,0)
+                        guardardatoscoordenadas_gee_tifffiles(dffiles)
                         print(dffiles)
-                        dffiles.drop(dffiles.index,inplace=True)
+                        dffiles.drop(dffiles.index,inplace=True)  
                     else:
                         print('Datos no encontrados')
                 else:
                     print('No se han encontrado imagenes para el punto')
             if (satellite == 'landsat'):
+                pathdef = 'N/A'
                 print("empezando landsat")
                 images = ee.ImageCollection('LANDSAT/LC08/C02/T1_L2') \
                     .filterBounds(roi_point) \
-                    .filterDate(start, end) \
-                    .filter(ee.Filter.lt('CLOUDY_PIXEL_PERCENTAGE', num_cloud))
+                    .filterDate(start, end)  \
+                    .filter(ee.Filter.lt('CLOUD_COVER', 50))
                 
                 
                 print("Total landsat SR Image Retrieved for data: ",images.size().getInfo())
             
                 if int(images.size().getInfo()) > 0:
                     #Get bands for the better image  and save to dir
+                    #bestCloudImage = images.sort('CLOUDY_PIXEL_PERCENTAGE',True).first() # Sorting the image on cloudcover and taking the best image
+                    
+                    # Apply the cloud mask function
+                    maskedCollection = images.map(maskL8sr);
+                    # Compute a median image and display.
+                    median = maskedCollection.median();
+
+
+                    #check if user forder exists
+                    data_safe = srvconf['PYSRV_SRC_ROOT_DATA_SAFE' ]
+                    userfolder = data_safe + '/appsharedfiles/' + str(dirstr)
+                    tiffuserfolder = userfolder + '/' + str(reference) + '/' + '0' +  '/tiff/gee/' + str(point_id) + '/zip'
+                    #create tiff folder if does not exists
+                    if not os.path.exists(tiffuserfolder):
+                        os.makedirs(tiffuserfolder)
+                    # Multi-band GeoTIFF file wrapped in a zip file.
+                    url = median.getDownloadUrl({
+                        'name': 'single_band',
+                        'bands':  ['SR_B1', 'SR_B2', 'SR_B3', 'SR_B4', 'SR_B5', 'SR_B6', 'SR_B7'],
+                        'region': region
+                    })
+                    print(url)
+                    #get date for zip files
+                    print('get date for zip files')
+                    timeStamp_zip_file = ee.Date(median.get('system:time_start')).format().slice(0,10); # get the time stamp of each frame. This can be any string. Date, Years, Hours, etc.
+                    timeStamp_zip_file = ee.String('Date: ').cat(ee.String(timeStamp_zip_file)); #convert time stamp to string 
+                    print(timeStamp_zip_file)
+                    timeStamp_zip_file_txt = timeStamp_zip_file.getInfo()
+                     
+                    response = requests.get(url)
+                      
+                    filename = tiffuserfolder + '/multi_band.zip'
+                    with open(filename, 'wb') as fd:
+                        fd.write(response.content)
+                    
+                    #Save bands info into database
+                    print('Save bands info into database')
+                    #Making a list of images so I can iterate over the number recived in call  images.
+                    num_items = 0
+                    if numberOfGeeImages  <= int(images.size().getInfo()):
+                        num_items = numberOfGeeImages
+                    else:
+                        num_items = images.size().getInfo()
+                    listOfImages = images.sort('CLOUDY_PIXEL_PERCENTAGE',True).toList(num_items)
+                    print('listOfImages.size().getInfo()')
+                    print(listOfImages.size().getInfo())
+                    failedBands = []
+                    selectedbands=['SR_B1', 'SR_B2', 'SR_B3', 'SR_B4', 'SR_B5', 'SR_B6', 'SR_B7']
+                    selectedbandsEquiv=['B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7']
+                    #LOOP OVER IMAGES
+                    for i in range(listOfImages.size().getInfo()):
+                        img = listOfImages.get(i)
+                        imageitm = ee.Image(img)
+                        cloud_cover =  ee.Image(img).get('CLOUDY_PIXEL_PERCENTAGE').getInfo() 
+                        print('Cloud cover:')
+                        print(cloud_cover)
+                        timeStamp_itm_file = ee.Date(imageitm.get('system:time_start')).format().slice(0,10); # get the time stamp of each frame. This can be any string. Date, Years, Hours, etc.
+                        timeStamp_itm_file = ee.String('Date: ').cat(ee.String(timeStamp_itm_file)); #convert time stamp to string 
+                        timeStamp_itm_file_txt = timeStamp_itm_file.getInfo()
+                        bestCloudImageCloudMasked = imageitm 
+                        
+                        projection =  bestCloudImageCloudMasked.select('SR_B5').projection()
+                        crs = projection.crs()
+                        #transform_image = projection.transform()
+                        path = bestCloudImageCloudMasked.getDownloadUrl({ 
+                            'name': 'single_band',
+                            'bands':  ['SR_B1', 'SR_B2', 'SR_B3', 'SR_B4', 'SR_B5', 'SR_B6', 'SR_B7'],
+                            'region': region
+                        }) 
+                        #print('path')
+                        #print(path)
+                        new_row = pd.DataFrame({'point_id':point_id, 'gee_path':path,'internal_path': tiffuserfolder, 'imageid':str(i),
+                                                    'B1':-1.1, 'B2':-1.1, 'B3':-1.1, 'B4':-1.1, 'B5':-1.1, 'B6':-1.1, 'B7':-1.1, 'B8':-1.1, 'B8A':-1.1, 'B9':-1.1,
+                                                    'B11':-1.1, 'B12':-1.1,'datetime_zip_file':timeStamp_zip_file_txt,'datetime_itm_file':timeStamp_itm_file_txt,'cloud_cover':cloud_cover,
+                                                    'user_id':user_id,'csvpath':pathdef,'B10':-1.1,'satellite':satellite,'iter':-1
+                                                    }, index=[0])
+                        for band in selectedbands:
+                            print(band)
+                            thisBand = bestCloudImageCloudMasked.select(band)   
+                            try:
+                                projection =  thisBand.projection()
+                                crs = projection.crs()
+                                #transform_image = projection.transform()
+                                urlNumpy = thisBand.getDownloadUrl({
+                                    'crs': crs,
+                                    'format': 'NPY'
+                                })
+                                responseNumpy= requests.get(urlNumpy)
+                                dataNumpy = np.load(io.BytesIO(responseNumpy.content), encoding='bytes').astype(np.float64)
+                                val = float(dataNumpy[0])
+                                new_row.at[0,selectedbandsEquiv[selectedbands.index(band)]] = val
+                                #print(bandsData)
+                            except Exception as e:
+                                failedBands.append(thisBand)
+                                print("An exception occurred while downloading band:", band)
+                                print(str(e))
+                        dffiles = pd.concat([new_row,dffiles.loc[:]]).reset_index(drop=True)
+                        print(dffiles)
+                    #insert data frame into database
+                    if len(dffiles) > 0:
+                        guardardatoscoordenadas_gee_tifffiles(dffiles)
+                        print(dffiles)
+                        dffiles.drop(dffiles.index,inplace=True)
+                    else:
+                        print('Datos no encontrados')
+                else:
+                    print('No se han encontrado imagenes para el punto')
+    if len(df) > 0:
+        guardardatoscsvpoints(df)
+
+    return 'Elementos procesados ',200
+# Applies scaling factors.
+def    applyScaleFactors(image) :
+  opticalBands = image.select('SR_B.').multiply(0.0000275).add(-0.2);
+  thermalBands = image.select('ST_B.*').multiply(0.00341802).add(149.0);
+  return image.addBands(opticalBands, None, True)\
+              .addBands(thermalBands, None, True)
+
+# Function to mask clouds and cloud shadows using the QA_PIXEL band
+def  maskL8sr(image) :
+  qa = image.select('QA_PIXEL') 
+  
+  # Bits 3 (cloud shadow), 4 (snow), and 5 (cloud)
+  cloudShadowBitMask = 1 << 3
+  snowBitMask = 1 << 4
+  cloudBitMask = 1 << 5
+  opticalBands = image.select('SR_B.').multiply(0.0000275).add(-0.2)
+  thermalBands = image.select('ST_B.*').multiply(0.00341802).add(149.0)
+  
+  # All three flags should be set to zero (i.e., no cloud, no shadow, no snow)
+  mask = qa.bitwiseAnd(cloudShadowBitMask).eq(0) \
+        .And(qa.bitwiseAnd(snowBitMask).eq(0)) \
+        .And (qa.bitwiseAnd(cloudBitMask).eq(0))
+
+  # Apply mask and scale the reflectance bands
+  return image.updateMask(mask).select(['SR_B1', 'SR_B2', 'SR_B3', 'SR_B4', 'SR_B5', 'SR_B6', 'SR_B7']) \
+              .copyProperties(image, ["system:time_start"]);
+
+@app.route('/api/gee/proc/download/csv/sent/noharm', methods = ['POST'])
+def geedownloadcsvnoharm(): 
+    """Get files and data from Google Earth Engine """
+    print('geedownload')
+    content = request.json 
+    #Gee credentials
+    service_account = 'walgreen@ee-josemanuelarocafernandez.iam.gserviceaccount.com'
+    credentials = ee.ServiceAccountCredentials(service_account,  srvconf['PYSRV_GEE_CONFIG_FILE'])
+    ee.Initialize(credentials)
+    #read input parameters
+    user_id = content['user_id']
+    dirstr = content['dirstr']
+    offset = content['offset']
+    num_offset= float(offset)
+    maxccvalue = content['cloudcover']
+    num_cloud = float(maxccvalue)
+    numberOfGeeImages = content['numberOfGeeImages']
+
+    reference = content['reference']
+    satellite = content['satellite']
+    
+    pathcsv = content['path']
+
+    # Create an empty DataFrame with column names
+    df = pd.DataFrame(columns=['depth','point_id','ph_cacl2','ph_h2o','ec',
+                               'oc','caco3','n','k','th_lat',
+                               'th_long','survey_date','elev','lc','lu',
+                               'lc0_desc','lc1_desc','lu1_desc','date_ini_search','date_end_search',
+                               'path'])
+    
+    #Leemos el CSV en un data frame
+    # Open file 
+    file = open(pathcsv, "r")
+    data = list(csv.reader(file, delimiter=";"))
+    file.close()
+    for i in range(1,len(data)):
+        
+        print(data[i][0])
+        dffiles = pd.DataFrame()
+        #fecha con formato DD-MM-YY
+        fecha_formato_lucas = data[i][5]
+        datetime_fecha_formato_lucas = datetime.strptime(fecha_formato_lucas,'%d/%m/%Y' )
+        print('Comienza el dia  : '+ fecha_formato_lucas + ' ' + satellite)
+        
+
+        start = datetime_fecha_formato_lucas + timedelta(days=-15)
+        end = datetime_fecha_formato_lucas + timedelta(days=15)
+
+
+        #Insertamos el valor en dl dataframe
+        df.loc[len(df.index)] = [data[i][0],data[i][1],-1,-1,-1,
+                                 data[i][2],-1,-1,-1,float(data[i][3]),
+                                 float(data[i][4]), data[i][5], data[i][6],'N/A','N/A',
+                                 data[i][7],data[i][8],data[i][9],start, end,
+                                 pathcsv]
+
+        long = float(data[i][4])
+        lat = float(data[i][3])
+        point_id =data[i][1]
+        #check in point has alredy values
+        buscarpunto = checkPuntGeeProcesadonoHarm(point_id,user_id,satellite,-1) 
+        if buscarpunto == 0:
+            sleepsecp = random_int(10) 
+            print('Esperando punto:' + str(sleepsecp) + ', segundos' + ',' + satellite)
+            time.sleep(sleepsecp)
+            
+            print('Long:' + str(long))
+            print('lat:' + str(lat))
+            print('point_id:' + str(point_id))
+            print(start)
+            print(end)
+            roi_point = ee.Geometry.Point(long,lat)
+            region = ee.Geometry.BBox(long - num_offset , lat - num_offset, long + num_offset , lat + num_offset)
+            
+            if (satellite == 'sentinel'):
+
+                images = ee.ImageCollection('COPERNICUS/S2_HARMONIZED') \
+                    .filterBounds(roi_point) \
+                    .filterDate(start, end) \
+                    .filter(ee.Filter.lt('CLOUDY_PIXEL_PERCENTAGE', num_cloud)) \
+                    .map(mask_s2_clouds)
+                
+                
+                print("Total Sentinel2 SR Image Retrieved for data: ",images.size().getInfo())
+            
+                if int(images.size().getInfo()) > 0:
+                    #Get bands for the better image  and save to dir
                     bestCloudImage = images.sort('CLOUDY_PIXEL_PERCENTAGE',True).first() # Sorting the image on cloudcover and taking the best image
                     #CloudMasking
                     print('Applying cloud mask')
-                    bestCloudImageCloudMasked = cloudMaskingBasedonSCL(bestCloudImage) # applying the cloud mask
+                    bestCloudImageCloudMasked = cloud_masking_basedon_scl(bestCloudImage) # applying the cloud mask
                     print('Applying cloud mask done')
 
                     #check if user forder exists
@@ -765,7 +1016,7 @@ def geedownloadcsv():
                     # Multi-band GeoTIFF file wrapped in a zip file.
                     url = bestCloudImage.getDownloadUrl({
                         'name': 'single_band',
-                        'bands':  ['B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B9', 'B10', 'B11'],
+                        'bands':  ['B1','B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B8A', 'B9', 'B11', 'B12'],
                         'region': region
                     })
                     #get date for zip files
@@ -792,7 +1043,7 @@ def geedownloadcsv():
                     print('listOfImages.size().getInfo()')
                     print(listOfImages.size().getInfo())
                     failedBands = []
-                    selectedbands=['B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B9', 'B10', 'B11']
+                    selectedbands=['B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B8A', 'B9', 'B11', 'B12']
                     #LOOP OVER IMAGES
                     for i in range(listOfImages.size().getInfo()):
                         img = listOfImages.get(i)
@@ -808,7 +1059,7 @@ def geedownloadcsv():
                         #inicio codigo prueba 
                         bandnames = bestCloudImageCloudMasked.bandNames() # Retrieving the bandnames 
                         #Scaling the selected bands
-                        selectedbands=['B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B9', 'B10', 'B11']
+                        selectedbands = ['B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B8A', 'B9', 'B11', 'B12']
                         # scale_factor = 1 # Define the scale factor
                         scale_factor = 0.0001 # Define the scale factor
                         print('Scaling the bands',selectedbands, 'by factor', scale_factor)
@@ -816,27 +1067,27 @@ def geedownloadcsv():
                         print('Scaling done')
 
                         print('Resampling the masked and scaled image') 
-                        bestCloudImageCloudMaskedScaledResampled = functn_ResemapleSentinel2(bestCloudImageCloudMaskedScaled) #reseampled to 10m 
+                        bestCloudImageCloudMaskedScaledResampled = functn_resemaple_sentinel2(bestCloudImageCloudMaskedScaled) #reseampled to 10m 
                         print('Resampling done')
 
                         print('Clipping the image') 
-                        bestCloudImageCloudMaskedScaledResampledClipped = functn_Clip(bestCloudImageCloudMaskedScaledResampled,roi_point) #clipped to aoi
+                        bestCloudImageCloudMaskedScaledResampledClipped = functn_clip(bestCloudImageCloudMaskedScaledResampled,roi_point) #clipped to aoi
                         print('clipping done.')
 
-                        selectedbands=['B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B9', 'B10', 'B11']
+                        selectedbands = ['B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B8A', 'B9', 'B11', 'B12']
                         bestCloudImageCloudMaskedScaledResampledClipped_SB = bestCloudImageCloudMaskedScaledResampledClipped.select(selectedbands)
 
                         bestCloudImageCloudMaskedScaledResampledClipped_SB_f=bestCloudImageCloudMaskedScaledResampledClipped_SB.toFloat()
 
                         #Some meta info of the image that will be useful for later calculatiosn
-                        projection =  bestCloudImageCloudMaskedScaled.select('B5').projection()
+                        projection =  bestCloudImageCloudMaskedScaled.select('B8').projection()
                         crs = projection.crs()
                         transform_image = projection.transform()
 
                         path = imageitm.getDownloadUrl({ 
-                        'scale': 10,  
                         'crs': crs,
-                        'region': roi_point}) 
+                        'crs_transform':transform_image
+                        })  
                         #print('path')
                         #print(path)
                         new_row = pd.DataFrame({'point_id':point_id, 'gee_path':path,'internal_path': tiffuserfolder, 'imageid':str(i),
@@ -847,11 +1098,15 @@ def geedownloadcsv():
                         for band in selectedbands:
                             print(band)
                             thisBand = bestCloudImageCloudMaskedScaledResampledClipped_SB_f.select(band)   
+                            #Some meta info of the image that will be useful for later calculatiosn
+                            #This was not before
+                            projection =  thisBand.projection()
+                            crs = projection.crs()  
+                            transform_image = projection.transform()
                             try:
                                 urlNumpy = thisBand.getDownloadUrl({
-                                    'scale': 10,
                                     'crs': crs,
-                                    'region': roi_point,
+                                    'crs_transform':transform_image,
                                     'format': 'NPY'
                                 })
                                 responseNumpy= requests.get(urlNumpy)
@@ -867,7 +1122,7 @@ def geedownloadcsv():
                         print(dffiles)
                     #insert data frame into database
                     if len(dffiles) > 0:
-                        guardardatoscoordenadasGeeTifffiles(dffiles,0)
+                        guardardatoscoordenadas_gee_tifffiles_no_harm(dffiles)
                         print(dffiles)
                         dffiles.drop(dffiles.index,inplace=True)
                     else:
@@ -875,10 +1130,9 @@ def geedownloadcsv():
                 else:
                     print('No se han encontrado imagenes para el punto')
     if len(df) > 0:
-        guardardatoscsvpoints(df,0) 
+        guardardatoscsvpoints(df)
 
     return 'Elementos procesados ',200
-
 
 # retrieve file from 'static/images' directory
 @app.route('/api/obtenercsvproc/reflvector/gee/', methods = ['POST'])
@@ -892,7 +1146,7 @@ def obtenercsvprocreflvector():
 
 
     #Obtenemos los parametros minimo y max del poligono
-    dfdata = puntosUploadCsvOC(userid,path )
+    dfdata = puntos_upload_csv_oc(userid,path )
     return dfdata.to_json(),200
 
 
@@ -990,10 +1244,9 @@ def geedownloadkalmanPoint():
         print(end)
 
         #check in point has alredy values
-        #buscarpunto = deletePuntGeeProcesado(point_id,user_id,satellite,num,pathdef) 
         buscarpunto = checkPuntGeeProcesado(point_id,user_id,satellite,num)
         if buscarpunto == 1:
-            sleepsecp = random.randint(3,6) 
+            sleepsecp = random_int(10) 
             print('Esperando punto:' + str(sleepsecp) + ', segundos')
             time.sleep(sleepsecp)
             
@@ -1021,7 +1274,7 @@ def geedownloadkalmanPoint():
                     bestCloudImage = images.sort('CLOUDY_PIXEL_PERCENTAGE',True).first() # Sorting the image on cloudcover and taking the best image
                     #CloudMasking
                     print('Applying cloud mask')
-                    bestCloudImageCloudMasked = cloudMaskingBasedonSCL(bestCloudImage) # applying the cloud mask
+                    bestCloudImageCloudMasked = cloud_masking_basedon_scl(bestCloudImage) # applying the cloud mask
                     print('Applying cloud mask done')
 
                     #check if user forder exists
@@ -1086,11 +1339,11 @@ def geedownloadkalmanPoint():
                         print('Scaling done')
 
                         print('Resampling the masked and scaled image') 
-                        bestCloudImageCloudMaskedScaledResampled = functn_ResemapleSentinel2(bestCloudImageCloudMaskedScaled) #reseampled to 10m 
+                        bestCloudImageCloudMaskedScaledResampled = functn_resemaple_sentinel2(bestCloudImageCloudMaskedScaled) #reseampled to 10m 
                         print('Resampling done')
 
                         print('Clipping the image') 
-                        bestCloudImageCloudMaskedScaledResampledClipped = functn_Clip(bestCloudImageCloudMaskedScaledResampled,roi_point) #clipped to aoi
+                        bestCloudImageCloudMaskedScaledResampledClipped = functn_clip(bestCloudImageCloudMaskedScaledResampled,roi_point) #clipped to aoi
                         print('clipping done.')
 
                         selectedbands = ['B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B8A', 'B9', 'B11', 'B12']
@@ -1101,12 +1354,12 @@ def geedownloadkalmanPoint():
                         #Some meta info of the image that will be useful for later calculatiosn
                         projection =  bestCloudImageCloudMaskedScaled.select('B8').projection()
                         crs = projection.crs()
-                        #transform_image = projection.transform()
+                        transform_image = projection.transform()
 
                         path = imageitm.getDownloadUrl({ 
-                        'scale': 10,  
                         'crs': crs,
-                        'region': roi_point}) 
+                        'crs_transform':transform_image
+                        }) 
                         #print('path')
                         #print(path)
                         new_row = pd.DataFrame({'point_id':point_id, 'gee_path':path,'internal_path': tiffuserfolder, 'imageid':str(i),
@@ -1116,12 +1369,16 @@ def geedownloadkalmanPoint():
                                                     }, index=[0])
                         for band in selectedbands:
                             print(band)
-                            thisBand = bestCloudImageCloudMaskedScaledResampledClipped_SB_f.select(band)   
+                            thisBand = bestCloudImageCloudMaskedScaledResampledClipped_SB_f.select(band) 
+                            #Some meta info of the image that will be useful for later calculatiosn
+                            #This was not before
+                            projection =  thisBand.projection()
+                            crs = projection.crs()  
+                            transform_image = projection.transform()
                             try:
                                 urlNumpy = thisBand.getDownloadUrl({
-                                    'scale': 10,
                                     'crs': crs,
-                                    'region': roi_point,
+                                    'crs_transform':transform_image,
                                     'format': 'NPY'
                                 })
                                 responseNumpy= requests.get(urlNumpy)
@@ -1138,7 +1395,7 @@ def geedownloadkalmanPoint():
                         print(dffiles)
                     #insert data frame into database
                     if len(dffiles) > 0:
-                        guardardatoscoordenadasGeeTifffiles(dffiles,0)  
+                        guardardatoscoordenadas_gee_tifffiles(dffiles)
                         print(dffiles)
                         dffiles.drop(dffiles.index,inplace=True)
                     else:
@@ -1152,17 +1409,14 @@ def geedownloadkalmanPoint():
                     .filterDate(start, end) \
                     .filter(ee.Filter.lt('CLOUDY_PIXEL_PERCENTAGE', num_cloud))
                 
-                
+                #Scaling the selected bands
+                images = images.map(apply_scale_factors)
+
                 print("Total landsat SR Image Retrieved for data: ",images.size().getInfo())
             
                 if int(images.size().getInfo()) > 0:
                     #Get bands for the better image  and save to dir
                     bestCloudImage = images.sort('CLOUDY_PIXEL_PERCENTAGE',True).first() # Sorting the image on cloudcover and taking the best image
-                    #CloudMasking
-                    print('Applying cloud mask')
-                    bestCloudImageCloudMasked = cloudMaskingBasedonSCL(bestCloudImage) # applying the cloud mask
-                    print('Applying cloud mask done')
-
                     #check if user forder exists
                     data_safe = srvconf['PYSRV_SRC_ROOT_DATA_SAFE' ]
                     userfolder = data_safe + '/appsharedfiles/' + str(dirstr)
@@ -1173,7 +1427,7 @@ def geedownloadkalmanPoint():
                     # Multi-band GeoTIFF file wrapped in a zip file.
                     url = bestCloudImage.getDownloadUrl({
                         'name': 'single_band',
-                        'bands':  ['B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B9', 'B10', 'B11'],
+                        'bands':  ['SR_B1', 'SR_B2', 'SR_B3', 'SR_B4', 'SR_B5', 'SR_B6', 'SR_B7'],
                         'region': region
                     })
                     #get date for zip files
@@ -1200,7 +1454,8 @@ def geedownloadkalmanPoint():
                     print('listOfImages.size().getInfo()')
                     print(listOfImages.size().getInfo())
                     failedBands = []
-                    selectedbands=['B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B9', 'B10', 'B11']
+                    selectedbands=['SR_B1', 'SR_B2', 'SR_B3', 'SR_B4', 'SR_B5', 'SR_B6', 'SR_B7']
+                    selectedbandsEquiv=['B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7']
                     #LOOP OVER IMAGES
                     for i in range(listOfImages.size().getInfo()):
                         img = listOfImages.get(i)
@@ -1212,39 +1467,14 @@ def geedownloadkalmanPoint():
                         timeStamp_itm_file = ee.String('Date: ').cat(ee.String(timeStamp_itm_file)); #convert time stamp to string 
                         timeStamp_itm_file_txt = timeStamp_itm_file.getInfo()
                         bestCloudImageCloudMasked = imageitm 
-                        print('Detalles de la imagen  :')
-                        #inicio codigo prueba 
-                        bandnames = bestCloudImageCloudMasked.bandNames() # Retrieving the bandnames 
-                        #Scaling the selected bands
-                        selectedbands=['B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B9', 'B10', 'B11']
-                        # scale_factor = 1 # Define the scale factor
-                        scale_factor = 0.0001 # Define the scale factor
-                        print('Scaling the bands',selectedbands, 'by factor', scale_factor)
-                        bestCloudImageCloudMaskedScaled = functn_scale_bands(bestCloudImageCloudMasked, selectedbands, scale_factor) # Scaling the selected layers of cloudmasked image
-                        print('Scaling done')
-
-                        print('Resampling the masked and scaled image') 
-                        bestCloudImageCloudMaskedScaledResampled = functn_ResemapleSentinel2(bestCloudImageCloudMaskedScaled) #reseampled to 10m 
-                        print('Resampling done')
-
-                        print('Clipping the image') 
-                        bestCloudImageCloudMaskedScaledResampledClipped = functn_Clip(bestCloudImageCloudMaskedScaledResampled,roi_point) #clipped to aoi
-                        print('clipping done.')
-
-                        selectedbands=['B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B9', 'B10', 'B11']
-                        bestCloudImageCloudMaskedScaledResampledClipped_SB = bestCloudImageCloudMaskedScaledResampledClipped.select(selectedbands)
-
-                        bestCloudImageCloudMaskedScaledResampledClipped_SB_f=bestCloudImageCloudMaskedScaledResampledClipped_SB.toFloat()
-
-                        #Some meta info of the image that will be useful for later calculatiosn
-                        projection =  bestCloudImageCloudMaskedScaled.select('B5').projection()
+                        
+                        projection =  bestCloudImageCloudMasked.select('SR_B5').projection()
                         crs = projection.crs()
                         transform_image = projection.transform()
-
                         path = imageitm.getDownloadUrl({ 
-                        'scale': 10,  
                         'crs': crs,
-                        'region': roi_point}) 
+                        'crs_transform':transform_image
+                        }) 
                         #print('path')
                         #print(path)
                         new_row = pd.DataFrame({'point_id':point_id, 'gee_path':path,'internal_path': tiffuserfolder, 'imageid':str(i),
@@ -1254,18 +1484,20 @@ def geedownloadkalmanPoint():
                                                     }, index=[0])
                         for band in selectedbands:
                             print(band)
-                            thisBand = bestCloudImageCloudMaskedScaledResampledClipped_SB_f.select(band)   
+                            thisBand = bestCloudImageCloudMasked.select(band)   
                             try:
+                                projection =  thisBand.projection()
+                                crs = projection.crs()
+                                transform_image = projection.transform()
                                 urlNumpy = thisBand.getDownloadUrl({
-                                    'scale': 10,
                                     'crs': crs,
-                                    'region': roi_point,
+                                    'crs_transform':transform_image,
                                     'format': 'NPY'
                                 })
                                 responseNumpy= requests.get(urlNumpy)
                                 dataNumpy = np.load(io.BytesIO(responseNumpy.content), encoding='bytes').astype(np.float64)
                                 val = float(dataNumpy[0])
-                                new_row.at[0,band] = val
+                                new_row.at[0,selectedbandsEquiv[selectedbands.index(band)]] = val
                                 #print(bandsData)
                             except Exception as e:
                                 failedBands.append(thisBand)
@@ -1276,7 +1508,7 @@ def geedownloadkalmanPoint():
                         print(dffiles)
                     #insert data frame into database
                     if len(dffiles) > 0:
-                        guardardatoscoordenadasGeeTifffiles(dffiles,0)
+                        guardardatoscoordenadas_gee_tifffiles(dffiles)
                         print(dffiles)
                         dffiles.drop(dffiles.index,inplace=True)
                     else:
@@ -1289,11 +1521,11 @@ def geedownloadkalmanPoint():
     band_array_literal  = ['B01','B02','B03','B04','B05','B06','B07','B08','B8A','B09','B11','B12']
     num_bands = 12
     if (satellite == 'sentinel'):
-        dffkalmanproc = getPuntGeeSentinelProcesados(point_id,user_id,satellite,pathdef) 
+        dffkalmanproc = get_punt_gee_sentinel_procesados(point_id,user_id,satellite,pathdef) 
         print('dffkalmanproc sentinel')
         print(dffkalmanproc)
     if (satellite == 'landsat'):
-        dffkalmanproc = getPuntGeeLandsatProcesados(point_id,user_id,satellite,pathdef) 
+        dffkalmanproc = get_punt_gee_landsat_procesados(point_id,user_id,satellite,pathdef)
         num_bands = 11
         band_array_literal  = ['B01','B02','B03','B04','B05','B06','B07','B08','B09','B10','B11']
         print('dffkalmanproc landsat')

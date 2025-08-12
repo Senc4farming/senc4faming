@@ -5,7 +5,6 @@ import java.io.*;
 import java.net.MalformedURLException;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Optional;
 
 import com.example.senc4farming.dto.DatosLucas2018Dto;
 import com.example.senc4farming.dto.EvalScriptLaunchDto;
@@ -103,8 +102,8 @@ public class ImageController extends AbstractController <SentinelQueryFilesTiffD
 
     @GetMapping("/visor/image/evalscript/{id}")
     public String getListImagesEvalscript(@PathVariable("id") Integer id,Model model) {
-        Optional<EvalScriptLaunchDto> evalScriptLaunchDto = evalScriptLaunchService.encuentraPorId(id);
-        String pathcompleto =  evalScriptLaunchDto.get().getPathtiff();
+        EvalScriptLaunchDto evalScriptLaunchDto = evalScriptLaunchService.buscarDtoSinOpt(id);
+        String pathcompleto =  evalScriptLaunchDto.getPathtiff();
 
         String nombredirinterno =  pathcompleto.substring(pathcompleto.lastIndexOf(STR_USERFILES)+10,(pathcompleto.lastIndexOf("/")));
         String uploadDir = STR_F_SRC + nombredirinterno ;
@@ -117,9 +116,9 @@ public class ImageController extends AbstractController <SentinelQueryFilesTiffD
 
     @GetMapping("/visor/image/{id}")
     public String getListImages(@PathVariable("id") Integer id,Model model) throws IOException, ParseException {
-        Optional<SentinelQueryFilesTiffDto> sentinelQueryFilesTiffDto = service.encuentraPorId(id);
-        String pathcompleto =  sentinelQueryFilesTiffDto.get().getPath();
-        SentinelQueryFilesTiffDto sentinelQueryFilesTiffDto1 = sentinelQueryFilesTiffDto.get();
+        SentinelQueryFilesTiffDto sentinelQueryFilesTiffDto = service.buscarDtoSinOpt(id);
+        String pathcompleto =  sentinelQueryFilesTiffDto.getPath();
+        SentinelQueryFilesTiffDto sentinelQueryFilesTiffDto1 = sentinelQueryFilesTiffDto;
         String polygon = sentinelQueryFilesTiffDto1.getSentinelQueryFilesfortiff().getFiltroListarArchivos().getPolygon();
         String nombredirinterno =  pathcompleto.substring(pathcompleto.lastIndexOf(STR_USERFILES),(pathcompleto.lastIndexOf("/")));
         String uploadDir = STR_F_SRC + nombredirinterno ;
@@ -192,9 +191,9 @@ public class ImageController extends AbstractController <SentinelQueryFilesTiffD
                                     @PathVariable("idprev") Integer idprev,
                                     Model model) throws IOException, ParseException {
         logger.info("getListImagesBack");
-        Optional<SentinelQueryFilesTiffDto> sentinelQueryFilesTiffDto = service.encuentraPorId(id);
-        String pathcompleto =  sentinelQueryFilesTiffDto.get().getPath();
-        SentinelQueryFilesTiffDto sentinelQueryFilesTiffDto1 = sentinelQueryFilesTiffDto.get();
+        SentinelQueryFilesTiffDto sentinelQueryFilesTiffDto = service.buscarDtoSinOpt(id);
+        String pathcompleto =  sentinelQueryFilesTiffDto.getPath();
+        SentinelQueryFilesTiffDto sentinelQueryFilesTiffDto1 = sentinelQueryFilesTiffDto;
         String polygon = sentinelQueryFilesTiffDto1.getSentinelQueryFilesfortiff().getFiltroListarArchivos().getPolygon();
         String nombredirinterno =  pathcompleto.substring(pathcompleto.lastIndexOf(STR_USERFILES),(pathcompleto.lastIndexOf("/")));
         String uploadDir = STR_F_SRC + nombredirinterno ;
@@ -261,9 +260,9 @@ public class ImageController extends AbstractController <SentinelQueryFilesTiffD
                                     @PathVariable("idprev") Integer idprev,
                                     Model model) throws IOException, ParseException {
         logger.info("getListImagesMapBack");
-        Optional<SentinelQueryFilesTiffDto> sentinelQueryFilesTiffDto = service.encuentraPorId(id);
-        String pathcompleto =  sentinelQueryFilesTiffDto.get().getPath();
-        SentinelQueryFilesTiffDto sentinelQueryFilesTiffDto1 = sentinelQueryFilesTiffDto.get();
+        SentinelQueryFilesTiffDto sentinelQueryFilesTiffDto = service.buscarDtoSinOpt(id);
+        String pathcompleto =  sentinelQueryFilesTiffDto.getPath();
+        SentinelQueryFilesTiffDto sentinelQueryFilesTiffDto1 = sentinelQueryFilesTiffDto;
         String polygon = sentinelQueryFilesTiffDto1.getSentinelQueryFilesfortiff().getFiltroListarArchivos().getPolygon();
         String nombredirinterno =  pathcompleto.substring(pathcompleto.lastIndexOf(STR_USERFILES),(pathcompleto.lastIndexOf("/")));
         String uploadDir = STR_F_SRC + nombredirinterno ;
@@ -329,9 +328,9 @@ public class ImageController extends AbstractController <SentinelQueryFilesTiffD
     public String getListImagesTiff(@PathVariable("id") Integer id,
                                     @PathVariable("idprev") Integer idprev,
                                     Model model) throws IOException, ParseException {
-        Optional<SentinelQueryFilesTiffDto> sentinelQueryFilesTiffDto = service.encuentraPorId(id);
-        String pathcompleto =  sentinelQueryFilesTiffDto.get().getPath();
-        SentinelQueryFilesTiffDto sentinelQueryFilesTiffDto1 = sentinelQueryFilesTiffDto.get();
+        SentinelQueryFilesTiffDto sentinelQueryFilesTiffDto = service.buscarDtoSinOpt(id);
+        String pathcompleto =  sentinelQueryFilesTiffDto.getPath();
+        SentinelQueryFilesTiffDto sentinelQueryFilesTiffDto1 = sentinelQueryFilesTiffDto;
         String polygon = sentinelQueryFilesTiffDto1.getSentinelQueryFilesfortiff().getFiltroListarArchivos().getPolygon();
         String nombredirinterno =  pathcompleto.substring(pathcompleto.lastIndexOf(STR_USERFILES),(pathcompleto.lastIndexOf("/")));
         String uploadDir = STR_F_SRC + nombredirinterno ;
@@ -404,7 +403,7 @@ public class ImageController extends AbstractController <SentinelQueryFilesTiffD
     @PostMapping("/visor/image/lucaspoints")
     public String showlucaspointsPost(Model model, @Valid Dates dates, BindingResult result)  {
         if (result.hasErrors()) {
-            return STR_V_IMAGES_PREV;
+            logger.error(result.getAllErrors());
         }
         logger.info(dates.getStartDate());
         long interval = datesService.calculateDateInterval(dates.getStartDate(), dates.getEndDate());
@@ -420,9 +419,9 @@ public class ImageController extends AbstractController <SentinelQueryFilesTiffD
 
     @GetMapping("/visor/image/evalscriptn/{id}")
     public String getListImagesEvalscriptnew(@PathVariable("id") Integer id,Model model) throws IOException, ParseException {
-        Optional<EvalScriptLaunchDto> evalScriptLaunchDto = evalScriptLaunchService.encuentraPorId(id);
-        String pathcompletotiff =  evalScriptLaunchDto.get().getPathtiff();
-        String pathcompletojson =  evalScriptLaunchDto.get().getPathjson();
+        EvalScriptLaunchDto evalScriptLaunchDto = evalScriptLaunchService.buscarDtoSinOpt(id);
+        String pathcompletotiff =  evalScriptLaunchDto.getPathtiff();
+        String pathcompletojson =  evalScriptLaunchDto.getPathjson();
         //Traducimos a  la imagen en local
         logger.info("Path inicial: %s" , pathcompletotiff);
 
@@ -486,15 +485,15 @@ public class ImageController extends AbstractController <SentinelQueryFilesTiffD
         model.addAttribute(STR_MAXLONG, maxlong);
         model.addAttribute(STR_MAXLAT, maxlat);
         model.addAttribute(STR_IMAGE, internaltiffautopath);
-        model.addAttribute(STR_POLYGON, evalScriptLaunchDto.get().getPolygon());
+        model.addAttribute(STR_POLYGON, evalScriptLaunchDto.getPolygon());
 
         return "/visor/imagesprevmyqueryv1";
     }
 
     @GetMapping("/visor/image/lucas/{id}")
     public String getPathImags(@PathVariable("id") Long id,Model model) throws IOException, ParseException {
-        Optional<DatosLucas2018Dto> datosLucas2018Dto = datosLucas2018Service.encuentraPorId(id);
-        String pathcompleto =  datosLucas2018Dto.get().getPath();
+        DatosLucas2018Dto datosLucas2018Dto = datosLucas2018Service.buscarDtoSinOpt(id);
+        String pathcompleto =  datosLucas2018Dto.getPath();
         //Traducimos a  la imagen en local
         logger.info("Path inicial: %s" , pathcompleto);
 
@@ -503,13 +502,13 @@ public class ImageController extends AbstractController <SentinelQueryFilesTiffD
         String internaljsonfloat32path = internaltifffloat32path.replace("response.tiff","request.json" );
         //Buscanmos el path para la imagen a mostrar
         //Obtenemos el id del punto y la banda
-        Optional<DatosLucas2018> datosLucas2018 = datosLucas2018Service.buscar(id);
+        DatosLucas2018 datosLucas2018 = datosLucas2018Service.buscarSinOpt(id);
         // Con los datos buscamos los registros con auto el json y el tiff
         //Buscamos el tiff
         DatosLucas2018 datosLucas20181TiffAuto = datosLucas2018Service.getlucasreglike(
-                datosLucas2018.get().getSearchid(),
-                datosLucas2018.get().getPointid(),
-                datosLucas2018.get().getBand(), "%AUTO%response.tiff");
+                datosLucas2018.getSearchid(),
+                datosLucas2018.getPointid(),
+                datosLucas2018.getBand(), "%AUTO%response.tiff");
         //
         String internaltiffautopath = datosLucas20181TiffAuto.getPath().replace(STR_APP,"");
         //¿Existe?

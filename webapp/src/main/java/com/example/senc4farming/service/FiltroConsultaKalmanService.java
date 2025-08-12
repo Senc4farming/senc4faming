@@ -23,6 +23,7 @@ public class FiltroConsultaKalmanService extends AbstractBusinessService<FiltroC
 
         super(repo, serviceMapper);
     }
+    @Override
     public FiltroConsultaKalmanDto guardar(FiltroConsultaKalmanDto dto){
         //Traduzco del dto con datos de entrada a la entidad
         final FiltroConsultaKalman entidad = getMapper().toEntity(dto);

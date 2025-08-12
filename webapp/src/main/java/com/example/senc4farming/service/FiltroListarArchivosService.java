@@ -23,6 +23,7 @@ public class FiltroListarArchivosService extends AbstractBusinessService<FiltroL
 
         super(repo, serviceMapper);
     }
+    @Override
     public FiltroListarArchivosDto guardar(FiltroListarArchivosDto dto){
         //Traduzco del dto con datos de entrada a la entidad
         final FiltroListarArchivos entidad = getMapper().toEntity(dto);

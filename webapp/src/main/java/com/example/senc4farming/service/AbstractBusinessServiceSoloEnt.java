@@ -6,12 +6,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.*;
 
-public abstract class AbstractBusinessServiceSoloEnt<E, ID,  REPO extends JpaRepository<E,ID>>  {
-    private final REPO repo;
+public abstract class AbstractBusinessServiceSoloEnt<E, I,  R extends JpaRepository<E,I>>  {
+    private final R repo;
 
 
 
-    protected AbstractBusinessServiceSoloEnt(REPO repo) {
+    protected AbstractBusinessServiceSoloEnt(R repo) {
         this.repo = repo;
 
     }
@@ -23,11 +23,11 @@ public abstract class AbstractBusinessServiceSoloEnt<E, ID,  REPO extends JpaRep
         return   new HashSet<>(this.repo.findAll());
     }
 
-    public Optional<E> encuentraPorIdEntity(ID id){
+    public Optional<E> encuentraPorIdEntity(I id){
 
         return this.repo.findById(id);
     }
-    public Optional<E> encuentraPorId(ID id){
+    public Optional<E> encuentraPorId(I id){
 
         return this.repo.findById(id);
     }
@@ -52,9 +52,9 @@ public abstract class AbstractBusinessServiceSoloEnt<E, ID,  REPO extends JpaRep
         }
     }
     //eliminar un registro
-    public void eliminarPorId(ID id){
+    public void eliminarPorId(I id){
         this.repo.deleteById(id);
     }
     //Obtener el repo
-    public REPO getRepo(){return  repo;}
+    public R getRepo(){return  repo;}
 }

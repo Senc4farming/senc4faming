@@ -104,8 +104,6 @@ https://www.baeldung.com/spring-security-csrf
                 .accessDeniedPage("/accessDenied")
 
                 .and()
-                .csrf().disable()
-                .cors().disable()
                 .authenticationProvider(authenticationProvider());
 
         return http.build();
@@ -125,7 +123,7 @@ https://www.baeldung.com/spring-security-csrf
 
     @Bean
     public ServletListenerRegistrationBean<HttpSessionEventPublisher> httpSessionEventPublisher() {
-        return new ServletListenerRegistrationBean<HttpSessionEventPublisher>(new HttpSessionEventPublisher());
+        return new ServletListenerRegistrationBean<>(new HttpSessionEventPublisher());
     }
 
 

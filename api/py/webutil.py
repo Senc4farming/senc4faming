@@ -51,7 +51,7 @@ def get_myself():
     """Return the user object of the caller or None if he is a visitor.
     Loads the user from the database, then caches it during request."""
 
-    if not "userid" in session:
+    if "userid" not in session:
         return None
 
     if hasattr(g, "MYSELF"):
@@ -88,10 +88,7 @@ def before_request():
        prepares global data, loads current user."""
 
     # log request path+input, but not secrets
-    try:
-        params = request.json or request.args or request.form
-    except:
-        params = None
+    params = request.json or request.args or request.form
     if params:
         cloned = None
         secret_keys = ["password", "passwd", "pwd"]
@@ -115,10 +112,10 @@ def before_request():
     # but do not pollute g, store only the most relevant data
     g.HOST = request.headers.get('X-Real-Host', '')
     g.ISLOGGED = "userid" in session
-    myrole = session.get("role") or ""
+    myrole =
     g.IS_SUPER_USER = myrole == "superuser"
 
-    if myrole == "disabled":
+    if (session.get("role") or "") == "disabled":
         err = "account disabled"
         log.warn(err)
         return jsonify({"err":err}), 400
@@ -150,7 +147,6 @@ def after_request(response):
     response.headers['Access-Control-Allow-Methods'] = 'GET,POST,PUT,DELETE,OPTIONS'
     response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
     response.headers['Access-Control-Allow-Credentials'] = 'true'
-#     response.headers['Access-Control-Expose-Headers'] = 'Access-Control-Allow-Origin'
 
     return response
 
@@ -212,11 +208,11 @@ def init_logging():
     """Initialize logging system."""
 
     prefix = "PROD " if config.IS_PRODUCTION else ""
-    format = prefix+"%(levelname)3.3s %(uid)s@%(ip)s %(asctime)s %(filename)s %(message)s"
+    format_str = prefix+"%(levelname)3.3s %(uid)s@%(ip)s %(asctime)s %(filename)s %(message)s"
     dfmt = "%d%m%y-%H:%M:%S"
-    logging.basicConfig(level=logging.INFO, format=format, datefmt=dfmt)
+    logging.basicConfig(level=logging.INFO, format=format_str, datefmt=dfmt)
 
-    formatter = ColorFormatter(format, datefmt=dfmt)
+    formatter = ColorFormatter(format_str, datefmt=dfmt)
 
     # custom log data: userid + ip addr
     f = MyLogContextFilter()
@@ -253,10 +249,9 @@ def _is_role_atleast(myrole, rolebase):
         return "userid" in session
 
     levels = {"readonly":1, "editor":2, "admin":3, "superuser":4}
-    try:
-        return levels[myrole] >= levels[rolebase]
-    except:
-        return False
+
+    return levels[myrole] >= levels[rolebase]
+
 
 
 class MyJSONEncoder(JSONEncoder):
@@ -266,7 +261,6 @@ class MyJSONEncoder(JSONEncoder):
         if isinstance(obj, db.BaseModel):
             return obj.serialize()
         elif isinstance(obj, datetime.datetime):
-#             dt_local = util.utc2local(obj)
             return obj.isoformat() if obj else None
         return JSONEncoder.default(self, obj)
 

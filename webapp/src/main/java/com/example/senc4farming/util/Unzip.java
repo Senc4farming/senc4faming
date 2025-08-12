@@ -1,7 +1,5 @@
 package com.example.senc4farming.util;
 
-import org.apache.tomcat.util.http.fileupload.FileUtils;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -10,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-
+import org.apache.commons.io.FileUtils;
 
 /**
  * Slightly modified version of https://www.mkyong.com/java/how-to-decompress-files-from-a-zip-file/
@@ -19,7 +17,7 @@ import java.util.zip.ZipInputStream;
 public class Unzip {
 
     private final File input;
-    private final List<File> output = new ArrayList<>();
+    private List<File> output = new ArrayList<>();
     private String outputFolder = "C:\\KMZ_TEMP";
 
     public Unzip(File file) {
@@ -46,8 +44,11 @@ public class Unzip {
 
     /**
      * Method to unzip the input file.
+     * <p>
+     * @param zipFile input zip file
+     * @throws java.lang.Exception
      */
-    public void unZipIt() throws IOException {
+    public void unZipIt() throws Exception, IOException {
 
         byte[] buffer = new byte[1024];
 

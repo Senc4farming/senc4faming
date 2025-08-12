@@ -21,11 +21,11 @@ public class Menu {
     @Column(nullable = false)
     private String description;
     @Column(nullable = false)
-    private String description_es;
+    private String descriptionEs;
     @Column(nullable = false)
-    private String description_en;
+    private String descriptionEn;
     @Column(nullable = false)
-    private String description_fr;
+    private String descriptionFr;
     @Column(nullable = false)
     private String description01;
     @Column(nullable = false)

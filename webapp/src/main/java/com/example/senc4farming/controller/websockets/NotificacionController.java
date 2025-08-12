@@ -5,7 +5,6 @@ import com.example.senc4farming.dto.websockets.NotificacionDto;
 import com.example.senc4farming.model.Usuario;
 import com.example.senc4farming.model.websockets.Notificacion;
 import com.example.senc4farming.service.MenuService;
-import com.example.senc4farming.service.UsuarioService;
 import com.example.senc4farming.service.websockets.NotificacionService;
 import com.example.senc4farming.controller.AbstractController;
 import org.springframework.data.domain.Page;
@@ -28,13 +27,16 @@ import java.util.Optional;
 public class NotificacionController extends AbstractController<NotificacionDto> {
 
 
-    private final UsuarioService usuarioService;
+
 
     private final NotificacionService notificacionService;
 
-    protected NotificacionController(MenuService menuService, UsuarioService usuarioService, NotificacionService notificacionService) {
+    private static final String STR_LOGGEDUSER="logeduser";
+    private static final String STR_PENDIENTE = "Pendiente";
+
+    protected NotificacionController(MenuService menuService,NotificacionService notificacionService) {
         super(menuService);
-        this.usuarioService = usuarioService;
+
         this.notificacionService = notificacionService;
     }
 
@@ -44,13 +46,11 @@ public class NotificacionController extends AbstractController<NotificacionDto> 
                                         @RequestParam("size") Optional<Integer> size,
                                         ModelMap interfazConPantalla){
         Usuario usuario = ((SuperCustomerUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsuario();
-        interfazConPantalla.addAttribute("logeduser",usuario.getNombreUsuario());
+        interfazConPantalla.addAttribute(STR_LOGGEDUSER,usuario.getNombreUsuario());
 
         //tenemos que leer la lista de usuarios
         //Que elemento me la ofrece?
         //listaUsrTodos
-        //List<UsuarioDto>  lusrdto = this.service.listaUsrTodos();
-        //interfazConPantalla.addAttribute("listausuarios", lusrdto);
         //Obetenemos el objeto Page del servicio
         Integer pagina = 0;
         if (page.isPresent()) {
@@ -63,7 +63,7 @@ public class NotificacionController extends AbstractController<NotificacionDto> 
         Page<NotificacionDto> notificacionDtos =
                 this.notificacionService.buscarTodos(PageRequest.of(pagina,maxelementos));
 
-        Integer numPendientes = this.notificacionService.getRepo().countByUserToAndEstado(usuario.getNombreUsuario(),"Pendiente");
+        Integer numPendientes = this.notificacionService.getRepo().countByUserToAndEstado(usuario.getNombreUsuario(),STR_PENDIENTE);
 
         interfazConPantalla.addAttribute(pageNumbersAttributeKey,dameNumPaginas(notificacionDtos));
         interfazConPantalla.addAttribute("listanotificaciones", notificacionDtos);
@@ -81,8 +81,6 @@ public class NotificacionController extends AbstractController<NotificacionDto> 
         //tenemos que leer la lista de usuarios
         //Que elemento me la ofrece?
         //listaUsrTodos
-        //List<UsuarioDto>  lusrdto = this.service.listaUsrTodos();
-        //interfazConPantalla.addAttribute("listausuarios", lusrdto);
         //Obetenemos el objeto Page del servicio
         Integer pagina = 0;
         if (page.isPresent()) {
@@ -94,12 +92,12 @@ public class NotificacionController extends AbstractController<NotificacionDto> 
         }
 
         Usuario usuario = ((SuperCustomerUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsuario();
-        interfazConPantalla.addAttribute("logeduser",usuario.getNombreUsuario());
+        interfazConPantalla.addAttribute(STR_LOGGEDUSER,usuario.getNombreUsuario());
 
         Page<NotificacionDto> notificacionDtos =
-                this.notificacionService.buscarTodosEstado(PageRequest.of(pagina,maxelementos),usuario.getNombreUsuario(), "Pendiente");
+                this.notificacionService.buscarTodosEstado(PageRequest.of(pagina,maxelementos),usuario.getNombreUsuario(), STR_PENDIENTE);
 
-        Integer numPendientes = this.notificacionService.getRepo().countByUserToAndEstado(usuario.getNombreUsuario(),"Pendiente");
+        Integer numPendientes = this.notificacionService.getRepo().countByUserToAndEstado(usuario.getNombreUsuario(),STR_PENDIENTE);
         interfazConPantalla.addAttribute("numpendientes",numPendientes);
         interfazConPantalla.addAttribute(pageNumbersAttributeKey,dameNumPaginas(notificacionDtos));
         interfazConPantalla.addAttribute("listanotificaciones", notificacionDtos);
@@ -108,7 +106,7 @@ public class NotificacionController extends AbstractController<NotificacionDto> 
     @GetMapping("/leerNotificacion/{id}")
     public String leerNotificacionesPendientes(@PathVariable("id") Integer id, ModelMap interfazConPantalla ) {
         Usuario usuario = ((SuperCustomerUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsuario();
-        interfazConPantalla.addAttribute("logeduser",usuario.getNombreUsuario());
+        interfazConPantalla.addAttribute(STR_LOGGEDUSER,usuario.getNombreUsuario());
 
         Optional<Notificacion> notificacion = this.notificacionService.buscar(id);
 
@@ -127,7 +125,7 @@ public class NotificacionController extends AbstractController<NotificacionDto> 
     ) {
         Usuario usuario = ((SuperCustomerUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsuario();
 
-        Integer numPendientes = this.notificacionService.getRepo().countByUserToAndEstado(usuario.getNombreUsuario(),"Pendiente");
+        Integer numPendientes = this.notificacionService.getRepo().countByUserToAndEstado(usuario.getNombreUsuario(),STR_PENDIENTE);
         return String.valueOf(numPendientes);
     }
 }

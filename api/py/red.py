@@ -23,8 +23,6 @@ import config
 import logging
 log = logging.getLogger("cache")
 
-
-#rdb = redis.StrictRedis(host=config.redishost)
 rdb = redis.from_url('redis://{}'.format(config.redishost))
 
 # --------------------------------------------------------------------------
@@ -39,6 +37,7 @@ def set_keyval(key, val, expiration_secs=0):
         rdb.set(key, s, expiration_secs or None)
     except:
         log.error("redis set_keyval %s", key)
+        raise
 
 def get_keyval(key, default=None):
     """Returns key value or default if key is missing."""
@@ -57,6 +56,7 @@ def delete_key(key):
         rdb.delete(key)
     except:
         log.error("redis del %s", key)
+        raise
 
 
 # --------------------------------------------------------------------------
@@ -73,6 +73,7 @@ def list_append(name, item, max_size=None):
             rdb.ltrim(name, -int(max_size), -1)
     except:
         log.error("redis list_append")
+        raise
 
 def list_pop(name, timeout=None):
     """Returns first item in the list. If timeout is given, wait that many

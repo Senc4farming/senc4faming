@@ -3,10 +3,10 @@ package com.example.senc4farming.controller;
 import com.example.senc4farming.config.details.SuperCustomerUserDetails;
 import com.example.senc4farming.dto.EvalScriptDto;
 import com.example.senc4farming.dto.EvalScriptLaunchDto;
-import com.example.senc4farming.model.Usuario;
+
 import com.example.senc4farming.service.EvalScriptService;
 import com.example.senc4farming.service.MenuService;
-import com.example.senc4farming.service.UsuarioService;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,13 +22,12 @@ public class AppEvalScriptController extends AbstractController <EvalScriptDto> 
 
     private final EvalScriptService service;
 
-    private final UsuarioService usuarioService;
+    private static final String STR_DET_NOENC = "evalscript/detallesnoencontrado";
+    private static final String STR_DATOS = "datos";
 
-
-    public AppEvalScriptController(MenuService menuService, EvalScriptService service, UsuarioService usuarioService) {
+    public AppEvalScriptController(MenuService menuService, EvalScriptService service) {
         super(menuService);
         this.service = service;
-        this.usuarioService = usuarioService;
     }
 
     @GetMapping("/evalscript")
@@ -65,12 +64,12 @@ public class AppEvalScriptController extends AbstractController <EvalScriptDto> 
             //addAttribute y thymeleaf no  entienden Optional
             EvalScriptDto attr = dto.get();
             //Asigno atributos y muestro
-            interfazConPantalla.addAttribute("datos",attr);
+            interfazConPantalla.addAttribute(STR_DATOS,attr);
 
             return "evalscript/edit";
         } else{
             //Mostrar página usuario no existe
-            return "evalscript/detallesnoencontrado";
+            return STR_DET_NOENC;
         }
     }
 
@@ -86,33 +85,28 @@ public class AppEvalScriptController extends AbstractController <EvalScriptDto> 
             return "redirect:/evalscript";
         } else{
             //Mostrar página usuario no existe
-            return "evalscript/detallesnoencontrado";
+            return STR_DET_NOENC;
         }
     }
 
     //Postmaping para guardar
     @PostMapping("/evalscript/{idusr}")
     public String guardarEdicionDatos(@PathVariable("idusr") Integer id,
-                                      EvalScriptDto dtoEntrada) throws Exception {
-        //Obtenemos los datos del usuario
-        Integer userId = ((SuperCustomerUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserID();
-        //Con el id tengo que buscar el registro a nivel de entidad
-        Optional<Usuario> usuario = this.usuarioService.encuentraPorIdEntity(userId);
-        //Cuidado que la password no viene
-        //Necesitamos copiar la información que llega menos la password
+                                      EvalScriptDto dtoEntrada)  {
         //Con el id tengo que buscar el registro a nivel de entidad
         Optional<EvalScriptDto> dtoControl = this.service.encuentraPorId(id);
         //¿Debería comprobar si hay datos?
         if (dtoControl.isPresent()){
             //LLamo al método del servicioi para guardar los datos
             dtoEntrada.setId(id);
-            dtoEntrada.setUsuarioScript(usuario.get());
+            dtoEntrada.setUsuarioScript(((SuperCustomerUserDetails) SecurityContextHolder.
+                    getContext().getAuthentication().getPrincipal()).getUsuario());
             this.service.guardar(dtoEntrada);
 
             return String.format("redirect:/evalscript/%s", id);
         } else {
             //Mostrar página usuario no existe
-            return "evalscript/detallesnoencontrado";
+            return STR_DET_NOENC;
         }
     }
 
@@ -123,19 +117,16 @@ public class AppEvalScriptController extends AbstractController <EvalScriptDto> 
         logger.info("/evalscript/registro get");
         final EvalScriptDto dto = new EvalScriptDto();
         //Mediante "addAttribute" comparto con la pantalla
-        interfazConPantalla.addAttribute("datos", dto);
+        interfazConPantalla.addAttribute(STR_DATOS, dto);
         return "evalscript/edit";
     }
     //El que con los datos de la pantalla guarda la informacion de tipo PostMapping
     @PostMapping("/evalscript/registro")
-    public String guardar( @ModelAttribute(name ="datos") EvalScriptDto dto) throws Exception {
+    public String guardar( @ModelAttribute(name =STR_DATOS) EvalScriptDto dto)  {
         logger.info("/evalscript/registro post");
-        //Obtenemos los datos del usuario
-        Integer userId = ((SuperCustomerUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserID();
-        //Con el id tengo que buscar el registro a nivel de entidad
-        Optional<Usuario> usuario = this.usuarioService.encuentraPorIdEntity(userId);
         //Comprobamos el patron
-        dto.setUsuarioScript(usuario.get());
+        dto.setUsuarioScript(((SuperCustomerUserDetails) SecurityContextHolder.
+                getContext().getAuthentication().getPrincipal()).getUsuario());
         EvalScriptDto dto1 = this.service.guardar(dto);
         logger.info("Evalscript guardado:");
         logger.info(dto1.getId());
@@ -143,18 +134,18 @@ public class AppEvalScriptController extends AbstractController <EvalScriptDto> 
     }
 
     @PostMapping("/evalscript/launch/{idevalscript}")
-    public String vistaRegistroLaunch(@PathVariable("idevalscript") Integer id_script,Model interfazConPantalla){
+    public String vistaRegistroLaunch(@PathVariable("idevalscript") Integer idScript,Model interfazConPantalla){
         //Instancia en memoria del dto a informar en la pantalla
-        Optional<EvalScriptDto> evalScriptDto = this.service.encuentraPorId(id_script);
+        Optional<EvalScriptDto> evalScriptDto = this.service.encuentraPorId(idScript);
         EvalScriptLaunchDto evalScriptLaunchDto = new EvalScriptLaunchDto();
         if (evalScriptDto.isPresent()){
             //Mediante "addAttribute" comparto con la pantalla
             interfazConPantalla.addAttribute("datosscript", evalScriptDto.get());
-            interfazConPantalla.addAttribute("datos", evalScriptLaunchDto);
+            interfazConPantalla.addAttribute(STR_DATOS, evalScriptLaunchDto);
             return "evalscript/launch";
         } else {
             //Mostrar página usuario no existe
-            return "evalscript/detallesnoencontrado";
+            return STR_DET_NOENC;
         }
     }
 

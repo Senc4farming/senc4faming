@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.security.SecureRandom;
 import java.util.*;
 
 
@@ -115,7 +116,7 @@ public class AppCallApiSenc4farming extends AbstractController <GrupoTrabajoDto>
     private static final String STR_SATELLITE ="satellite";
 
     private static final String STR_HTTP = "http://";
-    private Random r = new Random();
+    private Random r = new SecureRandom();
 
     public AppCallApiSenc4farming(MenuService menuService,
                                   CsvGeneratorUtil csvGeneratorUtil, CallApiSenc4farmingService callApiSenc4farmingService, List<Listfilestiff> objlistfilestiff,
@@ -174,7 +175,7 @@ public class AppCallApiSenc4farming extends AbstractController <GrupoTrabajoDto>
     }
     @PostMapping("/api/credentials")
     public String getcredentials(@ModelAttribute(name ="consulta") Copernicuscredentials copernicuscredentials
-            , HttpSession session, Model interfazConPantalla) {
+            , HttpSession session, Model interfazConPantalla) throws IOException {
 
         logger.info("En Postmapping /api/credentials: tenemos datos en sesión: {} " , copernicuscredentials.getClientid());
         session.setAttribute(STRCLIENTID,copernicuscredentials.getClientid() );
@@ -196,7 +197,7 @@ public class AppCallApiSenc4farming extends AbstractController <GrupoTrabajoDto>
         Request request1 = new Request(urltext, requestParam);
         //Obtenemos el token del request
         try {
-            String jsonArray = request1.output;
+            String jsonArray = request1.getOutput();
             logger.info("Post pantalla de busqueda json leido");
             logger.info(jsonArray);
 
@@ -351,11 +352,11 @@ public class AppCallApiSenc4farming extends AbstractController <GrupoTrabajoDto>
             //Comprobamos el patron
             //Se invoca a la URL
             Request request1 = new Request(urltext, requestParam, 0.1F);
-            logger.info(request1.output);
-            logger.info(request1.errormessage);
-            if (request1.errormessage.equals("")) {
-                logger.info("Post pantalla de busqueda llamada realizada:{}", request1.output);
-                String jsonArray = request1.output;
+            logger.info(request1.getOutput());
+            logger.info(request1.getErrormessage());
+            if (request1.getErrormessage().equals("")) {
+                logger.info("Post pantalla de busqueda llamada realizada:{}", request1.getOutput());
+                String jsonArray = request1.getOutput();
                 logger.info("Post pantalla de busqueda json leido");
                 logger.info(jsonArray);
                 JSONObject jsonObject = new JSONObject(jsonArray);
@@ -395,8 +396,8 @@ public class AppCallApiSenc4farming extends AbstractController <GrupoTrabajoDto>
                 filtroListarArchivosdto = callApiSenc4farmingService.getFiltroListarArchivosService().guardar(filtroListarArchivosDto);
                 logger.info("request1.getResponseHeaders()");
                 logger.info(request1.getResponseHeaders());
-                logger.info("request1.output");
-                logger.info(request1.output);
+                logger.info("request1.getOutput()");
+                logger.info(request1.getOutput());
 
                 //Guardamos desde la lista
                 callApiSenc4farmingService.getSentinelQueryFilesService().guardarDesdeConsulta(objlistfiles, filtroListarArchivosdto.getId());
@@ -405,8 +406,8 @@ public class AppCallApiSenc4farming extends AbstractController <GrupoTrabajoDto>
             }
             else{
                 logger.info("Error Message en readerror");
-                logger.info(request1.errormessage);
-                String jsonArray = request1.output;
+                logger.info(request1.getErrormessage());
+                String jsonArray = request1.getOutput();
 
                 JSONObject jsonObject = new JSONObject(jsonArray);
                 Iterator<String> keys = jsonObject.keys();
@@ -498,18 +499,17 @@ public class AppCallApiSenc4farming extends AbstractController <GrupoTrabajoDto>
             //Comprobamos el patron
             //Se invoca a la URL
             Request request1 = new Request(urltext, requestParam, 0.1F);
-            logger.info(request1.output);
-            logger.info(request1.errormessage);
-            if (request1.errormessage.equals("")) {
-                logger.info("Post pantalla de busqueda llamada realizada: {} ", request1.output);
-                String jsonArray = request1.output;
+            logger.info(request1.getOutput());
+            logger.info(request1.getErrormessage());
+            if (request1.getErrormessage().equals("")) {
+                logger.info("Post pantalla de busqueda llamada realizada: {} ", request1.getOutput());
                 //aqui hay que cambiar
                 return String.format(STR_REDIRECT_SENTINEQUERYFILESFILTER, filtroListarArchivosDto1.getId());
             }
             else{
                 logger.info("Error Message en readerror");
-                logger.info(request1.errormessage);
-                String jsonArray = request1.output;
+                logger.info(request1.getErrormessage());
+                String jsonArray = request1.getOutput();
                 JSONObject jsonObject = new JSONObject(jsonArray);
                 Iterator<String> keys = jsonObject.keys();
                 while (keys.hasNext()) {
@@ -618,7 +618,7 @@ public class AppCallApiSenc4farming extends AbstractController <GrupoTrabajoDto>
 
     //El que con los datos de la pantalla guarda la informacion de tipo PostMapping
     @PostMapping("/api/listfiles/downloadbands/{idquery}")
-    public String listfilesDownloadbands(@PathVariable("idquery") Integer id, Model interfazConPantalla,HttpSession session) throws Exception {
+    public String listfilesDownloadbands(@PathVariable("idquery") Integer id, Model interfazConPantalla,HttpSession session)  {
         //Objeto para guardar el filtro de la consulta
         Optional<SentinelQueryFiles> sentinelQueryFiles = callApiSenc4farmingService.getSentinelQueryFilesService().
                 getRepo().findById(id);
@@ -666,9 +666,9 @@ public class AppCallApiSenc4farming extends AbstractController <GrupoTrabajoDto>
                 //Comprobamos el patron
                 //Se invoca a la URL
                 Request request1 = new Request(urltext, requestParam);
-                logger.info(request1.output);
+                logger.info(request1.getOutput());
 
-                String jsonArray = request1.output;
+                String jsonArray = request1.getOutput();
 
                 JSONObject jsonObject = new JSONObject(jsonArray);
                 Iterator<String> keys = jsonObject.keys();
@@ -735,7 +735,7 @@ public class AppCallApiSenc4farming extends AbstractController <GrupoTrabajoDto>
 
     //El que con los datos de la pantalla guarda la informacion de tipo PostMapping
     @GetMapping ("/api/listfiles/downloadbands/{idquery}")
-    public String listfilesDownloadbandsGet (@PathVariable("idquery") Integer id, Model interfazConPantalla,HttpSession session) throws Exception {
+    public String listfilesDownloadbandsGet (@PathVariable("idquery") Integer id, Model interfazConPantalla,HttpSession session)  {
         //Objeto para guardar el filtro de la consulta
         Optional<SentinelQueryFiles> sentinelQueryFiles = callApiSenc4farmingService.getSentinelQueryFilesService().
                 getRepo().findById(id);
@@ -780,7 +780,7 @@ public class AppCallApiSenc4farming extends AbstractController <GrupoTrabajoDto>
                 //Comprobamos el patron
                 //Se invoca a la URL
                 Request request1 = new Request(urltext, requestParam);
-                String jsonArray = request1.output;
+                String jsonArray = request1.getOutput();
 
                 JSONObject jsonObject = new JSONObject(jsonArray);
                 Iterator<String> keys = jsonObject.keys();
@@ -962,7 +962,7 @@ public class AppCallApiSenc4farming extends AbstractController <GrupoTrabajoDto>
                     //Comprobamos el patron
                     //Se invoca a la URL
                     Request request1 = new Request(urltext, requestParam);
-                    String jsonArray = request1.output;
+                    String jsonArray = request1.getOutput();
 
                     JSONObject jsonObject = new JSONObject(jsonArray);
                     Iterator<String> keys = jsonObject.keys();
@@ -1026,12 +1026,12 @@ public class AppCallApiSenc4farming extends AbstractController <GrupoTrabajoDto>
 
 
     @GetMapping("/api/csvdata")
-    public String csvdataGet(ModelMap interfazConPantalla) {
+    public String csvdataGet(ModelMap interfazConPantalla) throws IOException {
         String urltext = STR_HTTP + configuationProperties.getIppythonserver() + ":8100/api/csvdatosprocesados/";
         Request  request1 = new Request(urltext);
         EscribeCSVDto  escribeCSVDto = new EscribeCSVDto();
         try {
-            escribeCSVDto.setResultado(request1.output);
+            escribeCSVDto.setResultado(request1.getOutput());
             interfazConPantalla.addAttribute("file",escribeCSVDto);
         } catch (Exception e) {
             logger.info(STR_ERRORMSG);
@@ -1099,7 +1099,7 @@ public class AppCallApiSenc4farming extends AbstractController <GrupoTrabajoDto>
                 listItm.setBand(jsonObject1.get(keyint).toString());
                 break;
             case STR_SURVEY_DATE:
-                listItm.setSurvey_date(jsonObject1.get(keyint).toString());
+                listItm.setSurveyDate(jsonObject1.get(keyint).toString());
                 break;
             case STR_OC:
                 listItm.setOc(jsonObject1.get(keyint).toString());
@@ -1188,7 +1188,7 @@ public class AppCallApiSenc4farming extends AbstractController <GrupoTrabajoDto>
             //Comprobamos el patron
             //Se invoca a la URL
             Request request1 = new Request(urltext, requestParam);
-            String jsonArray = request1.output;
+            String jsonArray = request1.getOutput();
             JSONObject jsonObject = new JSONObject(jsonArray);
             Iterator<String> keys = jsonObject.keys();
 
@@ -1237,7 +1237,7 @@ public class AppCallApiSenc4farming extends AbstractController <GrupoTrabajoDto>
                     dto.setLongitud(dtoapi.getLongitud());
                     dto.setKeyapi(dtoapi.getKeyapi());
                     dto.setOc(dtoapi.getOc());
-                    dto.setSsurveyDate(dtoapi.getSurvey_date());
+                    dto.setSsurveyDate(dtoapi.getSurveyDate());
 
 
                     DatosLucas2018Dto dtosaved = callApiSenc4farmingService.getDatosLucas2018Service().guardar(dto);
@@ -1308,7 +1308,7 @@ public class AppCallApiSenc4farming extends AbstractController <GrupoTrabajoDto>
                 //Se invoca a la URL
                 Request request1 = new Request(urltext, requestParam);
                 logger.info("/api/uploadedfiles/csv/reflvectors/copsh/: Post pantalla de busqueda 60");
-                String jsonArray = request1.output;
+                String jsonArray = request1.getOutput();
                 logger.info("/api/uploadedfiles/csv/reflvectors/copsh/: Post pantalla de busqueda 80");
                 jsonlistdatosuploadcsvOCfield(jsonArray);
 
@@ -1447,7 +1447,7 @@ public class AppCallApiSenc4farming extends AbstractController <GrupoTrabajoDto>
                 logger.info("/api/uploadedfiles/csv/reflvectors/gee/: Post pantalla de busqueda 50");
                 Request request1 = new Request(urltext, requestParam);
                 logger.info("/api/uploadedfiles/csv/reflvectors/gee/: Post pantalla de busqueda 60");
-                String jsonArray = request1.output;
+                String jsonArray = request1.getOutput();
                 logger.info("/api/uploadedfiles/csv/reflvectors/gee/: Post pantalla de busqueda 80");
                 jsonDatosuploadcsvOCrecord(jsonArray);
                 logger.info("/api/uploadedfiles/csv/reflvectors/gee/: Post pantalla de busqueda 100");
@@ -1655,7 +1655,7 @@ public class AppCallApiSenc4farming extends AbstractController <GrupoTrabajoDto>
                 //Se invoca a la URL
                 logger.info("Post pantalla de busqueda 50");
                 Request request1 = new Request(urltext, requestParam);
-                String jsonArray = request1.output;
+                String jsonArray = request1.getOutput();
                 jsonUploadedFilesReflectancerecord(jsonArray);
 
                 //comprobamos si hay datos
@@ -1789,7 +1789,7 @@ public class AppCallApiSenc4farming extends AbstractController <GrupoTrabajoDto>
             //Se invoca a la URL
             logger.info("Post pantalla de busqueda 50");
             Request request1 = new Request(urltext, requestParam);
-            String jsonArray = request1.output;
+            String jsonArray = request1.getOutput();
             readAIJson(jsonArray);
             //comprobamos si hay datos
             if (!objListAIModels.isEmpty()) {
@@ -1939,7 +1939,7 @@ public class AppCallApiSenc4farming extends AbstractController <GrupoTrabajoDto>
             //Se invoca a la URL
             logger.info("Post pantalla de busqueda 550");
             Request request1 = new Request(urltext, requestParam);
-            String jsonArray = request1.output;
+            String jsonArray = request1.getOutput();
 
             querySocDtoEntrada.setSoc(jsonArray);
             interfazConPantalla.addAttribute(STR_DATOS,querySocDtoEntrada);

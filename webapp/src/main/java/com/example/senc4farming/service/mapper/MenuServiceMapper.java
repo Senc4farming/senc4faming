@@ -24,8 +24,7 @@ public class MenuServiceMapper extends AbstractServiceMapper<Menu, MenuDTO> {
         final Menu entidad = new Menu();
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.map(entidad,dto);
-        entidad.setRoles(this.roleServiceMapper.toEntity(dto.getRoles().stream().collect(Collectors.toList())).stream()
-                .collect(Collectors.toSet()));
+        entidad.setRoles(this.roleServiceMapper.toEntity(dto.getRoles().stream().toList().stream().collect(Collectors.toSet())));
         return entidad;
     }
 

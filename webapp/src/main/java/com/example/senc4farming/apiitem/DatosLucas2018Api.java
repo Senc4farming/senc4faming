@@ -17,6 +17,6 @@ public class DatosLucas2018Api {
     private String path;
     private String reflectance;
     private String band;
-    private String survey_date;
+    private String surveyDate;
     private String oc;
 }

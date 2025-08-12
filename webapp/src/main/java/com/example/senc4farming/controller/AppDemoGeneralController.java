@@ -14,6 +14,7 @@ import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.SecureRandom;
 import java.util.*;
 
 @Controller
@@ -21,7 +22,7 @@ public class AppDemoGeneralController extends AbstractController <GrupoTrabajoDt
 
     private final GrupoService service;
     // create instance of Random class
-    private Random rand = new Random();
+    private Random rand = new SecureRandom();
 
     private static final String  STR_DEMO_NO_ENCONTRADO =  "demogeneral/detallesgruponoencontrado";
     private static final String  STR_DEMO_CARRITO ="carrito";

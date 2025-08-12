@@ -16,7 +16,6 @@ public class AuthenticationEventListener {
 
     @EventListener
     public void onAuthenticationSuccess(AuthenticationSuccessEvent event) {
-        String username = event.getAuthentication().getName();
         authenticatedUsersService.addAuthenticatedUser();
     }
 

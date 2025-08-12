@@ -7,7 +7,6 @@ import com.example.senc4farming.dto.*;
 
 import com.example.senc4farming.model.SentinelQueryFiles;
 import com.example.senc4farming.service.*;
-import com.example.senc4farming.util.CsvGeneratorUtil;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -21,6 +20,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import java.io.File;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -35,7 +35,7 @@ import java.util.*;
 @Controller
 public class AppCallApiSenc4farmingAsync extends AbstractController <GrupoTrabajoDto> {
 
-    private final CsvGeneratorUtil csvGeneratorUtil;
+
 
     private final GrupoService service;
     private final SentinelQueryFilesService sentinelQueryFilesService;
@@ -91,7 +91,7 @@ public class AppCallApiSenc4farmingAsync extends AbstractController <GrupoTrabaj
             .connectTimeout(Duration.ofSeconds(5))
             .build();
 
-    public AppCallApiSenc4farmingAsync(MenuService menuService, CsvGeneratorUtil csvGeneratorUtil, GrupoService service,
+    public AppCallApiSenc4farmingAsync(MenuService menuService,  GrupoService service,
                                        SentinelQueryFilesService sentinelQueryFilesService,
                                        FiltroConsultaKalmanService filtroConsultaKalmanService,
                                        SentinelQueryFilesTiffService sentinelQueryFilesTiffService,
@@ -99,7 +99,6 @@ public class AppCallApiSenc4farmingAsync extends AbstractController <GrupoTrabaj
                                        UploadedFilesService uploadedFilesService,
                                        ConfiguationProperties configuationProperties) {
         super(menuService);
-        this.csvGeneratorUtil = csvGeneratorUtil;
         this.service = service;
         this.sentinelQueryFilesService = sentinelQueryFilesService;
         this.filtroConsultaKalmanService = filtroConsultaKalmanService;
@@ -140,8 +139,8 @@ public class AppCallApiSenc4farmingAsync extends AbstractController <GrupoTrabaj
                 {
                     requestParam.put(STR_SATELLITE, STR_SENTINEL);
                 }
-                String pathcompleto = optuploadedFilesDto.get().getPath() + "/" + optuploadedFilesDto.get().getDescription();
-                requestParam.put(STR_PATH, pathcompleto);
+                File  itm = new File(optuploadedFilesDto.get().getPath(),optuploadedFilesDto.get().getDescription());
+                requestParam.put(STR_PATH, itm.getPath());
                 logger.info("getreflecance gee: paso 2");
 
 
@@ -161,19 +160,18 @@ public class AppCallApiSenc4farmingAsync extends AbstractController <GrupoTrabaj
                 var client = HttpClient.newBuilder().executor(executor).build();
 
                 var responseFuture = client.sendAsync(postRequest, HttpResponse.BodyHandlers.ofString());
+                logger.info("============  client.sendAsync :===============  %s " , responseFuture);
                 interfazConPantalla.addAttribute(STR_RESULTADO, STR_PROC_LAUNCHED);
-                return STR_UPLOAD_PROC_LAUNCHED;
             } catch (Exception e) {
                 logger.info(STR_ERRORMSG);
                 logger.info(e.getClass().getSimpleName());
                 logger.info(e.getMessage());
                 interfazConPantalla.addAttribute(STR_RESULTADO, STR_ERRORMSG + e.getClass().getSimpleName() + e.getMessage());
-                return STR_UPLOAD_PROC_LAUNCHED;
             }
         } else {
             interfazConPantalla.addAttribute(STR_RESULTADO, STR_CSV_FILE_NOT_FOUND);
-            return STR_UPLOAD_PROC_LAUNCHED;
         }
+        return STR_UPLOAD_PROC_LAUNCHED;
     }
 
     @GetMapping ("/api/uploadedfiles/getreflecance/copsh/{opt}/{id}")
@@ -210,8 +208,8 @@ public class AppCallApiSenc4farmingAsync extends AbstractController <GrupoTrabaj
                 {
                     requestParam.put(STR_SATELLITE, STR_SENTINEL);
                 }
-                String pathcompleto = optuploadedFilesDto.get().getPath() + "/" + optuploadedFilesDto.get().getDescription();
-                requestParam.put(STR_PATH, pathcompleto);
+                File  itm = new File(optuploadedFilesDto.get().getPath(),optuploadedFilesDto.get().getDescription());
+                requestParam.put(STR_PATH, itm.getPath());
                 logger.info("getreflecance  copsh: paso 2");
 
 
@@ -233,18 +231,18 @@ public class AppCallApiSenc4farmingAsync extends AbstractController <GrupoTrabaj
                 var responseFuture = client.sendAsync(postRequest, HttpResponse.BodyHandlers.ofString());
                 logger.info(responseFuture);
                 interfazConPantalla.addAttribute(STR_RESULTADO, STR_PROC_LAUNCHED);
-                return STR_UPLOAD_PROC_LAUNCHED;
+
             } catch (Exception e) {
                 logger.info(STR_ERRORMSG);
                 logger.info(e.getClass().getSimpleName());
                 logger.info(e.getMessage());
                 interfazConPantalla.addAttribute(STR_RESULTADO, STR_ERRORMSG + e.getClass().getSimpleName() + e.getMessage());
-                return STR_UPLOAD_PROC_LAUNCHED;
             }
         } else {
             interfazConPantalla.addAttribute(STR_RESULTADO, STR_CSV_FILE_NOT_FOUND);
-            return STR_UPLOAD_PROC_LAUNCHED;
+
         }
+        return STR_UPLOAD_PROC_LAUNCHED;
     }
 
 
@@ -291,19 +289,18 @@ public class AppCallApiSenc4farmingAsync extends AbstractController <GrupoTrabaj
                 var client = HttpClient.newBuilder().executor(executor).build();
 
                 var responseFuture = client.sendAsync(postRequest, HttpResponse.BodyHandlers.ofString());
+                logger.info("===========  client.sendAsync :===============  %s " , responseFuture);
                 interfazConPantalla.addAttribute(STR_RESULTADO, STR_PROC_LAUNCHED);
-                return STR_UPLOAD_PROC_LAUNCHED;
             } catch (Exception e) {
                 logger.info(STR_ERRORMSG);
                 logger.info(e.getClass().getSimpleName());
                 logger.info(e.getMessage());
                 interfazConPantalla.addAttribute(STR_RESULTADO, STR_ERRORMSG + e.getClass().getSimpleName() + e.getMessage());
-                return STR_UPLOAD_PROC_LAUNCHED;
             }
         } else {
             interfazConPantalla.addAttribute(STR_RESULTADO, STR_CSV_FILE_NOT_FOUND);
-            return STR_UPLOAD_PROC_LAUNCHED;
         }
+        return STR_UPLOAD_PROC_LAUNCHED;
     }
 
     @GetMapping ("/api/uploadedfiles/runknn/gee/{opt}/{id}")
@@ -349,19 +346,18 @@ public class AppCallApiSenc4farmingAsync extends AbstractController <GrupoTrabaj
                 var client = HttpClient.newBuilder().executor(executor).build();
 
                 var responseFuture = client.sendAsync(postRequest, HttpResponse.BodyHandlers.ofString());
+                logger.info("==========  client.sendAsync :===============  %s " , responseFuture);
                 interfazConPantalla.addAttribute(STR_RESULTADO, STR_PROC_LAUNCHED);
-                return STR_UPLOAD_PROC_LAUNCHED;
             } catch (Exception e) {
                 logger.info(STR_ERRORMSG);
                 logger.info(e.getClass().getSimpleName());
                 logger.info(e.getMessage());
                 interfazConPantalla.addAttribute(STR_RESULTADO, STR_ERRORMSG + e.getClass().getSimpleName() + e.getMessage());
-                return STR_UPLOAD_PROC_LAUNCHED;
             }
         } else {
             interfazConPantalla.addAttribute(STR_RESULTADO, STR_CSV_FILE_NOT_FOUND);
-            return STR_UPLOAD_PROC_LAUNCHED;
         }
+        return STR_UPLOAD_PROC_LAUNCHED;
     }
 
     @GetMapping ("/api/uploadedfiles/runsvr/copsh/{opt}/{id}")
@@ -408,21 +404,21 @@ public class AppCallApiSenc4farmingAsync extends AbstractController <GrupoTrabaj
                 var client = HttpClient.newBuilder().executor(executor).build();
 
                 var responseFuture = client.sendAsync(postRequest, HttpResponse.BodyHandlers.ofString());
+                logger.info("===============  client.sendAsync :============  %s " , responseFuture);
                 interfazConPantalla.addAttribute(STR_RESULTADO, STR_PROC_LAUNCHED);
-                return STR_UPLOAD_PROC_LAUNCHED;
             } catch (Exception e) {
                 logger.info(STR_ERRORMSG);
                 logger.info(e.getClass().getSimpleName());
                 logger.info(e.getMessage());
                 interfazConPantalla.addAttribute(STR_RESULTADO, STR_ERRORMSG + e.getClass().getSimpleName() + e.getMessage());
-                return STR_UPLOAD_PROC_LAUNCHED;
+
             } finally {
                 interfazConPantalla.addAttribute(STR_RESULTADO, "");
             }
         } else {
             interfazConPantalla.addAttribute(STR_RESULTADO, STR_CSV_FILE_NOT_FOUND);
-            return STR_UPLOAD_PROC_LAUNCHED;
         }
+        return STR_UPLOAD_PROC_LAUNCHED;
     }
 
     @GetMapping ("/api/uploadedfiles/runsvr/gee/{opt}/{id}")
@@ -470,19 +466,18 @@ public class AppCallApiSenc4farmingAsync extends AbstractController <GrupoTrabaj
                 var client = HttpClient.newBuilder().executor(executor).build();
 
                 var responseFuture = client.sendAsync(postRequest, HttpResponse.BodyHandlers.ofString());
+                logger.info("============  client.sendAsync :============  %s " , responseFuture);
                 interfazConPantalla.addAttribute(STR_RESULTADO, STR_PROC_LAUNCHED);
-                return STR_UPLOAD_PROC_LAUNCHED;
             } catch (Exception e) {
                 logger.info(STR_ERRORMSG);
                 logger.info(e.getClass().getSimpleName());
                 logger.info(e.getMessage());
                 interfazConPantalla.addAttribute(STR_RESULTADO, STR_ERRORMSG + e.getClass().getSimpleName() + e.getMessage());
-                return STR_UPLOAD_PROC_LAUNCHED;
             }
         } else {
             interfazConPantalla.addAttribute(STR_RESULTADO, STR_CSV_FILE_NOT_FOUND);
-            return STR_UPLOAD_PROC_LAUNCHED;
         }
+        return STR_UPLOAD_PROC_LAUNCHED;
     }
 
 
@@ -545,7 +540,7 @@ public class AppCallApiSenc4farmingAsync extends AbstractController <GrupoTrabaj
                     var client = HttpClient.newBuilder().executor(executor).build();
 
                     var responseFuture = client.sendAsync(postRequest, HttpResponse.BodyHandlers.ofString());
-
+                    logger.info("===============  client.sendAsync :===============  %s " , responseFuture);
                     interfazConPantalla.addAttribute(STR_RESULTADO, "Process launched, list files in 15 minutes");
                     return "sentinelqueryfiles/processlaunched";
                 } catch (Exception e) {
@@ -643,9 +638,9 @@ public class AppCallApiSenc4farmingAsync extends AbstractController <GrupoTrabaj
 
                 HttpResponse<String> response = asyncResponse.join();
                 intAsyncResultStatusCode = asyncResponse.thenApply(HttpResponse::statusCode).get(5, TimeUnit.SECONDS);
-
+                logger.info("=============== asyncResponse :===============  %s " , response);
                 logger.info("=============== AsyncHTTPClient Body:===============  %s " , strAsyncResultBody);
-                logger.info("\n=============== AsyncHTTPClient Status Code:===============  %s " , intAsyncResultStatusCode);
+                logger.info("=============== AsyncHTTPClient Status Code:===============  %s " , intAsyncResultStatusCode);
 
 
                 String jsonArray = strAsyncResultBody;
@@ -854,6 +849,7 @@ public class AppCallApiSenc4farmingAsync extends AbstractController <GrupoTrabaj
             var client = HttpClient.newBuilder().executor(executor).build();
 
             var responseFuture = client.sendAsync(postRequest, HttpResponse.BodyHandlers.ofString());
+            logger.info("===============  client.sendAsync :===============  %s " , responseFuture);
             interfazConPantalla.addAttribute(STR_RESULTADO, "Process launched, view results in 15 minutes");
             interfazConPantalla.addAttribute("csvid", dtofiltroConsultaKanlamDto.getCsvid());
             return "upload/processlaunchedkalman";

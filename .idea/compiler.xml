@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="junit" />
+        <module name="ognl" />
+        <module name="commons-io (1)" />
+        <module name="commons-io (2)" />
+        <module name="commons-io (3)" />
+        <module name="joda-time" />
+        <module name="commons-io (4)" />
+        <module name="commons-io (5)" />
+        <module name="commons-collections" />
+        <module name="commons-beanutils" />
+        <module name="Senc4farming" />
+        <module name="mysql-connector-java" />
+        <module name="commons-codec" />
+        <module name="commons-logging" />
+        <module name="commons-fileupload" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="commons-io" target="1.5" />
+    </bytecodeTargetLevel>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="Senc4farming" options="-parameters" />
+      <module name="junit" options="-Xdoclint:none" />
+    </option>
+  </component>
+</project>

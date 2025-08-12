@@ -13,7 +13,7 @@ public class ValidarFormatoPassword {
     // Contraseña de 4 a 32 caracteres que requiere al menos 3 de 4 (mayúsculas
     // y letras minúsculas, números y caracteres especiales) y como máximo
     // 2 caracteres consecutivos iguales.
-    private static final String COMPLEX_PASSWORD_REGEX =
+    private static final String COMPLEX_FORMAT_REGEX =
             "^(?:(?=.*\\d)(?=.*[A-Z])(?=.*[a-z])|" +
                     "(?=.*\\d)(?=.*[^A-Za-z0-9])(?=.*[a-z])|" +
                     "(?=.*[^A-Za-z0-9])(?=.*[A-Z])(?=.*[a-z])|" +
@@ -22,7 +22,7 @@ public class ValidarFormatoPassword {
                     "{8,32}$";
 
     private static final Pattern PASSWORD_PATTERN =
-            Pattern.compile(COMPLEX_PASSWORD_REGEX);
+            Pattern.compile(COMPLEX_FORMAT_REGEX);
     @Bean
     public static boolean validarformato(String password){
         // Validar una contraseña

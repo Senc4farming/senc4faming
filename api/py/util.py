@@ -17,6 +17,7 @@ except NameError:  # python3
   basestring = str
 from xml.etree import ElementTree as ET
 import logging
+from datetime import datetime, timezone
 log = logging.getLogger("util")
 
 
@@ -46,7 +47,7 @@ def local2utc(local_dt, tz=tz_hki):
 
 def utcnow():
     """Return UTC now."""
-    return datetime.datetime.utcnow()
+    return datetime.now(timezone.utc)
 
 def generate_token():
     """Generate a random token
@@ -86,9 +87,7 @@ def etree_to_dict(t):
     return d
 def dict_to_etree(d):
     def _to_etree(d, root):
-        if not d:
-            pass
-        elif isinstance(d, basestring):
+        if isinstance(d, basestring):
             root.text = d
         elif isinstance(d, dict):
             for k,v in d.items():

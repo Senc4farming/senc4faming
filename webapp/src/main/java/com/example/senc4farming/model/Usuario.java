@@ -43,16 +43,16 @@ public class Usuario implements Serializable {
 
 
     @OneToMany(mappedBy = "usuarioUpload" )
-    private Set<UploadedFiles> uploadedFiles;
+    private transient Set<UploadedFiles> uploadedFiles;
 
     @OneToMany(mappedBy = "usuarioScript" )
-    private Set<EvalScript> evalScripts;
+    private transient Set<EvalScript> evalScripts;
 
     @OneToMany(mappedBy = "usuarioPythonScript" )
-    private Set<PythonScript> pythonScripts;
+    private transient Set<PythonScript> pythonScripts;
 
     @OneToMany(mappedBy = "usuarioFiltro" )
-    private Set<FiltroListarArchivos> filtroListarArchivos;
+    private transient Set<FiltroListarArchivos> filtroListarArchivos;
 
     @Basic(optional = false)
     private boolean active = true;

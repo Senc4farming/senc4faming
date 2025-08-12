@@ -55,8 +55,3 @@ def daily_single_server():
     log.info("daily task here - only 1 server in a cluster runs this")
 
 
-# @filemon("/tmp/foobar")
-# def file_has_been_modified(num):
-#     """Runs when a file has been modified."""
-#     log.info("cron task: file has been modified")
-

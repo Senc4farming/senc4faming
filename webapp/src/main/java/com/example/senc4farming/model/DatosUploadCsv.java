@@ -35,7 +35,7 @@ public class DatosUploadCsv {
     @Column
     private String band;
     @Column
-    private String survey_date;
+    private String surveyDate;
     @Column
     private String oc;
 }

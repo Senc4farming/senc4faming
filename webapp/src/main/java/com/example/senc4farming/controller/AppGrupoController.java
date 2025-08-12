@@ -98,10 +98,7 @@ public class AppGrupoController extends AbstractController <GrupoTrabajoDto> {
         //¿Debería comprobar si hay datos?
         if (grupo.isPresent()){
             GrupoTrabajo attr = grupo.get();
-            if (attr.isActive())
-                attr.setActive(false);
-            else
-                attr.setActive(true);
+            attr.setActive(attr.isActive());
             this.service.getRepo().save(attr);
             //Mostrar listado de usuarios
             return "redirect:/grupos";

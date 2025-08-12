@@ -136,17 +136,20 @@ public class AppEvalScriptLaunchController extends AbstractController <EvalScrip
 
 
             InputStream is = url.openStream();
-            OutputStream os = new FileOutputStream(uploadDir + "/response.tiff");
+            try (OutputStream os = new FileOutputStream(uploadDir + "/response.tiff")){
+                byte[] b = new byte[2048];
+                int length;
 
-            byte[] b = new byte[2048];
-            int length;
-
-            while ((length = is.read(b)) != -1) {
-                os.write(b, 0, length);
+                while ((length = is.read(b)) != -1) {
+                    os.write(b, 0, length);
+                }
+            }  catch (Exception e) {
+                // ...
+            } finally {
+                is.close();
             }
 
-            is.close();
-            os.close();
+
 
 
             return String.format("redirect:/visor/image/evalscriptn/%s", id);

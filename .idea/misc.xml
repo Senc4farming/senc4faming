@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ExternalStorageConfigurationManager" enabled="true" />
+  <component name="MavenProjectsManager">
+    <option name="originalFiles">
+      <list>
+        <option value="$PROJECT_DIR$/.m2/repository/ognl/ognl/3.3.4/ognl-3.3.4.pom" />
+        <option value="$PROJECT_DIR$/.m2/repository/junit/junit/4.13.2/junit-4.13.2.pom" />
+        <option value="$PROJECT_DIR$/.m2/repository/mysql/mysql-connector-java/8.0.31/mysql-connector-java-8.0.31.pom" />
+        <option value="$PROJECT_DIR$/.m2/repository/joda-time/joda-time/2.10.5/joda-time-2.10.5.pom" />
+        <option value="$PROJECT_DIR$/.m2/repository/commons-io/commons-io/2.2/commons-io-2.2.pom" />
+        <option value="$PROJECT_DIR$/.m2/repository/commons-io/commons-io/2.4/commons-io-2.4.pom" />
+        <option value="$PROJECT_DIR$/.m2/repository/commons-io/commons-io/2.5/commons-io-2.5.pom" />
+        <option value="$PROJECT_DIR$/.m2/repository/commons-io/commons-io/2.6/commons-io-2.6.pom" />
+        <option value="$PROJECT_DIR$/.m2/repository/commons-io/commons-io/2.11.0/commons-io-2.11.0.pom" />
+        <option value="$PROJECT_DIR$/.m2/repository/commons-codec/commons-codec/1.11/commons-codec-1.11.pom" />
+        <option value="$PROJECT_DIR$/.m2/repository/commons-logging/commons-logging/1.2/commons-logging-1.2.pom" />
+        <option value="$PROJECT_DIR$/.m2/repository/commons-beanutils/commons-beanutils/1.9.4/commons-beanutils-1.9.4.pom" />
+        <option value="$PROJECT_DIR$/.m2/repository/commons-fileupload/commons-fileupload/1.4/commons-fileupload-1.4.pom" />
+        <option value="$PROJECT_DIR$/.m2/repository/commons-collections/commons-collections/3.2.2/commons-collections-3.2.2.pom" />
+        <option value="$PROJECT_DIR$/webapp/pom.xml" />
+      </list>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" project-jdk-name="openjdk-24" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/out" />
+  </component>
+</project>

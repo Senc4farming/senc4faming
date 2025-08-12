@@ -28,7 +28,7 @@ public class MessagingService extends AbstractBusinessService<Mensaje,Integer, M
 
     private final  NotificacionRepositorio notificacionRepositorio;
 
-    @Autowired
+
     SimpMessagingTemplate simpMessagingTemplate;
 
     protected MessagingService(MensajeRepositorio mensajeRepositorio, MensajeMapper mapper, NotificacionRepositorio notificacionRepositorio) {
@@ -36,7 +36,7 @@ public class MessagingService extends AbstractBusinessService<Mensaje,Integer, M
         this.notificacionRepositorio = notificacionRepositorio;
     }
 
-    public void EnviarMensajeSTOMPDeNotificacion(PrivateMessage message, Notificacion notificacion)
+    public void enviarMensajeSTOMPDeNotificacion(PrivateMessage message, Notificacion notificacion)
     {
         simpMessagingTemplate.convertAndSendToUser(
                 message.getTo(),

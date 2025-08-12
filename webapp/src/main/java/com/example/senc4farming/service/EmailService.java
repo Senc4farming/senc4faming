@@ -39,6 +39,7 @@ public class EmailService {
         //create the Session object
         session = Session.getInstance(props,
                 new jakarta.mail.Authenticator() {
+                    @Override
                     protected PasswordAuthentication getPasswordAuthentication() {
                         return new PasswordAuthentication(env.getProperty("mailstrap.username"), env.getProperty("mailstrap.password"));
                     }
@@ -69,7 +70,7 @@ public class EmailService {
             Transport.send(message);
             logger.info("Email Message Sent Successfully");
         } catch (MessagingException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
             throw e;
         }
     }

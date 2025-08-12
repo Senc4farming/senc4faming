@@ -29,11 +29,11 @@ public class Role implements Serializable {
     private Integer showOnCreate;
 
     @Column(nullable = false)
-    private String roleName_en;
+    private String roleNameEn;
     @Column(nullable = false)
-    private String roleName_es;
+    private String roleNameEs;
     @Column(nullable = false)
-    private String roleName_fr;
+    private String roleNameFr;
     @Column(nullable = false)
     private String roleName_01;
     @Column(nullable = false)

@@ -141,6 +141,7 @@ public class AppBlockchainController  extends AbstractController <BloqueDto>{
     public  byte[] decryptPublicKeys(Integer id, byte[] encryptedPublic ) throws NoSuchAlgorithmException, InvalidKeySpecException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
         //Buscamos el usuario
         Optional<Usuario> usuario = service.buscar(id);
+        byte[] bytes = {};
         if (usuario.isPresent()) {
             //obtenemos la clave pública
             PublicKey publicKey =
@@ -156,7 +157,7 @@ public class AppBlockchainController  extends AbstractController <BloqueDto>{
             }
         } else {
             logger.warn("User not found");
-            byte[] bytes = {};
+
             return  bytes;
         }
     }

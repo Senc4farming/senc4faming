@@ -15,11 +15,11 @@ import java.util.Set;
 public class MenuDTO implements Serializable {
     private Integer id;
     private String description;
-    private String description_es;
+    private String descriptionEs;
 
-    private String description_en;
+    private String descriptionEn;
 
-    private String description_fr;
+    private String descriptionFr;
 
     private String description_01;
 

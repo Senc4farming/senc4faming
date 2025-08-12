@@ -3,7 +3,6 @@ package com.example.senc4farming.controller;
 import com.example.senc4farming.dto.SentinelQueryFilesDto;
 import com.example.senc4farming.service.MenuService;
 import com.example.senc4farming.service.SentinelQueryFilesService;
-import com.example.senc4farming.service.UsuarioService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
@@ -17,13 +16,13 @@ public class AppSentinelQueryFilesController extends AbstractController <Sentine
 
     private final SentinelQueryFilesService service;
 
-    private final UsuarioService usuarioService;
 
 
-    public AppSentinelQueryFilesController(MenuService menuService, SentinelQueryFilesService service, UsuarioService usuarioService) {
+
+    public AppSentinelQueryFilesController(MenuService menuService, SentinelQueryFilesService service) {
         super(menuService);
         this.service = service;
-        this.usuarioService = usuarioService;
+
     }
 
     @GetMapping("/sentinelqueryfiles/filter/{idfilter}")

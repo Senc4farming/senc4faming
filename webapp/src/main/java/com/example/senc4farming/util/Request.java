@@ -2,6 +2,7 @@ package com.example.senc4farming.util;
 
 
 // Data streaming
+import lombok.Getter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
@@ -22,11 +23,11 @@ import java.util.zip.GZIPInputStream;
 import java.util.List;
 
 // Constants
-
+@Getter
 public class Request {
     private String method;
-    public String output;
-    public String errormessage;
+    private String output;
+    private String errormessage;
     private Map<String, List<String>> headers;
 
     private static final String STR_APP_JSON = "application/json";
@@ -37,7 +38,7 @@ public class Request {
      * Default constructor that always makes a GET request
      * @param url URL to make a GET request
      */
-    public Request(String url) {
+    public Request(String url) throws IOException {
         this.method = Constants.GET;
 
         HttpURLConnection urlConnection;
@@ -47,8 +48,8 @@ public class Request {
 
             urlConnection.setRequestMethod(this.method);
 
-            urlConnection.setConnectTimeout(Constants.STANDARD_TIMEOUT);
-            urlConnection.setReadTimeout(Constants.STANDARD_TIMEOUT);
+            urlConnection.setConnectTimeout(Constants.STANDARDTIMEOUT);
+            urlConnection.setReadTimeout(Constants.STANDARDTIMEOUT);
 
             boolean redirect = false;
 
@@ -72,13 +73,14 @@ public class Request {
                 // open the new connnection again
                 urlConnection = (HttpURLConnection) new URL(newUrl).openConnection();
                 urlConnection.setRequestProperty("Cookie", cookies);
-                urlConnection.setConnectTimeout(Constants.STANDARD_TIMEOUT);
-                urlConnection.setReadTimeout(Constants.STANDARD_TIMEOUT);
+                urlConnection.setConnectTimeout(Constants.STANDARDTIMEOUT);
+                urlConnection.setReadTimeout(Constants.STANDARDTIMEOUT);
             }
             this.output = read(urlConnection);
             this.headers = urlConnection.getHeaderFields();
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
+            throw e;
         }
     }
 
@@ -89,62 +91,56 @@ public class Request {
      * @param data Data to write to the request
      * @param headers Headers for the request
      */
-    public Request(String url, String method, String data, String[][] headers) {
+    public Request(String url, String method, String data, String[][] headers) throws IOException {
         this.method = method.toUpperCase();
-
         if (data == null) data = "{}";
-
-        HttpURLConnection urlConnection;
-
-        if (this.method.equals(Constants.POST) || this.method.equals(Constants.DELETE)
-                || this.method.equals(Constants.PUT) || this.method.equals(Constants.PATCH)) {
-            if (headers == null) {
-                Request writable = new Request(url, method, data);
-                this.output = writable.output;
-            } else {
-                try {
-                    urlConnection = (HttpURLConnection) new URL(url).openConnection();
-
-                    urlConnection.setRequestMethod(this.method);
-
-                    urlConnection.setConnectTimeout(Constants.STANDARD_TIMEOUT);
-                    urlConnection.setReadTimeout(Constants.STANDARD_TIMEOUT);
-
-                    urlConnection.setDoOutput(true);
-
-                    // Add the headers
-                    setHeaders(urlConnection, headers);
-
-                    try {
-                        byte[] bytes = data.getBytes(StandardCharsets.UTF_8);
-                        int length = bytes.length;
-                        urlConnection.setFixedLengthStreamingMode(length);
-
-                        OutputStream outputStream = urlConnection.getOutputStream();
-                        outputStream.write(bytes, 0, length);
-                        outputStream.flush();
-                        outputStream.close();
-                    } finally {
-                        this.output = read(urlConnection);
-                        urlConnection.getInputStream().close();
-                    }
-                    this.headers = urlConnection.getHeaderFields();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+        if (headers == null) {
+            Request readOnly = new Request(url);
+            this.output = readOnly.output;
         } else {
-            if (headers == null) {
-                Request readOnly = new Request(url);
-                this.output = readOnly.output;
+            HttpURLConnection urlConnection;
+
+            if (this.method.equals(Constants.POST) || this.method.equals(Constants.DELETE)
+                    || this.method.equals(Constants.PUT) || this.method.equals(Constants.PATCH)) {
+                    try {
+                        urlConnection = (HttpURLConnection) new URL(url).openConnection();
+
+                        urlConnection.setRequestMethod(this.method);
+
+                        urlConnection.setConnectTimeout(Constants.STANDARDTIMEOUT);
+                        urlConnection.setReadTimeout(Constants.STANDARDTIMEOUT);
+
+                        urlConnection.setDoOutput(true);
+
+                        // Add the headers
+                        setHeaders(urlConnection, headers);
+
+                        try {
+                            byte[] bytes = data.getBytes(StandardCharsets.UTF_8);
+                            int length = bytes.length;
+                            urlConnection.setFixedLengthStreamingMode(length);
+
+                            OutputStream outputStream = urlConnection.getOutputStream();
+                            outputStream.write(bytes, 0, length);
+                            outputStream.flush();
+                            outputStream.close();
+                        } finally {
+                            this.output = read(urlConnection);
+                            urlConnection.getInputStream().close();
+                        }
+                        this.headers = urlConnection.getHeaderFields();
+                    } catch (IOException e) {
+                        logger.error(e.getMessage());
+                        throw  e;
+                    }
             } else {
                 try {
                     urlConnection = (HttpURLConnection) new URL(url).openConnection();
 
                     urlConnection.setRequestMethod(this.method);
 
-                    urlConnection.setConnectTimeout(Constants.STANDARD_TIMEOUT);
-                    urlConnection.setReadTimeout(Constants.STANDARD_TIMEOUT);
+                    urlConnection.setConnectTimeout(Constants.STANDARDTIMEOUT);
+                    urlConnection.setReadTimeout(Constants.STANDARDTIMEOUT);
 
                     // Adds headers
                     setHeaders(urlConnection, headers);
@@ -152,8 +148,10 @@ public class Request {
                     this.output = read(urlConnection);
                     this.headers = urlConnection.getHeaderFields();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    logger.error(e.getMessage());
+                    throw  e;
                 }
+
             }
         }
     }
@@ -164,7 +162,7 @@ public class Request {
      * @param method Request method
      * @param data Data to write to the request
      */
-    public Request(String url, String method, String data) {
+    public Request(String url, String method, String data) throws IOException {
         this.method = method.toUpperCase();
 
         if (data == null) data = "{}";
@@ -177,8 +175,8 @@ public class Request {
 
                 urlConnection.setRequestMethod(this.method);
 
-                urlConnection.setConnectTimeout(Constants.STANDARD_TIMEOUT);
-                urlConnection.setReadTimeout(Constants.STANDARD_TIMEOUT);
+                urlConnection.setConnectTimeout(Constants.STANDARDTIMEOUT);
+                urlConnection.setReadTimeout(Constants.STANDARDTIMEOUT);
 
                 urlConnection.setDoOutput(true);
 
@@ -198,7 +196,8 @@ public class Request {
 
                 this.headers = urlConnection.getHeaderFields();
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error(e.getMessage());
+                throw  e;
             }
         } else {
             Request readOnly = new Request(url);
@@ -211,7 +210,7 @@ public class Request {
      * @param url URL to request
      * @param jsonobject
      */
-    public Request(String url, JSONObject requestParam) {
+    public Request(String url, JSONObject requestParam) throws IOException {
         this.method = Constants.POST;
 
         HttpURLConnection urlConnection;
@@ -220,8 +219,8 @@ public class Request {
             urlConnection = (HttpURLConnection) new URL(url).openConnection();
             urlConnection.setRequestMethod(this.method);
 
-            urlConnection.setConnectTimeout(Constants.STANDARD_TIMEOUT1);
-            urlConnection.setReadTimeout(Constants.STANDARD_TIMEOUT1);
+            urlConnection.setConnectTimeout(Constants.STANDARDTIMEOUT_1);
+            urlConnection.setReadTimeout(Constants.STANDARDTIMEOUT_1);
             urlConnection.setRequestProperty(STR_CONTENT_TYPE, STR_APP_JSON);
             urlConnection.setRequestProperty(STR_ACCEPT, STR_APP_JSON);
             urlConnection.setDoOutput(true);
@@ -249,7 +248,8 @@ public class Request {
 
             this.headers = urlConnection.getHeaderFields();
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
+            throw  e;
         }
     }
     /**
@@ -257,7 +257,7 @@ public class Request {
      * @param url URL to request
      * @param jsonobject
      */
-    public Request(String url, JSONObject requestParam, Float f) {
+    public Request(String url, JSONObject requestParam, Float f) throws IOException {
         this.method = Constants.POST;
 
         HttpURLConnection urlConnection;
@@ -266,8 +266,8 @@ public class Request {
             urlConnection = (HttpURLConnection) new URL(url).openConnection();
             urlConnection.setRequestMethod(this.method);
 
-            urlConnection.setConnectTimeout(Constants.STANDARD_TIMEOUT1);
-            urlConnection.setReadTimeout(Constants.STANDARD_TIMEOUT1);
+            urlConnection.setConnectTimeout(Constants.STANDARDTIMEOUT_1);
+            urlConnection.setReadTimeout(Constants.STANDARDTIMEOUT_1);
             urlConnection.setRequestProperty(STR_CONTENT_TYPE, STR_APP_JSON);
             urlConnection.setRequestProperty(STR_ACCEPT, STR_APP_JSON);
             urlConnection.setDoOutput(true);
@@ -297,7 +297,8 @@ public class Request {
             logger.info("antes de this.headers  ");
             this.headers = urlConnection.getHeaderFields();
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
+            throw  e;
         }
     }
 
@@ -307,7 +308,7 @@ public class Request {
      * @param jsonobject
      * @param path on java server
      */
-    public Request(String url, JSONObject requestParam, String path) {
+    public Request(String url, JSONObject requestParam, String path) throws IOException {
         this.method = Constants.POST;
 
         HttpURLConnection urlConnection;
@@ -316,8 +317,8 @@ public class Request {
             urlConnection = (HttpURLConnection) new URL(url).openConnection();
             urlConnection.setRequestMethod(this.method);
 
-            urlConnection.setConnectTimeout(Constants.STANDARD_TIMEOUT);
-            urlConnection.setReadTimeout(Constants.STANDARD_TIMEOUT);
+            urlConnection.setConnectTimeout(Constants.STANDARDTIMEOUT);
+            urlConnection.setReadTimeout(Constants.STANDARDTIMEOUT);
             urlConnection.setRequestProperty(STR_CONTENT_TYPE, STR_APP_JSON);
             urlConnection.setRequestProperty(STR_ACCEPT, STR_APP_JSON);
             urlConnection.setDoOutput(true);
@@ -328,19 +329,15 @@ public class Request {
             InputStream inputStream = null;
 
             // This will read the data from the server
-            OutputStream outputStream = null;
-            try {
-                byte[] bytes = requestParam.toString().getBytes(StandardCharsets.UTF_8);
-                int lengthJson = bytes.length;
-                urlConnection.setFixedLengthStreamingMode(lengthJson);
-                OutputStream os = urlConnection.getOutputStream();
-                os.write(bytes, 0, bytes.length);
+            byte[] bytes = requestParam.toString().getBytes(StandardCharsets.UTF_8);
+            int lengthJson = bytes.length;
+            urlConnection.setFixedLengthStreamingMode(lengthJson);
+            OutputStream os = urlConnection.getOutputStream();
+            os.write(bytes, 0, bytes.length);
 
-                // Requesting input data from server
-                inputStream = urlConnection.getInputStream();
-
-                // Open local file writer
-                outputStream = new FileOutputStream(path);
+            // Requesting input data from server
+            inputStream = urlConnection.getInputStream();
+            try(OutputStream outputStream = new FileOutputStream(path)) {
 
                 // Limiting byte written to file per loop
                 byte[] bufferout = new byte[2048];
@@ -361,12 +358,12 @@ public class Request {
             // The computer will not be able to use the image
             // This is a must
 
-            outputStream.close();
             inputStream.close();
 
             this.headers = urlConnection.getHeaderFields();
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
+            throw  e;
         }
     }
     /**
@@ -374,7 +371,7 @@ public class Request {
      * @param url URL to request
      * @param data Data to post
      */
-    public Request(String url, String data) {
+    public Request(String url, String data) throws IOException {
         this.method = Constants.POST;
 
         HttpURLConnection urlConnection;
@@ -384,8 +381,8 @@ public class Request {
 
             urlConnection.setRequestMethod(this.method);
 
-            urlConnection.setConnectTimeout(Constants.STANDARD_TIMEOUT);
-            urlConnection.setReadTimeout(Constants.STANDARD_TIMEOUT);
+            urlConnection.setConnectTimeout(Constants.STANDARDTIMEOUT);
+            urlConnection.setReadTimeout(Constants.STANDARDTIMEOUT);
 
             urlConnection.setDoOutput(true);
 
@@ -405,7 +402,8 @@ public class Request {
 
             this.headers = urlConnection.getHeaderFields();
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
+            throw  e;
         }
     }
     /**
@@ -413,7 +411,7 @@ public class Request {
      * @param connection The connection as an instance of HttpURLConnection
      * @return Output as a String from reading the connection output
      */
-    public static String readerror(HttpURLConnection connection) {
+    public  String readerror(HttpURLConnection connection) throws IOException {
         InputStream connectionInputStream = null;
         connectionInputStream = connection.getErrorStream();
 
@@ -423,7 +421,8 @@ public class Request {
                 assert connectionInputStream != null;
                 reader = new InputStreamReader(new GZIPInputStream(connectionInputStream));
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error(e.getMessage());
+                throw  e;
             }
         } else {
             reader = new InputStreamReader(connection.getErrorStream());
@@ -446,7 +445,8 @@ public class Request {
 
                 stringBuilder.append((char) ch);
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error(e.getMessage());
+                throw  e;
             }
         }
     }
@@ -456,12 +456,13 @@ public class Request {
      * @param connection The connection as an instance of HttpURLConnection
      * @return Output as a String from reading the connection output
      */
-    public static String read(HttpURLConnection connection) {
+    public  String read(HttpURLConnection connection) throws IOException {
         InputStream connectionInputStream = null;
         try {
             connectionInputStream = connection.getInputStream();
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
+            throw  e;
         }
 
         Reader reader = null;
@@ -470,13 +471,15 @@ public class Request {
                 assert connectionInputStream != null;
                 reader = new InputStreamReader(new GZIPInputStream(connectionInputStream));
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error(e.getMessage());
+                throw  e;
             }
         } else {
             try {
                 reader = new InputStreamReader(connection.getInputStream());
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error(e.getMessage());
+                throw  e;
             }
         }
 
@@ -497,7 +500,8 @@ public class Request {
 
                 stringBuilder.append((char) ch);
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error(e.getMessage());
+                throw  e;
             }
         }
     }
@@ -522,22 +526,22 @@ public class Request {
      * @param headers Headers in the form of a 2-dimensional array
      * @return Output of the request as a String
      */
-    public static String get(String url, String[][] headers) {
+    public  String get(String url, String[][] headers) throws IOException {
         HttpURLConnection connection;
 
         try {
             connection = (HttpURLConnection) new URL(url).openConnection();
             connection.setRequestMethod(Constants.GET);
 
-            connection.setConnectTimeout(Constants.STANDARD_TIMEOUT);
-            connection.setReadTimeout(Constants.STANDARD_TIMEOUT);
+            connection.setConnectTimeout(Constants.STANDARDTIMEOUT);
+            connection.setReadTimeout(Constants.STANDARDTIMEOUT);
 
             if (headers != null) setHeaders(connection, headers);
 
             return read(connection);
         } catch (IOException e) {
-            e.printStackTrace();
-            return e.toString();
+            logger.error(e.getMessage());
+            throw  e;
         }
     }
 

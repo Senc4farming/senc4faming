@@ -79,12 +79,12 @@ public class AppFiltroConsultaKalmanController extends AbstractController <Filtr
             //Buscamos la posiciopn de bandnumber
             Integer position = forLoop(bandnumbers,bandnumber);
             String bandleter = bandleters[position];
-            String kalmanpredfilename = "kalmanpredictionfilter" + bandleter + ".png";
-            String kalmansmoothingfilename = "kalmanpredictionsmoothed" + bandleter + ".png";
+            String kalmanpredfilename = "/kalmanpredictionfilter" + bandleter + ".png";
+            String kalmansmoothingfilename = "/kalmanpredictionsmoothed" + bandleter + ".png";
             String pathKalmanpredfilename = filtroConsultaKalmanDto.getPath().replace(".csv","/kanlman/images/" +
-                    filtroConsultaKalmanDto.getPointid().toString()) + "/" + kalmanpredfilename ;
+                    filtroConsultaKalmanDto.getPointid().toString()) + kalmanpredfilename ;
             String pathKalmansmoothingfilename = filtroConsultaKalmanDto.getPath().replace(".csv","/kanlman/images/" +
-                    filtroConsultaKalmanDto.getPointid().toString()) + "/" + kalmansmoothingfilename ;
+                    filtroConsultaKalmanDto.getPointid().toString()) + kalmansmoothingfilename ;
             //Comprobamos si existen los archivos
             String pathKalmanpredfilenameJava = pathKalmanpredfilename.replace("/app","/solovmwarewalgreen/projecto/SEN4CFARMING/api");
             String pathKalmansmoothingfilenameJava = pathKalmansmoothingfilename.replace("/app","/solovmwarewalgreen/projecto/SEN4CFARMING/api");

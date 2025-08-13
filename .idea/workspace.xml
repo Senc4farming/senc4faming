@@ -6,12 +6,27 @@
   <component name="ChangeListManager">
     <list default="true" id="53a4a23d-09cd-4942-ab2a-ab58d37ca2c9" name="Changes" comment="update">
       <changelist_data name="JoseManuelAroca" email="jmafernandez@ubu.es" />
+      <change afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.m2/copy_reference_file.log" beforeDir="false" afterPath="$PROJECT_DIR$/.m2/copy_reference_file.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker-compose-desarrollo.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose-desarrollo.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/webapp/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/webapp/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/webapp/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/webapp/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/webapp/src/main/java/com/example/senc4farming/config/ConfiguationProperties.java" beforeDir="false" afterPath="$PROJECT_DIR$/webapp/src/main/java/com/example/senc4farming/config/ConfiguationProperties.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/webapp/src/main/java/com/example/senc4farming/util/Unzip.java" beforeDir="false" afterPath="$PROJECT_DIR$/webapp/src/main/java/com/example/senc4farming/util/Unzip.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/webapp/src/test/java/com/example/senc4farming/webapp/webappTests.java" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="PREVIOUS_COMMIT_AUTHORS">
@@ -37,21 +52,31 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;SONARLINT_PRECOMMIT_ANALYSIS&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/investigación/ubu/doctorado/repositorio/senc4faming&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;spring.configuration.checksum&quot;: &quot;a192b16a0a6a86db28ef3d8d4a693fed&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "SONARLINT_PRECOMMIT_ANALYSIS": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "last_opened_file_path": "D:/investigación/ubu/doctorado/repositorio/senc4faming/webapp/src/test/java/com/example/senc4farming/webapp",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "spring.configuration.checksum": "a192b16a0a6a86db28ef3d8d4a693fed",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\investigación\ubu\doctorado\repositorio\senc4faming\webapp\src\test\java\com\example\senc4farming\webapp" />
+      <recent name="D:\investigación\ubu\doctorado\repositorio\senc4faming\webapp\src\test\java\com\example\senc4farming" />
+    </key>
+    <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
+      <recent name="" />
+    </key>
+  </component>
   <component name="RunManager" selected="Docker.docker-compose-desarrollo.yml.app: Compose Deployment">
     <configuration name="senc4farming" type="MavenRunConfiguration" factoryName="Maven">
       <MavenSettings>
@@ -124,6 +149,12 @@
       </deployment>
       <method v="2" />
     </configuration>
+    <configuration default="true" type="docker-deploy" factoryName="dockerfile" temporary="true">
+      <deployment type="dockerfile">
+        <settings />
+      </deployment>
+      <method v="2" />
+    </configuration>
     <configuration name="docker-compose-desarrollo.yml: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
       <deployment type="docker-compose.yml">
         <settings>
@@ -158,7 +189,16 @@
       </deployment>
       <method v="2" />
     </configuration>
+    <configuration name="webapp/Dockerfile" type="docker-deploy" factoryName="dockerfile" temporary="true" server-name="Docker">
+      <deployment type="dockerfile">
+        <settings>
+          <option name="sourceFilePath" value="webapp/Dockerfile" />
+        </settings>
+      </deployment>
+      <method v="2" />
+    </configuration>
     <list>
+      <item itemvalue="Docker.webapp/Dockerfile" />
       <item itemvalue="Docker.docker-compose-desarrollo.yml.app: Compose Deployment" />
       <item itemvalue="Docker.docker-compose-desarrollo.yml.mysqldb: Compose Deployment" />
       <item itemvalue="Docker.docker-compose-desarrollo.yml: Compose Deployment" />
@@ -168,8 +208,9 @@
     <recent_temporary>
       <list>
         <item itemvalue="Docker.docker-compose-desarrollo.yml.app: Compose Deployment" />
-        <item itemvalue="Docker.docker-compose-desarrollo.yml.mysqldb: Compose Deployment" />
         <item itemvalue="Docker.docker-compose-desarrollo.yml: Compose Deployment" />
+        <item itemvalue="Docker.docker-compose-desarrollo.yml.mysqldb: Compose Deployment" />
+        <item itemvalue="Docker.webapp/Dockerfile" />
       </list>
     </recent_temporary>
   </component>
@@ -185,7 +226,8 @@
       <workItem from="1754590238816" duration="1050000" />
       <workItem from="1754999649992" duration="2002000" />
       <workItem from="1755001675760" duration="535000" />
-      <workItem from="1755002225870" duration="2651000" />
+      <workItem from="1755002225870" duration="5289000" />
+      <workItem from="1755078672511" duration="12709000" />
     </task>
     <task id="LOCAL-00001" summary="update">
       <created>1754477738890</created>

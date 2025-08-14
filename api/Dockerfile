@@ -1,8 +1,18 @@
 FROM hakonamdal/python-gdal:python3.9-gdal3.1.2
 
-RUN  apt-get update  -y --allow-releaseinfo-change \
-  && apt-get install -y python3-numpy 
-RUN pip install gdal==3.1.2
+RUN /usr/sbin/groupadd nonroot \
+    && /usr/sbin/groupadd docker \
+    && adduser  nonroot -g nonroot \
+    && usermod -aG docker   nonroot
+
+USER nonroot
+
+RUN apt-get --no-install-recommends install -y build-essential \
+    && apt-get update  -y --allow-releaseinfo-change \
+    && apt-get install -y python3-numpy \
+    && apt-get clean \
+    && pip install gdal==3.1.2 \
+    && pip3 install --upgrade pip
 # install pip
 #RUN apt-get update && apt-get -y install python3-pip --fix-missing
 
@@ -16,15 +26,14 @@ COPY requirements.txt /app/requirements.txt
 WORKDIR /app
 
 
-RUN pip3 install --upgrade pip
 
 
 #Install wget
 RUN  apt-get update  -y --allow-releaseinfo-change \
   && apt-get install -y wget \
   && apt-get install -y curl \
-  && apt-get install -y gnupg \ 
-  && apt-get install -y gnupg1 \ 
+  && apt-get install -y gnupg \
+  && apt-get install -y gnupg1 \
   && apt-get install -y gnupg2 \
   && apt-get install -y apt-utils \
   && apt-get install -y unzip \

@@ -175,7 +175,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           mvn -B clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
-            -Dsonar.projectKey=senc4farming \
+            -Dsonar.projectKey=senc4faming \
             -Dsonar.branch.name=main
         working-directory: ./webapp
 

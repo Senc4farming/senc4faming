@@ -19,6 +19,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<geotools.version>31-SNAPSHOT</geotools.version>
 		<restassured.version>5.4.0</restassured.version>
+		<sonar.organization>josemanuelaroca</sonar.organization>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -57,6 +58,10 @@
 				<exclusion>
 					<groupId>commons-codec</groupId>
 					<artifactId>commons-codec</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.sun.mail</groupId>
+					<artifactId>mailapi</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
@@ -211,35 +216,17 @@
 		<!-- La dependencia freemarker me obliga a ponerla en el EmailService.java.
 		He buscado: Configuration se utiliza para configurar la plantilla
 		de correo electrónico utilizando FreeMarker, una biblioteca de generación de plantillas.-->
-
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-freemarker</artifactId>
 		</dependency>
 
 		<!-- ///////////////////Email///////////////////-->
-
-
 		<dependency>
 			<groupId>com.sun.mail</groupId>
 			<artifactId>jakarta.mail</artifactId>
 			<version>2.0.1</version>
 		</dependency>
-		<dependency>
-			<groupId>io.rest-assured</groupId>
-			<artifactId>json-schema-validator</artifactId>
-			<version>${rest-assured.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>com.sun.mail</groupId>
-					<artifactId>mailapi</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-
-
-
-
 
 		<!-- ///////////////////devtools///////////////////-->
 		<dependency>

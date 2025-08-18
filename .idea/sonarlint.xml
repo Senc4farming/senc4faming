@@ -2,7 +2,25 @@
 <project version="4">
   <component name="SonarLintProjectSettings">
     <option name="bindingEnabled" value="true" />
+<<<<<<< Updated upstream
     <option name="projectKey" value="JoseManuelAroca_walgreen" />
     <option name="serverId" value="walgreen" />
+=======
+    <option name="fileExclusions">
+      <list>
+        <option value="GLOB:api/py/.mypy_cache/**" />
+        <option value="GLOB:api/venv/**" />
+        <option value="GLOB:api/**" />
+        <option value="DIRECTORY:ai" />
+        <option value="DIRECTORY:mysqldb" />
+        <option value="DIRECTORY:webapp/target" />
+        <option value="DIRECTORY:reportes" />
+        <option value="DIRECTORY:api/files" />
+        <option value="GLOB:mysqldb/**" />
+      </list>
+    </option>
+    <option name="projectKey" value="JoseManuelAroca_senc4faming" />
+    <option name="serverId" value="senc4farming" />
+>>>>>>> Stashed changes
   </component>
 </project>

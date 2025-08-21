@@ -104,7 +104,6 @@ jobs:
           restore-keys: ${{ runner.os }}-sonar
   # Job 4.99: check_vars
   check_vars:
-    environment: desarrollo
     name: check vars
     runs-on: ubuntu-latest
     env:
@@ -117,7 +116,6 @@ jobs:
         run: echo "MYSQLDB_DOCKER_PORT is ${{ env.MYSQLDB_DOCKER_PORT }}"
   # Job 5: Análisis de código con SonarQube
   sonar-analysis:
-    environment: desarrollo
     name: SonarQube Code Analysis
     runs-on: ubuntu-latest
     needs: [setup, build, sonar-cache-setup]
@@ -127,10 +125,10 @@ jobs:
         ports:
           - ${{ vars.MYSQLDB_DOCKER_PORT }}:${{ vars.MYSQLDB_LOCAL_PORT }}
         env:
-          MYSQL_ROOT_PASSWORD: ${{ vars.MYSQL_ROOT_PASSWORD }}
+          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
           MYSQL_DATABASE: ${{ vars.MYSQL_DATABASE }}
           MYSQL_USER: ${{ vars.MYSQL_USER }}
-          MYSQL_PASSWORD: ${{ vars.MYSQL_PASSWORD }}
+          MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
         options: >-
           --health-cmd="mysqladmin ping --silent"
           --health-interval=10s
@@ -175,7 +173,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           mvn -B clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
-            -Dsonar.projectKey=senc4faming \
+            -Dsonar.projectKey=Senc4farming_senc4faming \
             -Dsonar.branch.name=main
         working-directory: ./webapp
 

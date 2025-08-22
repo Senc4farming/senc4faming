@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 import java.io.*;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 import java.security.SecureRandom;
 import java.util.*;
@@ -1077,6 +1078,30 @@ public class AppCallApiSenc4farming extends AbstractController <GrupoTrabajoDto>
         }
         return listini;
     }
+    private void handledatoslucas2018OC(String jsonArray){
+        JSONObject jsonObject = new JSONObject(jsonArray);
+        Iterator<String> keys = jsonObject.keys();
+        while (keys.hasNext()) {
+            String key = keys.next();
+            if (jsonObject.get(key) instanceof JSONObject) {
+                // do something with jsonObject here
+                JSONObject jsonObjectForKey = jsonObject.getJSONObject(key);
+                Iterator<String> keysint = jsonObjectForKey.keys();
+                while (keysint.hasNext()) {
+                    String keyint = keysint.next();
+                    DatosLucas2018Api itemlistCheck = finddatoslucas2018OCrecord(keyint);
+                    if (itemlistCheck.getKeyapi().equals(-1)) {
+                        setlistdatoslucas2018OCfield(key, jsonObjectForKey, keyint, itemlistCheck, 0);
+                    } else {
+                        // You use this ".get()" method to actually get your Listfiles from the Optional object
+                        objlistdatoslucas2018Api.remove(itemlistCheck);
+                        setlistdatoslucas2018OCfield(key, jsonObjectForKey, keyint, itemlistCheck, 1);
+                    }
+                }
+            }
+        }
+    }
+
     private void setlistdatoslucas2018OCfield(String key, JSONObject jsonObject1, String keyint,
                                               DatosLucas2018Api listItm  , Integer option) {
         switch (key.toLowerCase()) {
@@ -1188,29 +1213,7 @@ public class AppCallApiSenc4farming extends AbstractController <GrupoTrabajoDto>
             //Comprobamos el patron
             //Se invoca a la URL
             Request request1 = new Request(urltext, requestParam);
-            String jsonArray = request1.getOutput();
-            JSONObject jsonObject = new JSONObject(jsonArray);
-            Iterator<String> keys = jsonObject.keys();
-
-            while (keys.hasNext()) {
-                String key = keys.next();
-                if (jsonObject.get(key) instanceof JSONObject) {
-                    // do something with jsonObject here
-                    JSONObject jsonObjectForKey = jsonObject.getJSONObject(key);
-                    Iterator<String> keysint = jsonObjectForKey.keys();
-                    while (keysint.hasNext()) {
-                        String keyint = keysint.next();
-                        DatosLucas2018Api itemlistCheck = finddatoslucas2018OCrecord(keyint);
-                        if (itemlistCheck.getKeyapi().equals(-1)) {
-                            setlistdatoslucas2018OCfield(key, jsonObjectForKey, keyint, itemlistCheck, 0);
-                        } else {
-                            // You use this ".get()" method to actually get your Listfiles from the Optional object
-                            objlistdatoslucas2018Api.remove(itemlistCheck);
-                            setlistdatoslucas2018OCfield(key, jsonObjectForKey, keyint, itemlistCheck, 1);
-                        }
-                    }
-                }
-            }
+            handledatoslucas2018OC( request1.getOutput());
 
             //id unico de la busqueda
             int low = 10;
@@ -1965,9 +1968,9 @@ public class AppCallApiSenc4farming extends AbstractController <GrupoTrabajoDto>
     @GetMapping("/api/test")
     public String testapicall(ModelMap interfazConPantalla) throws IOException {
         String urltext = STR_HTTP + configuationProperties.getIppythonserver() + ":8100/api/listar?reference=02_UBU";
-        URL url = new URL(urltext);
+        URI uri =  URI.create(urltext);
 
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        HttpURLConnection conn = (HttpURLConnection) uri.toURL().openConnection();
         conn.setRequestMethod("GET");
         conn.connect();
 
@@ -1979,7 +1982,7 @@ public class AppCallApiSenc4farming extends AbstractController <GrupoTrabajoDto>
         } else {
 
             StringBuilder inline = new StringBuilder("");
-            Scanner scanner = new Scanner(url.openStream());
+            Scanner scanner = new Scanner(uri.toURL().openStream());
 
             //Write all the JSON data into a string using a scanner
             while (scanner.hasNext()) {
@@ -2000,9 +2003,9 @@ public class AppCallApiSenc4farming extends AbstractController <GrupoTrabajoDto>
     @GetMapping("/api/testlist")
     public String testapilist(ModelMap interfazConPantalla) throws IOException {
         String urltext = STR_HTTP + configuationProperties.getIppythonserver() + ":8100/api/listar?reference=02_UBU";
-        URL url = new URL(urltext);
+        URI uri =  URI.create(urltext);
 
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        HttpURLConnection conn = (HttpURLConnection) uri.toURL().openConnection();
         conn.setRequestMethod("GET");
         conn.connect();
 
@@ -2014,7 +2017,7 @@ public class AppCallApiSenc4farming extends AbstractController <GrupoTrabajoDto>
         } else {
 
             StringBuilder inline = new StringBuilder();
-            Scanner scanner = new Scanner(url.openStream());
+            Scanner scanner = new Scanner(uri.toURL().openStream());
 
             //Write all the JSON data into a string using a scanner
             while (scanner.hasNext()) {

@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import javax.management.RuntimeErrorException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
@@ -75,7 +76,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             try {
                 keyPairGenerator = KeyPairGenerator.getInstance("RSA");
             } catch (NoSuchAlgorithmException e) {
-                throw new RuntimeException(e);
+                Error error = new Error();
+                error.addSuppressed(e);
+                throw new RuntimeErrorException(error);
             }
             keyPairGenerator.initialize(2048);
             KeyPair keyPair = keyPairGenerator.generateKeyPair();

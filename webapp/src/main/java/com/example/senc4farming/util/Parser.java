@@ -99,12 +99,15 @@ public class Parser {
      * @throws Exception
      */
     private boolean checkKMZ() throws IOException {
+        try (RandomAccessFile raf = new RandomAccessFile(file, "r")) {
+            int b1 = raf.readUnsignedByte();
+            int b2 = raf.readUnsignedByte();
+            int b3 = raf.readUnsignedByte();
+            int b4 = raf.readUnsignedByte();
 
-
-            RandomAccessFile raf = new RandomAccessFile(file, "r");
-            Integer n = raf.readInt();
-
-            return (validKMZsignatures.contains(n));
+            // Firma de archivo ZIP: 0x50 0x4B 0x03 0x04
+            return (b1 == 0x50 && b2 == 0x4B && b3 == 0x03 && b4 == 0x04);
+        }
     }
 
     /**

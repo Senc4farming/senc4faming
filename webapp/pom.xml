@@ -19,7 +19,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<geotools.version>31-SNAPSHOT</geotools.version>
 		<restassured.version>5.4.0</restassured.version>
-		<sonar.organization>Senc4farming</sonar.organization>
+		<sonar.organization>senc4farming</sonar.organization>
 		<sonar.projectKey>Senc4farming_senc4faming</sonar.projectKey>
 	</properties>
 	<dependencies>

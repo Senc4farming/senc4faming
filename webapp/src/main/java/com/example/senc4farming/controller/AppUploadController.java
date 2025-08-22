@@ -94,7 +94,7 @@ public class AppUploadController extends AbstractController <UploadFilesDto>  {
                              Model model) throws IOException {
 
         if (file.isEmpty()) {
-            model.addAttribute(STR_DESCRIPTION "Cannot upload empty file.");
+            model.addAttribute(STR_DESCRIPTION ,"Cannot upload empty file.");
             return STR_UPLOAD_VIEW_UNO;
         }
 

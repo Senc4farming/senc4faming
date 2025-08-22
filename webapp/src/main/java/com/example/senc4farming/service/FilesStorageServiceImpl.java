@@ -2,6 +2,7 @@ package com.example.senc4farming.service;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InterruptedIOException;
 import java.lang.module.FindException;
 import java.net.MalformedURLException;
@@ -35,13 +36,19 @@ public class FilesStorageServiceImpl implements FilesStorageService {
 
     @Override
     public void save(MultipartFile file) throws IOException {
-        try {
-            Files.copy(file.getInputStream(), this.root.resolve(file.getOriginalFilename()));
-        } catch (FileAlreadyExistsException e) {
-                throw new FileAlreadyExistsException("A file of that name already exists.");
-        } catch (Exception e) {
 
-            throw new InterruptedIOException(e.getMessage());
+        String filename = Paths.get(file.getOriginalFilename()).getFileName().toString();
+        if (filename == null || filename.trim().isEmpty()) {
+            throw new IOException("Invalid file name.");
+        }
+
+        Path destination = this.root.resolve(filename).normalize();
+        try (InputStream inputStream = file.getInputStream()) {
+            Files.copy(inputStream, destination);
+        } catch (FileAlreadyExistsException e) {
+            throw new FileAlreadyExistsException("A file named '" + filename + "' already exists.");
+        } catch (IOException e) {
+            throw new IOException("Failed to store file '" + filename + "'", e);
         }
     }
 

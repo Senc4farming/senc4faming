@@ -39,7 +39,7 @@ public class Parser {
      * @param file file to be parsed.
      * @throws Exception If file doesn't exist, can't be parsed or unzipped.
      */
-    public Parser(File file) throws Exception, IOException {
+    public Parser(File file) throws  IOException {
         this.file = file;
 
         detectFileType(file);
@@ -55,17 +55,17 @@ public class Parser {
      * @param file - file to be analyzed
      * @return String - String representation of the file type
      */
-    private void detectFileType(File file) throws Exception, IOException {
+    private void detectFileType(File file) throws  IOException {
 
         if (file.getTotalSpace() == 0)
-            throw(new Exception("File does not exist!"));
+            throw new RuntimeException("File does not exist!");
 
         if (file.getName().toLowerCase().endsWith(".kmz") && checkKMZ())
             type = FileType.KMZ;
         else if (file.getName().toLowerCase().endsWith(".kml") && checkKML(file))
             type = FileType.KML;
         else
-            throw(new Exception("Unsupported file type! This library only accepts KMZ and KML files."));
+            throw new RuntimeException("Unsupported file type! This library only accepts KMZ and KML files.");
 
     }
 
@@ -114,7 +114,7 @@ public class Parser {
      * parse
      * parses the file
      */
-    public void parse() throws IOException, Exception {
+    public void parse() throws IOException {
 
         switch(type) {
 
@@ -127,7 +127,7 @@ public class Parser {
             default:
                 // Unreachable case: Constructor throws error for unsupported formats.
                 // Adding this to be safe if someone reuses this code.
-                throw(new Exception("Unknown Type"));
+                throw new RuntimeException(("Unknown Type"));
         }
 
     }
@@ -135,7 +135,7 @@ public class Parser {
     /**
      * Unzips the KMZ file and then parses the KML file inside it.
      */
-    private void parseKMZ() throws IOException, Exception {
+    private void parseKMZ() throws IOException {
 
         Unzip unzip = new Unzip(file);
         unzip.unZipIt();

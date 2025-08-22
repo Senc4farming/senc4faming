@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.Files;
@@ -41,6 +42,8 @@ public class AppUploadController extends AbstractController <UploadFilesDto>  {
 
     private static final String STR_SEN4CFARMING = "SEN4CFARMING/";
     private static final String STR_SEN4CFARMING_API = "SEN4CFARMING/api/files/";
+
+    private static final String STR_DESCRIPTION = "description";
 
     public AppUploadController(MenuService menuService, UploadedFilesService service) {
         super(menuService);
@@ -85,46 +88,55 @@ public class AppUploadController extends AbstractController <UploadFilesDto>  {
 
 
     @PostMapping("/upload")
-    public String uploadPost(@RequestParam MultipartFile file, HttpSession session , HttpServletRequest request,Model model) throws IOException {
+    public String uploadPost(@RequestParam MultipartFile file,
+                             HttpSession session,
+                             HttpServletRequest request,
+                             Model model) throws IOException {
+
+        if (file.isEmpty()) {
+            model.addAttribute(STR_DESCRIPTION "Cannot upload empty file.");
+            return STR_UPLOAD_VIEW_UNO;
+        }
 
         String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-        //Obtenemos los datos del usuario
-        Integer userId = ((SuperCustomerUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserID();
-        String uploadDirApi = "/app/files/src_data_safe/userfiles/" + userId.toString() + STR_CSVCOORDS;
-        //Leemos desde el path de static la carpeta
-        String uploadDirRel = "src_data_safe/userfiles/" + userId.toString() + STR_CSVCOORDS;
-        //Usando path obtenemos la direccion url
-        Path uploadDirRelPath = Paths.get(uploadDirRel);
-        String uri = uploadDirRelPath.toUri().toString();
-        //Buscamos la url con formato /<val>/<val>/<val>/<val>
-        int lastIndex = uri.lastIndexOf(':');
-        String uploadDirreal =uri.substring(lastIndex + 1, uri.length() ).replace(STR_SEN4CFARMING,STR_SEN4CFARMING_API);
-
-        if (FileUploadUtil.checkfile(uploadDirreal,fileName )){
-            model.addAttribute(STR_RUTAMENU,this.rutanavegacion(request));
-            model.addAttribute(STR_FILES,file);
-            model.addAttribute("description","File alredy exists.");
+        if (fileName.contains("..")) {
+            throw new IOException("Invalid path sequence in file name: " + fileName);
         }
-        else {
-            //check if user folder exists if not create
-            Files.createDirectories(Paths.get(uploadDirreal));
 
-            FileUploadUtil.saveFile(uploadDirreal, fileName, file);
-            //Insertamos en la tabla de csv
+        Integer userId = ((SuperCustomerUserDetails) SecurityContextHolder
+                .getContext().getAuthentication().getPrincipal()).getUserID();
+
+        Path uploadDirPath = Paths.get("/app/files/src_data_safe/userfiles", userId.toString(), STR_CSVCOORDS);
+        Files.createDirectories(uploadDirPath);
+
+        Path targetPath = uploadDirPath.resolve(fileName).normalize();
+
+        if (Files.exists(targetPath)) {
+            model.addAttribute(STR_RUTAMENU, this.rutanavegacion(request));
+            model.addAttribute(STR_FILES, file);
+            model.addAttribute(STR_DESCRIPTION "File already exists.");
+        } else {
+            try (InputStream inputStream = file.getInputStream()) {
+                Files.copy(inputStream, targetPath);
+            }
+
             UploadedFiles uploadedFiles = new UploadedFiles();
-            uploadedFiles.setUsuarioUpload(((SuperCustomerUserDetails) SecurityContextHolder.getContext()
-                    .getAuthentication().getPrincipal()).getUsuario());
-            uploadedFiles.setPath(uploadDirApi);
+            uploadedFiles.setUsuarioUpload(((SuperCustomerUserDetails) SecurityContextHolder
+                    .getContext().getAuthentication().getPrincipal()).getUsuario());
+            uploadedFiles.setPath(uploadDirPath.toString());
             uploadedFiles.setDescription(fileName);
             uploadedFiles.setShared(false);
             uploadedFiles.setType("csv");
             service.getRepo().save(uploadedFiles);
-            model.addAttribute(STR_RUTAMENU,this.rutanavegacion(request));
-            model.addAttribute(STR_FILES,file);
+
+            model.addAttribute(STR_RUTAMENU, this.rutanavegacion(request));
+            model.addAttribute(STR_FILES, file);
+            model.addAttribute(STR_DESCRIPTION, "File uploaded successfully.");
         }
 
         return STR_UPLOAD_VIEW_UNO;
     }
+
 
     @GetMapping("/upload/kml")
     public String vistaGetKml(HttpServletRequest request,Model model ) throws IOException {

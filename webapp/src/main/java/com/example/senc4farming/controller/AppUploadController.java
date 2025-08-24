@@ -10,6 +10,7 @@ import com.example.senc4farming.service.UploadedFilesService;
 import com.example.senc4farming.util.FileUploadUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 
@@ -27,6 +28,7 @@ import java.nio.file.Files;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 //@SessionAttributes("productos")
 @Controller
@@ -85,6 +87,9 @@ public class AppUploadController extends AbstractController <UploadFilesDto>  {
         return "upload/upload";
     }
 
+    private String generateFileName(String fileName) {
+        return UUID.randomUUID().toString() + "." + FilenameUtils.getExtension(fileName);
+    }
 
 
     @PostMapping("/upload")
@@ -98,7 +103,7 @@ public class AppUploadController extends AbstractController <UploadFilesDto>  {
             return STR_UPLOAD_VIEW_UNO;
         }
 
-        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+        String fileName = StringUtils.cleanPath(generateFileName(file.getOriginalFilename()));
         if (fileName.contains("..")) {
             throw new IOException("Invalid path sequence in file name: " + fileName);
         }
@@ -190,7 +195,7 @@ public class AppUploadController extends AbstractController <UploadFilesDto>  {
         if (FileUploadUtil.checkfile(uploadDirreal,fileName )){
             model.addAttribute(STR_RUTAMENU,this.rutanavegacion(request));
             model.addAttribute(STR_FILES,file);
-            model.addAttribute("description","File alredy exists.");
+            model.addAttribute(STR_DESCRIPTION, "File alredy exists.");
         }
         else {
             //check if user folder exists if not create

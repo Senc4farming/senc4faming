@@ -87,11 +87,6 @@ public class AppUploadController extends AbstractController <UploadFilesDto>  {
         return "upload/upload";
     }
 
-    private String generateFileName(String fileName) {
-        return UUID.randomUUID().toString() + "." + FilenameUtils.getExtension(fileName);
-    }
-
-
     @PostMapping("/upload")
     public String uploadPost(@RequestParam MultipartFile file,
                              HttpSession session,
@@ -103,7 +98,7 @@ public class AppUploadController extends AbstractController <UploadFilesDto>  {
             return STR_UPLOAD_VIEW_UNO;
         }
 
-        String fileName = StringUtils.cleanPath(generateFileName(file.getOriginalFilename()));
+        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
         if (fileName.contains("..")) {
             throw new IOException("Invalid path sequence in file name: " + fileName);
         }

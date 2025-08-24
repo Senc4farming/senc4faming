@@ -26,9 +26,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.Files;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 //@SessionAttributes("productos")
 @Controller
@@ -98,7 +96,21 @@ public class AppUploadController extends AbstractController <UploadFilesDto>  {
             return STR_UPLOAD_VIEW_UNO;
         }
 
+        // Validar tipo MIME permitido
+        Map<String, List<String>> ALLOWED_FILE_TYPES = Map.of(
+                "csv", List.of("text/csv") // para shapefiles u otros datasets comprimidos
+        );
+        // Sanitizar nombre
         String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+
+        // Extraer extensión (en minúsculas)
+        String extension = FilenameUtils.getExtension(fileName).toLowerCase(Locale.ROOT);
+
+        // Validar que la extensión está permitida
+        if (!ALLOWED_FILE_TYPES.containsKey(extension)) {
+            throw new IOException("Tipo de archivo no permitido: " + extension);
+        }
+        // intento de path traversal
         if (fileName.contains("..")) {
             throw new IOException("Invalid path sequence in file name: " + fileName);
         }
@@ -173,8 +185,30 @@ public class AppUploadController extends AbstractController <UploadFilesDto>  {
     @PostMapping("/upload/kml")
     public String uploadPostKML(@RequestParam MultipartFile file, HttpSession session , HttpServletRequest request,
                                 Model model) throws IOException {
+        if (file.isEmpty()) {
+            model.addAttribute(STR_DESCRIPTION ,"Cannot upload empty file.");
+            return STR_UPLOAD_VIEW_UNO;
+        }
 
+        // Validar tipo MIME permitido
+        Map<String, List<String>> ALLOWED_FILE_TYPES = Map.of(
+                "kml", List.of("application/vnd.google-earth.kml+xml") // para shapefiles u otros datasets comprimidos
+        );
+        // Sanitizar nombre
         String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+
+        // Extraer extensión (en minúsculas)
+        String extension = FilenameUtils.getExtension(fileName).toLowerCase(Locale.ROOT);
+
+        // Validar que la extensión está permitida
+        if (!ALLOWED_FILE_TYPES.containsKey(extension)) {
+            throw new IOException("Tipo de archivo no permitido: " + extension);
+        }
+        // intento de path traversal
+        if (fileName.contains("..")) {
+            throw new IOException("Invalid path sequence in file name: " + fileName);
+        }
+
         //Obtenemos los datos del usuario
         Integer userId = ((SuperCustomerUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserID();
         String uploadDirApi = "/app/files/src_data_safe/appsharedfiles/kml/" + userId.toString() +STR_FILES_B;
@@ -224,7 +258,18 @@ public class AppUploadController extends AbstractController <UploadFilesDto>  {
     public String uploadImgPost(@RequestParam MultipartFile file, HttpSession session ,HttpServletRequest request,
                                 Model model) throws IOException {
 
+        if (file.isEmpty()) {
+            model.addAttribute(STR_DESCRIPTION ,"Cannot upload empty file.");
+            return STR_UPLOAD_VIEW_UNO;
+        }
+
+        // Sanitizar nombre
         String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+
+        // intento de path traversal
+        if (fileName.contains("..")) {
+            throw new IOException("Invalid path sequence in file name: " + fileName);
+        }
 
 
         String uploadDir = "src/main/resources/static/imagenes/";

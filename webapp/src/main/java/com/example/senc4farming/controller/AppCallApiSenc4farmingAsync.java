@@ -564,7 +564,7 @@ public class AppCallApiSenc4farmingAsync extends AbstractController <GrupoTrabaj
     //El que con los datos de la pantalla guarda la informacion de tipo PostMapping
     @PostMapping("/api/listfiles/downloadbands/async/wait/{idquery}")
     public String listfilesDownloadbandswait(@PathVariable("idquery") Integer id,
-                                             Model interfazConPantalla,HttpSession session) {
+                                             Model interfazConPantalla,HttpSession session) throws ExecutionException, InterruptedException, TimeoutException {
         //Objeto para guardar el filtro de la consulta
         Optional<SentinelQueryFiles> sentinelQueryFiles = sentinelQueryFilesService.getRepo().findById(id);
         SentinelQueryFiles sentinelQueryFiles1 = new SentinelQueryFiles();

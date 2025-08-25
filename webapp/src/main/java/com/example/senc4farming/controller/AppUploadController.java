@@ -92,28 +92,12 @@ public class AppUploadController extends AbstractController <UploadFilesDto>  {
                              Model model) throws IOException {
 
         if (file.isEmpty()) {
-            model.addAttribute(STR_DESCRIPTION ,"Cannot upload empty file.");
+            model.addAttribute(STR_DESCRIPTION ,"Cannot upload empty file. ");
             return STR_UPLOAD_VIEW_UNO;
         }
 
         // Validar tipo MIME permitido
-        Map<String, List<String>> ALLOWED_FILE_TYPES = Map.of(
-                "csv", List.of("text/csv") // para shapefiles u otros datasets comprimidos
-        );
-        // Sanitizar nombre
-        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-
-        // Extraer extensión (en minúsculas)
-        String extension = FilenameUtils.getExtension(fileName).toLowerCase(Locale.ROOT);
-
-        // Validar que la extensión está permitida
-        if (!ALLOWED_FILE_TYPES.containsKey(extension)) {
-            throw new IOException("Tipo de archivo no permitido: " + extension);
-        }
-        // intento de path traversal
-        if (fileName.contains("..")) {
-            throw new IOException("Invalid path sequence in file name: " + fileName);
-        }
+        String fileName = validateMpFile(file);
 
         Integer userId = ((SuperCustomerUserDetails) SecurityContextHolder
                 .getContext().getAuthentication().getPrincipal()).getUserID();
@@ -131,15 +115,7 @@ public class AppUploadController extends AbstractController <UploadFilesDto>  {
             try (InputStream inputStream = file.getInputStream()) {
                 Files.copy(inputStream, targetPath);
             }
-
-            UploadedFiles uploadedFiles = new UploadedFiles();
-            uploadedFiles.setUsuarioUpload(((SuperCustomerUserDetails) SecurityContextHolder
-                    .getContext().getAuthentication().getPrincipal()).getUsuario());
-            uploadedFiles.setPath(uploadDirPath.toString());
-            uploadedFiles.setDescription(fileName);
-            uploadedFiles.setShared(false);
-            uploadedFiles.setType("csv");
-            service.getRepo().save(uploadedFiles);
+            saveFile(fileName,uploadDirPath.toString(),"csv");
 
             model.addAttribute(STR_RUTAMENU, this.rutanavegacion(request));
             model.addAttribute(STR_FILES, file);
@@ -180,7 +156,43 @@ public class AppUploadController extends AbstractController <UploadFilesDto>  {
     }
 
 
+    private String validateMpFile(MultipartFile file) throws IOException {
 
+        // Validar tipo MIME permitido
+        Map<String, List<String>> ALLOWED_FILE_TYPES = Map.of(
+                "kml", List.of("application/vnd.google-earth.kml+xml") ,// para shapefiles u otros datasets comprimidos
+                "csv", List.of("text/csv") // para shapefiles u otros datasets comprimidos
+        );
+        // Sanitizar nombre
+        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+
+        // Extraer extensiï¿½n (en minï¿½sculas)
+        String extension = FilenameUtils.getExtension(fileName).toLowerCase(Locale.ROOT);
+
+        // Validar que la extensiï¿½n estï¿½ permitida
+        if (!ALLOWED_FILE_TYPES.containsKey(extension)) {
+            throw new IOException("Tipo de archivo no permitido: " + extension);
+        }
+        // intento de path traversal
+        if (fileName.contains("..")) {
+            throw new IOException("Invalid path sequence in file name: " + fileName);
+        }
+        return fileName;
+
+    }
+    private void saveFile( String fileName,
+                          String uploadDirApi,String type) throws IOException {
+
+        //Insertamos en la tabla de csv
+        UploadedFiles uploadedFiles = new UploadedFiles();
+        uploadedFiles.setUsuarioUpload(((SuperCustomerUserDetails) SecurityContextHolder
+                .getContext().getAuthentication().getPrincipal()).getUsuario());
+        uploadedFiles.setPath(uploadDirApi);
+        uploadedFiles.setDescription(fileName);
+        uploadedFiles.setShared(false);
+        uploadedFiles.setType(type);
+        service.getRepo().save(uploadedFiles);
+    }
 
     @PostMapping("/upload/kml")
     public String uploadPostKML(@RequestParam MultipartFile file, HttpSession session , HttpServletRequest request,
@@ -191,23 +203,7 @@ public class AppUploadController extends AbstractController <UploadFilesDto>  {
         }
 
         // Validar tipo MIME permitido
-        Map<String, List<String>> ALLOWED_FILE_TYPES = Map.of(
-                "kml", List.of("application/vnd.google-earth.kml+xml") // para shapefiles u otros datasets comprimidos
-        );
-        // Sanitizar nombre
-        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-
-        // Extraer extensión (en minúsculas)
-        String extension = FilenameUtils.getExtension(fileName).toLowerCase(Locale.ROOT);
-
-        // Validar que la extensión está permitida
-        if (!ALLOWED_FILE_TYPES.containsKey(extension)) {
-            throw new IOException("Tipo de archivo no permitido: " + extension);
-        }
-        // intento de path traversal
-        if (fileName.contains("..")) {
-            throw new IOException("Invalid path sequence in file name: " + fileName);
-        }
+        String fileName = validateMpFile(file);
 
         //Obtenemos los datos del usuario
         Integer userId = ((SuperCustomerUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserID();
@@ -231,15 +227,7 @@ public class AppUploadController extends AbstractController <UploadFilesDto>  {
             Files.createDirectories(Paths.get(uploadDirreal));
 
             FileUploadUtil.saveFile(uploadDirreal, fileName, file);
-            //Insertamos en la tabla de csv
-            UploadedFiles uploadedFiles = new UploadedFiles();
-            uploadedFiles.setUsuarioUpload(((SuperCustomerUserDetails) SecurityContextHolder
-                    .getContext().getAuthentication().getPrincipal()).getUsuario());
-            uploadedFiles.setPath(uploadDirApi);
-            uploadedFiles.setDescription(fileName);
-            uploadedFiles.setShared(false);
-            uploadedFiles.setType("kml");
-            service.getRepo().save(uploadedFiles);
+            saveFile(fileName,uploadDirApi,"kml");
             model.addAttribute(STR_RUTAMENU,this.rutanavegacion(request));
             model.addAttribute(STR_FILES,file);
         }

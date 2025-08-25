@@ -13,6 +13,7 @@ import com.example.senc4farming.model.Dates;
 import com.example.senc4farming.model.DatosLucas2018;
 import com.example.senc4farming.service.*;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.validation.Valid;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -160,8 +161,7 @@ public class ImageController extends AbstractController <SentinelQueryFilesTiffD
 
     }
 
-    @GetMapping("/visor/image/{id}")
-    public String getListImages(@PathVariable("id") Integer id,Model model) throws IOException, ParseException {
+    private void commonFunc(Integer id,Integer idPrev ,Model model) throws IOException, ParseException {
         SentinelQueryFilesTiffDto sentinelQueryFilesTiffDto = service.buscarDtoSinOpt(id);
         String pathcompleto =  sentinelQueryFilesTiffDto.getPath();
         SentinelQueryFilesTiffDto sentinelQueryFilesTiffDto1 = sentinelQueryFilesTiffDto;
@@ -192,6 +192,12 @@ public class ImageController extends AbstractController <SentinelQueryFilesTiffD
         model.addAttribute(STR_MAXLAT, maxlat);
         model.addAttribute(STR_IMAGE, internalpath);
         model.addAttribute(STR_POLYGON, polygon);
+        model.addAttribute(STR_IDPREV, idPrev);
+    }
+    @GetMapping("/visor/image/{id}")
+    public String getListImages(@PathVariable("id") Integer id,Model model) throws IOException,
+            ParseException {
+        commonFunc(id,0,model);
 
         return "/visor/images";
     }
@@ -206,36 +212,7 @@ public class ImageController extends AbstractController <SentinelQueryFilesTiffD
                                     @PathVariable("idprev") Integer idprev,
                                     Model model) throws IOException, ParseException {
         logger.info("getListImagesBack");
-        SentinelQueryFilesTiffDto sentinelQueryFilesTiffDto = service.buscarDtoSinOpt(id);
-        String pathcompleto =  sentinelQueryFilesTiffDto.getPath();
-        SentinelQueryFilesTiffDto sentinelQueryFilesTiffDto1 = sentinelQueryFilesTiffDto;
-        String polygon = sentinelQueryFilesTiffDto1.getSentinelQueryFilesfortiff().getFiltroListarArchivos().getPolygon();
-        String nombredirinterno =  pathcompleto.substring(pathcompleto.lastIndexOf(STR_USERFILES),(pathcompleto.lastIndexOf("/")));
-        String uploadDir = STR_F_SRC + nombredirinterno ;
-        String internalpath = uploadDir + STR_RESPONSETIFF;
-        String internalpathjson =  STR_API +uploadDir + STR_REQUESTJSON;
-        logger.info("Path: /%s" ,internalpath);
-        logger.info(polygon);
-        //Falta leer el json
-        Object o = new JSONParser().parse(new FileReader(internalpathjson));
-        JSONObject jsonObject = (JSONObject) o;
-        Number minlong = getMinMaxCoordsArr(jsonObject)[0];
-        Number minlat = getMinMaxCoordsArr(jsonObject)[1];
-        Number maxlong = getMinMaxCoordsArr(jsonObject)[2];
-        Number maxlat = getMinMaxCoordsArr(jsonObject)[3];
-
-        logsLongLat( minlong,  minlat,  maxlong,  maxlat  );
-
-        //Buscar bounds
-        //Enviar min lond, min lat , maz long max lat
-        // usar dichos valores para mostrar el poígono
-        model.addAttribute(STR_MINLONG, minlong);
-        model.addAttribute(STR_MINLAT, minlat);
-        model.addAttribute(STR_MAXLONG, maxlong);
-        model.addAttribute(STR_MAXLAT, maxlat);
-        model.addAttribute(STR_IMAGE, internalpath);
-        model.addAttribute(STR_POLYGON, polygon);
-        model.addAttribute(STR_IDPREV, idprev);
+        commonFunc(id,idprev,model);
 
         return "/visor/imagesprevmyqueryv1";
     }
@@ -244,74 +221,14 @@ public class ImageController extends AbstractController <SentinelQueryFilesTiffD
                                     @PathVariable("idprev") Integer idprev,
                                     Model model) throws IOException, ParseException {
         logger.info("getListImagesMapBack");
-        SentinelQueryFilesTiffDto sentinelQueryFilesTiffDto = service.buscarDtoSinOpt(id);
-        String pathcompleto =  sentinelQueryFilesTiffDto.getPath();
-        SentinelQueryFilesTiffDto sentinelQueryFilesTiffDto1 = sentinelQueryFilesTiffDto;
-        String polygon = sentinelQueryFilesTiffDto1.getSentinelQueryFilesfortiff().getFiltroListarArchivos().getPolygon();
-        String nombredirinterno =  pathcompleto.substring(pathcompleto.lastIndexOf(STR_USERFILES),(pathcompleto.lastIndexOf("/")));
-        String uploadDir = STR_F_SRC + nombredirinterno ;
-        String internalpath = uploadDir + STR_RESPONSETIFF;
-        String internalpathjson =  STR_API +uploadDir + STR_REQUESTJSON;
-        logger.info("Path /%s" ,internalpath);
-        logger.info(polygon);
-        //Falta leer el json
-        Object o = new JSONParser().parse(new FileReader(internalpathjson));
-        JSONObject jsonObject = (JSONObject) o;
-        Number minlong = getMinMaxCoordsArr(jsonObject)[0];
-        Number minlat = getMinMaxCoordsArr(jsonObject)[1];
-        Number maxlong = getMinMaxCoordsArr(jsonObject)[2];
-        Number maxlat = getMinMaxCoordsArr(jsonObject)[3];
-
-        logsLongLat( minlong,  minlat,  maxlong,  maxlat  );
-
-        //Buscar bounds
-        //Enviar min lond, min lat , maz long max lat
-        // usar dichos valores para mostrar el poígono
-        model.addAttribute(STR_MINLONG, minlong);
-        model.addAttribute(STR_MINLAT, minlat);
-        model.addAttribute(STR_MAXLONG, maxlong);
-        model.addAttribute(STR_MAXLAT, maxlat);
-        model.addAttribute(STR_IMAGE, internalpath);
-        model.addAttribute(STR_POLYGON, polygon);
-        model.addAttribute(STR_IDPREV, idprev);
-
+        commonFunc(id,idprev,model);
         return "/visor/imagesprevmyqueryv1map";
     }
     @GetMapping("/visor/image/tiff/{id}/{idprev}")
     public String getListImagesTiff(@PathVariable("id") Integer id,
                                     @PathVariable("idprev") Integer idprev,
                                     Model model) throws IOException, ParseException {
-        SentinelQueryFilesTiffDto sentinelQueryFilesTiffDto = service.buscarDtoSinOpt(id);
-        String pathcompleto =  sentinelQueryFilesTiffDto.getPath();
-        SentinelQueryFilesTiffDto sentinelQueryFilesTiffDto1 = sentinelQueryFilesTiffDto;
-        String polygon = sentinelQueryFilesTiffDto1.getSentinelQueryFilesfortiff().getFiltroListarArchivos().getPolygon();
-        String nombredirinterno =  pathcompleto.substring(pathcompleto.lastIndexOf(STR_USERFILES),(pathcompleto.lastIndexOf("/")));
-        String uploadDir = STR_F_SRC + nombredirinterno ;
-        String internalpath = uploadDir + STR_RESPONSETIFF;
-        String internalpathjson =  STR_API +uploadDir + STR_REQUESTJSON;
-        logger.info("Path:");
-        logger.info(internalpath);
-        logger.info(polygon);
-        //Falta leer el json
-        Object o = new JSONParser().parse(new FileReader(internalpathjson));
-        JSONObject jsonObject = (JSONObject) o;
-        Number minlong = getMinMaxCoordsArr(jsonObject)[0];
-        Number minlat = getMinMaxCoordsArr(jsonObject)[1];
-        Number maxlong = getMinMaxCoordsArr(jsonObject)[2];
-        Number maxlat = getMinMaxCoordsArr(jsonObject)[3];
-
-        logsLongLat( minlong,  minlat,  maxlong,  maxlat  );
-
-        //Buscar bounds
-        //Enviar min lond, min lat , maz long max lat
-        // usar dichos valores para mostrar el poígono
-        model.addAttribute(STR_MINLONG, minlong);
-        model.addAttribute(STR_MINLAT, minlat);
-        model.addAttribute(STR_MAXLONG, maxlong);
-        model.addAttribute(STR_MAXLAT, maxlat);
-        model.addAttribute(STR_IMAGE, internalpath);
-        model.addAttribute(STR_POLYGON, polygon);
-        model.addAttribute(STR_IDPREV, idprev);
+        commonFunc(id,idprev,model);
 
         return "/visor/imagesgeotiff";
     }

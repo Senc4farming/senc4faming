@@ -80,7 +80,7 @@ public class ImageController extends AbstractController <SentinelQueryFilesTiffD
     }
 
     @GetMapping("/visor/images/new")
-    public String newImage(Model model) {
+    public String newImage() {
         return "upload_form";
     }
 
@@ -115,85 +115,74 @@ public class ImageController extends AbstractController <SentinelQueryFilesTiffD
         return "/visor/images";
     }
     public Number[] getMinMaxCoordsArr(JSONObject jsonObject){
-        Number minlong = 0;
-        Number minlat = 0;
-        Number maxlong = 0;
-        Number maxlat = 0;
+        Number[] coords = new Number[4];
 
-        if ( jsonObject.get(STR_REQUESTS) instanceof JSONObject ) {
-            logger.info("lvl0");
-            Object jsonrequest = jsonObject.get(STR_REQUESTS);
-            JSONObject lvl1 = new JSONObject((Map) jsonrequest);
-            if ( lvl1.get(STR_PAYLOAD) instanceof JSONObject ) {
-                logger.info("lvl1");
-                Object jsonpayload = lvl1.get(STR_PAYLOAD);
-                JSONObject lvl2 = new JSONObject((Map) jsonpayload);
-                if (  lvl2.get(STR_INPUT) instanceof JSONObject ) {
-                    logger.info("lvl2");
-                    Object jsoninput = lvl2.get(STR_INPUT);
-                    JSONObject lvl3 = new JSONObject((Map) jsoninput);
-                    if (lvl3.get(STR_BOUNDS) instanceof JSONObject) {
-                        logger.info("lvl3");
-                        Object jsonbounds = lvl3.get(STR_BOUNDS);
-                        JSONObject lvl4 = new JSONObject((Map) jsonbounds);
-                        if (lvl3.get(STR_BOUNDS) instanceof JSONObject) {
-                            logger.info("lvl4");
-                            Object cc =  lvl4.get("bbox");
-                            if (cc instanceof JSONArray last ) {
-                                minlong = getMinMaxCoords(last,0);
-                                minlat = getMinMaxCoords(last,1);
-                                maxlong = getMinMaxCoords(last,2);
-                                maxlat = getMinMaxCoords(last,3);
-                            }
+        try {
+            JSONObject request = (JSONObject) jsonObject.get(STR_REQUESTS);
+            JSONObject payload = (JSONObject) request.get(STR_PAYLOAD);
+            JSONObject input   = (JSONObject) payload.get(STR_INPUT);
+            JSONObject bounds  = (JSONObject) input.get(STR_BOUNDS);
 
-                        }
-                    }
+            JSONArray bbox = (JSONArray) bounds.get("bbox");
+            if (bbox != null && bbox.size() == 4) {
+                for (int i = 0; i < 4; i++) {
+                    coords[i] = (Number) bbox.get(i);
                 }
+            } else {
+                logger.warn("BBox no válido o con tamaño distinto de 4");
             }
+        } catch (Exception e) {
+            logger.error("Error parseando coordenadas: {}", e.getMessage());
         }
-        Number[] numArr = new Number[4];
-        numArr[0] = minlong;
-        numArr[1] = minlat;
-        numArr[2] = maxlong;
-        numArr[3] = maxlat;
 
-        return  numArr;
+        return coords;
+
 
     }
-
-    private void commonFunc(Integer id,Integer idPrev ,Model model) throws IOException, ParseException {
-        SentinelQueryFilesTiffDto sentinelQueryFilesTiffDto = service.buscarDtoSinOpt(id);
-        String pathcompleto =  sentinelQueryFilesTiffDto.getPath();
-        SentinelQueryFilesTiffDto sentinelQueryFilesTiffDto1 = sentinelQueryFilesTiffDto;
-        String polygon = sentinelQueryFilesTiffDto1.getSentinelQueryFilesfortiff().getFiltroListarArchivos().getPolygon();
-        String nombredirinterno =  pathcompleto.substring(pathcompleto.lastIndexOf(STR_USERFILES),(pathcompleto.lastIndexOf("/")));
-        String uploadDir = STR_F_SRC + nombredirinterno ;
-        String internalpath = uploadDir + STR_RESPONSETIFF;
-        String internalpathjson =  STR_API +uploadDir + STR_REQUESTJSON;
-        logger.info("Path:");
-        logger.info(internalpath);
-        logger.info(polygon);
-        //Falta leer el json
-        Object o = new JSONParser().parse(new FileReader(internalpathjson));
-        JSONObject jsonObject = (JSONObject) o;
-        Number minlong = getMinMaxCoordsArr(jsonObject)[0];
-        Number minlat = getMinMaxCoordsArr(jsonObject)[1];
-        Number maxlong = getMinMaxCoordsArr(jsonObject)[2];
-        Number maxlat = getMinMaxCoordsArr(jsonObject)[3];
-
-        logsLongLat( minlong,  minlat,  maxlong,  maxlat  );
-
-        //Buscar bounds
-        //Enviar min lond, min lat , maz long max lat
-        // usar dichos valores para mostrar el poígono
-        model.addAttribute(STR_MINLONG, minlong);
-        model.addAttribute(STR_MINLAT, minlat);
-        model.addAttribute(STR_MAXLONG, maxlong);
-        model.addAttribute(STR_MAXLAT, maxlat);
-        model.addAttribute(STR_IMAGE, internalpath);
+    private void addBoundsToModel(Model model, JSONObject json, String imagePath, String polygon, Integer idPrev) {
+        Number[] coords = getMinMaxCoordsArr(json);
+        logsLongLat(coords[0], coords[1], coords[2], coords[3]);
+        model.addAttribute(STR_MINLONG, coords[0]);
+        model.addAttribute(STR_MINLAT, coords[1]);
+        model.addAttribute(STR_MAXLONG, coords[2]);
+        model.addAttribute(STR_MAXLAT, coords[3]);
+        model.addAttribute(STR_IMAGE, imagePath);
         model.addAttribute(STR_POLYGON, polygon);
-        model.addAttribute(STR_IDPREV, idPrev);
+        if (idPrev != null) model.addAttribute(STR_IDPREV, idPrev);
     }
+
+    private void commonFunc(Integer id, Integer idPrev, Model model) {
+        try {
+            // Recuperamos DTO y datos necesarios
+            SentinelQueryFilesTiffDto dto = service.buscarDtoSinOpt(id);
+            String pathCompleto = dto.getPath();
+            String polygon = dto.getSentinelQueryFilesfortiff()
+                    .getFiltroListarArchivos()
+                    .getPolygon();
+
+            // Construcción de rutas internas de forma más clara
+            String nombreDirInterno = pathCompleto.substring(
+                    pathCompleto.lastIndexOf(STR_USERFILES), pathCompleto.lastIndexOf("/")
+            );
+            String uploadDir = STR_F_SRC + nombreDirInterno;
+            String internalPath = uploadDir + STR_RESPONSETIFF;
+            String internalPathJson = STR_API + uploadDir + STR_REQUESTJSON;
+
+            logger.info("Path TIFF: {}", internalPath);
+            logger.info("Polygon: {}", polygon);
+
+            // Parsear JSON con coordenadas
+            JSONObject jsonObject = (JSONObject) new JSONParser().parse(new FileReader(internalPathJson));
+
+            // Añadir atributos comunes al modelo (coordenadas + imagen + polígono + idPrev)
+            addBoundsToModel(model, jsonObject, internalPath, polygon, idPrev);
+
+        } catch (IOException | ParseException e) {
+            logger.error("Error procesando commonFunc: {}", e.getMessage(), e);
+            model.addAttribute(STR_MESSAGE, "Error al procesar la imagen: " + e.getMessage());
+        }
+    }
+
     @GetMapping("/visor/image/{id}")
     public String getListImages(@PathVariable("id") Integer id,Model model) throws IOException,
             ParseException {
@@ -287,6 +276,7 @@ public class ImageController extends AbstractController <SentinelQueryFilesTiffD
         //Buscar bounds
         //Enviar min lond, min lat , maz long max lat
         // usar dichos valores para mostrar el poígono
+        addBoundsToModel(model,jsonObject,internaltiffautopath,evalScriptLaunchDto.getPolygon(),null);
         model.addAttribute(STR_MINLONG, minlong);
         model.addAttribute(STR_MINLAT, minlat);
         model.addAttribute(STR_MAXLONG, maxlong);
@@ -347,19 +337,6 @@ public class ImageController extends AbstractController <SentinelQueryFilesTiffD
         model.addAttribute(STR_IDPREV, id);
 
         return "/visor/imagesprevlucasv1";
-    }
-
-    private Number getMinMaxCoords(JSONArray jsonArray,Integer pos){
-        Iterator i = jsonArray.iterator();
-        Integer iter = 0;
-        Number valRes = 0;
-        while(i.hasNext()) {
-            Number val = (Number) i.next();
-            if ( iter.equals(pos))
-                valRes = val;
-            iter +=1;
-        }
-        return  valRes;
     }
 
 

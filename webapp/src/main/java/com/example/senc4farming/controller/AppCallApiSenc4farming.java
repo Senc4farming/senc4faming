@@ -41,6 +41,9 @@ public class AppCallApiSenc4farming extends AbstractController <GrupoTrabajoDto>
 
     private final CallApiSenc4farmingService callApiSenc4farmingService;
 
+    //Mensaje de error
+    private String strErrorMessage = "";
+
     private  List<Listfiles> objlistfiles;
 
     private  List<Listfilestiff> objlistfilestiff;
@@ -304,8 +307,6 @@ public class AppCallApiSenc4farming extends AbstractController <GrupoTrabajoDto>
         logger.info("En /api/listfiles post");
         //Objeto para guardar el filtro de la consulta
         FiltroListarArchivosDto filtroListarArchivosDto = new FiltroListarArchivosDto();
-        //Mensaje de error
-        String strErrorMessage = "";
         //componemos la url
 
         String urltext = STR_HTTP + configuationProperties.getIppythonserver() + ":8100/api/generarlista2ANew/";
@@ -360,30 +361,8 @@ public class AppCallApiSenc4farming extends AbstractController <GrupoTrabajoDto>
                 String jsonArray = request1.getOutput();
                 logger.info("Post pantalla de busqueda json leido");
                 logger.info(jsonArray);
-                JSONObject jsonObject = new JSONObject(jsonArray);
-                Iterator<String> keys = jsonObject.keys();
+                handleRequest(jsonArray,3);
 
-                while (keys.hasNext()) {
-                    String key = keys.next();
-                    if (jsonObject.get(key) instanceof JSONObject) {
-                        // do something with jsonObject here
-                        JSONObject jsonObjectForKey = jsonObject.getJSONObject(key);
-                        Iterator<String> keysint = jsonObjectForKey.keys();
-                        while (keysint.hasNext()) {
-                            String keyint = keysint.next();
-                            Listfiles itemlistfilesCheck = findfilerecord(keyint);
-                            if (itemlistfilesCheck.getKey().equals(-1)) {
-                                Listfiles itmlistfilesnew = new Listfiles();
-                                setlistfilesfield(key, jsonObjectForKey, keyint, itmlistfilesnew, 0);
-                            } else {
-                                // You use this ".get()" method to actually get your Listfiles from the Optional object
-
-                                objlistfiles.remove(itemlistfilesCheck);
-                                setlistfilesfield(key, jsonObjectForKey, keyint, itemlistfilesCheck, 1);
-                            }
-                        }
-                    }
-                }
                 filtroListarArchivosDto.setNunberOfResults(objlistfiles.size());
 
                 //Eliminamos los resultados de la consulta anterior por referencia
@@ -408,27 +387,7 @@ public class AppCallApiSenc4farming extends AbstractController <GrupoTrabajoDto>
             else{
                 logger.info("Error Message en readerror");
                 logger.info(request1.getErrormessage());
-                String jsonArray = request1.getOutput();
-
-                JSONObject jsonObject = new JSONObject(jsonArray);
-                Iterator<String> keys = jsonObject.keys();
-                while (keys.hasNext()) {
-                    String key = keys.next();
-                    if (jsonObject.get(key) instanceof JSONObject) {
-                        // do something with jsonObject here
-                        JSONObject jsonObjectForKey = jsonObject.getJSONObject(key);
-                        Iterator<String> keysint = jsonObjectForKey.keys();
-                        while (keysint.hasNext()) {
-                            logger.info("Key segundo nivel");
-                            String keyint = keysint.next();
-                            logger.info("Key {} , value {} ",keyint , jsonObjectForKey.get(keyint));
-                            if (keyint.equals("message")){
-                                strErrorMessage =  jsonObjectForKey.get(keyint).toString();
-                            }
-
-                        }
-                    }
-                }
+                handleRequest(request1.getOutput(),4);
                 interfazConPantalla.addAttribute(STR_ERRORMESSAGE, strErrorMessage);
                 return STR_SENTINELQUERYFILES_DETALLES_NO_ENCONTRADO;
             }
@@ -450,8 +409,7 @@ public class AppCallApiSenc4farming extends AbstractController <GrupoTrabajoDto>
         logger.info("En /api/checkpolygosize post");
         //Objeto para guardar el filtro de la consulta
         FiltroListarArchivosDto filtroListarArchivosDto = new FiltroListarArchivosDto();
-        //Mensaje de error
-        String strErrorMessage = "";
+
         //componemos la url
 
         String urltext = STR_HTTP + configuationProperties.getIppythonserver() + ":8100/api/checkpolygosize/";
@@ -461,18 +419,9 @@ public class AppCallApiSenc4farming extends AbstractController <GrupoTrabajoDto>
         logger.info(superCustomerUserDetails.getUsername());
         logger.info("Post pantalla de busqueda 22");
         //Comprobamos si hay usuario logeado
-        if (superCustomerUserDetails.getUsername().equals("anonimo@anonimo")) {
-            listarArchivosDto.setUserName(superCustomerUserDetails.getUsername());
-            listarArchivosDto.setGroupid(0L);
-            listarArchivosDto.setUserid(0L);
-        } else {
-            logger.info("Post pantalla de busqueda 30");
-
-            listarArchivosDto.setUserName(superCustomerUserDetails.getUsuario().getEmail());
-            listarArchivosDto.setGroupid(superCustomerUserDetails.getUsuario().getGrupoTrabajo().getId());
-            listarArchivosDto.setUserid(superCustomerUserDetails.getUsuario().getId());
-
-        }
+        listarArchivosDto.setUserName(superCustomerUserDetails.getUsuario().getEmail());
+        listarArchivosDto.setGroupid(superCustomerUserDetails.getUsuario().getGrupoTrabajo().getId());
+        listarArchivosDto.setUserid(superCustomerUserDetails.getUsuario().getId());
         logger.info("Post pantalla de busqueda 40");
         //Obtenemos el id del usuario y el grupo
         try {
@@ -510,26 +459,7 @@ public class AppCallApiSenc4farming extends AbstractController <GrupoTrabajoDto>
             else{
                 logger.info("Error Message en readerror");
                 logger.info(request1.getErrormessage());
-                String jsonArray = request1.getOutput();
-                JSONObject jsonObject = new JSONObject(jsonArray);
-                Iterator<String> keys = jsonObject.keys();
-                while (keys.hasNext()) {
-                    String key = keys.next();
-                    if (jsonObject.get(key) instanceof JSONObject) {
-                        // do something with jsonObject here
-                        JSONObject jsonObjectForKey = jsonObject.getJSONObject(key);
-                        Iterator<String> keysint = jsonObjectForKey.keys();
-                        while (keysint.hasNext()) {
-                            logger.info("Key segundo nivel");
-                            String keyint = keysint.next();
-                            logger.info("Key : {} , value {}" ,keyint , jsonObjectForKey.get(keyint));
-                            if (keyint.equals("message")){
-                                strErrorMessage =  jsonObjectForKey.get(keyint).toString();
-                            }
-
-                        }
-                    }
-                }
+                handleRequest(request1.getOutput(),4);
                 //aqui hay que cambiar
                 interfazConPantalla.addAttribute(STR_ERRORMESSAGE, strErrorMessage);
                 return STR_SENTINELQUERYFILES_DETALLES_NO_ENCONTRADO;
@@ -668,32 +598,8 @@ public class AppCallApiSenc4farming extends AbstractController <GrupoTrabajoDto>
                 //Se invoca a la URL
                 Request request1 = new Request(urltext, requestParam);
                 logger.info(request1.getOutput());
+                handleRequest(request1.getOutput(),2);
 
-                String jsonArray = request1.getOutput();
-
-                JSONObject jsonObject = new JSONObject(jsonArray);
-                Iterator<String> keys = jsonObject.keys();
-
-                while (keys.hasNext()) {
-                    String key = keys.next();
-                    if (jsonObject.get(key) instanceof JSONObject) {
-                        // do something with jsonObject here
-                        JSONObject jsonObjectForKey = jsonObject.getJSONObject(key);
-                        Iterator<String> keysint = jsonObjectForKey.keys();
-                        while (keysint.hasNext()) {
-                            String keyint = keysint.next();
-                            Listfilestiff itemlistfilesCheck = findfiletiffrecord(keyint);
-                            if (itemlistfilesCheck.getKey().equals(-1)) {
-                                Listfilestiff itmlistfilesnew = new Listfilestiff();
-                                setlistfilestifffield(key, jsonObjectForKey, keyint, itmlistfilesnew, 0);
-                            } else {
-                                // You use this ".get()" method to actually get your Listfiles from the Optional object
-                                objlistfilestiff.remove(itemlistfilesCheck);
-                                setlistfilestifffield(key, jsonObjectForKey, keyint, itemlistfilesCheck, 1);
-                            }
-                        }
-                    }
-                }
                 if (objlistfilestiff.isEmpty())
                     sentinelQueryFiles1.setNunberOfTiff(0);
                 else
@@ -781,33 +687,7 @@ public class AppCallApiSenc4farming extends AbstractController <GrupoTrabajoDto>
                 //Comprobamos el patron
                 //Se invoca a la URL
                 Request request1 = new Request(urltext, requestParam);
-                String jsonArray = request1.getOutput();
-
-                JSONObject jsonObject = new JSONObject(jsonArray);
-                Iterator<String> keys = jsonObject.keys();
-
-                while (keys.hasNext()) {
-                    String key = keys.next();
-                    if (jsonObject.get(key) instanceof JSONObject) {
-                        // do something with jsonObject here
-                        JSONObject jsonObjectForKey = jsonObject.getJSONObject(key);
-                        Iterator<String> keysint = jsonObjectForKey.keys();
-                        while (keysint.hasNext()) {
-                            String keyint = keysint.next();
-                            Listfilestiff itemlistfilesCheck = findfiletiffrecord(keyint);
-                            if (itemlistfilesCheck.getKey().equals(-1)) {
-                                Listfilestiff itmlistfilesnew = new Listfilestiff();
-                                setlistfilestifffield(key, jsonObjectForKey, keyint, itmlistfilesnew, 0);
-                            } else {
-                                // You use this ".get()" method to actually get your Listfiles from the Optional object
-                                logger.info(" /api/listfiles/downloadbands get valores para el json existe indice");
-
-                                objlistfilestiff.remove(itemlistfilesCheck);
-                                setlistfilestifffield(key, jsonObjectForKey, keyint, itemlistfilesCheck, 1);
-                            }
-                        }
-                    }
-                }
+                handleRequest(request1.getOutput(),2);
                 if (objlistfilestiff.isEmpty())
                     sentinelQueryFiles1.setNunberOfTiff(0);
                 else
@@ -963,33 +843,7 @@ public class AppCallApiSenc4farming extends AbstractController <GrupoTrabajoDto>
                     //Comprobamos el patron
                     //Se invoca a la URL
                     Request request1 = new Request(urltext, requestParam);
-                    String jsonArray = request1.getOutput();
-
-                    JSONObject jsonObject = new JSONObject(jsonArray);
-                    Iterator<String> keys = jsonObject.keys();
-
-                    while (keys.hasNext()) {
-                        String key = keys.next();
-                        if (jsonObject.get(key) instanceof JSONObject) {
-                            // do something with jsonObject here
-                            JSONObject jsonObjectForKey = jsonObject.getJSONObject(key);
-                            Iterator<String> keysint = jsonObjectForKey.keys();
-                            while (keysint.hasNext()) {
-                                String keyint = keysint.next();
-                                ListfilesEvalScript itemlistfilesevalscriptCheck = findfileevalscriptrecord(keyint);
-                                if (itemlistfilesevalscriptCheck.getKey().equals(-1)) {
-                                    ListfilesEvalScript itemlistfilesevalscript = new ListfilesEvalScript();
-                                    setlistfilesevalscriptfield(key, jsonObjectForKey, keyint, itemlistfilesevalscript, 0);
-                                } else {
-                                    // You use this ".get()" method to actually get your Listfiles from the Optional object
-                                    objlistfilesevalscript.remove(itemlistfilesevalscriptCheck);
-                                    setlistfilesevalscriptfield(key, jsonObjectForKey, keyint, itemlistfilesevalscriptCheck, 1);
-                                }
-                            }
-                        }
-                    }
-
-
+                    handleRequest(request1.getOutput(),1);
 
                     if (!objlistfilesevalscript.isEmpty()){
                         //Actualizamos el path
@@ -1024,6 +878,70 @@ public class AppCallApiSenc4farming extends AbstractController <GrupoTrabajoDto>
             return STR_REDIRECT_API_CREDENTIALS;
         }
     }
+    private void  handleRequest(String jsonArray,Integer option){
+        JSONObject jsonObject = new JSONObject(jsonArray);
+        Iterator<String> keys = jsonObject.keys();
+
+        while (keys.hasNext()) {
+            String key = keys.next();
+            if (jsonObject.get(key) instanceof JSONObject) {
+                // do something with jsonObject here
+                JSONObject jsonObjectForKey = jsonObject.getJSONObject(key);
+                Iterator<String> keysint = jsonObjectForKey.keys();
+                while (keysint.hasNext()) {
+                    String keyint = keysint.next();
+                    switch (option){
+                        case 1:
+                            ListfilesEvalScript itemlistfilesevalscriptCheck = findfileevalscriptrecord(keyint);
+                            if (itemlistfilesevalscriptCheck.getKey().equals(-1)) {
+                                ListfilesEvalScript itemlistfilesevalscript = new ListfilesEvalScript();
+                                setlistfilesevalscriptfield(key, jsonObjectForKey, keyint, itemlistfilesevalscript, 0);
+                            }
+                            else {
+                                objlistfilesevalscript.remove(itemlistfilesevalscriptCheck);
+                                setlistfilesevalscriptfield(key, jsonObjectForKey, keyint, itemlistfilesevalscriptCheck, 0);
+                            }
+                            break;
+                        case 2:
+                            Listfilestiff itemlisttifffilesCheck = findfiletiffrecord(keyint);
+                            if (itemlisttifffilesCheck.getKey().equals(-1)) {
+                                Listfilestiff itmlistfilesnew = new Listfilestiff();
+                                setlistfilestifffield(key, jsonObjectForKey, keyint, itmlistfilesnew, 0);
+                            } else {
+                                // You use this ".get()" method to actually get your Listfiles from the Optional object
+                                logger.info(" /api/listfiles/downloadbands get valores para el json existe indice");
+
+                                objlistfilestiff.remove(itemlisttifffilesCheck);
+                                setlistfilestifffield(key, jsonObjectForKey, keyint, itemlisttifffilesCheck, 1);
+                            }
+                            break;
+                        case 3:
+                            Listfiles itemlistfilesCheck = findfilerecord(keyint);
+                            if (itemlistfilesCheck.getKey().equals(-1)) {
+                                Listfiles itmlistfilesnew = new Listfiles();
+                                setlistfilesfield(key, jsonObjectForKey, keyint, itmlistfilesnew, 0);
+                            } else {
+                                // You use this ".get()" method to actually get your Listfiles from the Optional object
+
+                                objlistfiles.remove(itemlistfilesCheck);
+                                setlistfilesfield(key, jsonObjectForKey, keyint, itemlistfilesCheck, 1);
+                            }
+                            break;
+                        case 4:
+                            logger.info("Key : {} , value {}" ,keyint , jsonObjectForKey.get(keyint));
+                            if (keyint.equals("message")){
+                                strErrorMessage =  jsonObjectForKey.get(keyint).toString();
+                            }
+                            break;
+                        default:
+                                logger.error("Invalid Option");
+                        }
+
+                    }
+                }
+            }
+        }
+
 
 
     @GetMapping("/api/csvdata")

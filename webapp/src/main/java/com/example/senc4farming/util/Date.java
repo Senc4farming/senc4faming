@@ -11,22 +11,6 @@ import lombok.Getter;
 public class Date {
 
 
-
-	private final static int REFYEAR = 1990;
-
-	private int day;
-	private int intMonth;
-	private int year;
-	private int dow;
-	private boolean isHoliday;
-
-	// DAYOFWEEK[1] gives MON, DAYOFWEEK[7] gives SUN...
-	public static final String[] DAYOFWEEK = { "SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN" };
-
-	// MONTH[12] gives DEC, MONTH[1] gives JAN...
-	public static final String[] MONTH = { "EMPTY", "JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP",
-			"OCT", "NOV", "DEC" };
-
 	public Date(int month, int day, int year) {
 		this.day = day;
 		this.intMonth = month;
@@ -41,6 +25,15 @@ public class Date {
 		this.dow = (prev1st.getDow() + prevMonthDays) % 7;
 		this.isHoliday = false;
 	}
+
+	// DAYOFWEEK[1] gives MON, DAYOFWEEK[7] gives SUN...
+	public static final String[] DAYOFWEEK = { "SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN" };
+
+	// MONTH[12] gives DEC, MONTH[1] gives JAN...
+	public static final String[] MONTH = { "EMPTY", "JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP",
+			"OCT", "NOV", "DEC" };
+	public  static final int REFYEAR = 1990;
+
 
 	public static boolean isLeapYear(int year) {
 		boolean value = false;
@@ -107,5 +100,9 @@ public class Date {
 	public String toString() {
 		return intMonth + "/" + day + "/" + year + " " + Date.DAYOFWEEK[dow];
 	}
-
+	private int day;
+	private int intMonth;
+	private int year;
+	private int dow;
+	private boolean isHoliday;
 }

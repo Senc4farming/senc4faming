@@ -21,13 +21,13 @@ public class MenuDTO implements Serializable {
 
     private String descriptionFr;
 
-    private String description_01;
+    private String description01;
 
-    private String description_02;
+    private String description02;
 
-    private String description_03;
+    private String description03;
 
-    private String description_04;
+    private String description04;
 
     private MenuDTO parent;
     private Integer order;

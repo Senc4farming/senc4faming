@@ -1,5 +1,6 @@
 package com.example.senc4farming.controller;
 
+import com.example.senc4farming.apiitem.DatosLucas2018Api;
 import com.example.senc4farming.apiitem.Listfilestiff;
 import com.example.senc4farming.config.ConfiguationProperties;
 import com.example.senc4farming.config.details.SuperCustomerUserDetails;
@@ -65,7 +66,6 @@ public class AppCallApiSenc4farmingAsync extends AbstractController <GrupoTrabaj
     private static final String STRTOKEN="token";
     private static final String STR_RESULTADO = "resultado";
     private static final String STR_ERRORMSG="Error Message :";
-    private static final String STR_REDIRECT_SENTINELQUERYFILES = "redirect:/sentinelqueryfiles";
     private static final String STR_PATH="path";
     private static final String STR_REFLECTANCE="reflectance";
     private static final String STR_CONSULTA="consulta";
@@ -563,7 +563,8 @@ public class AppCallApiSenc4farmingAsync extends AbstractController <GrupoTrabaj
 
     //El que con los datos de la pantalla guarda la informacion de tipo PostMapping
     @PostMapping("/api/listfiles/downloadbands/async/wait/{idquery}")
-    public String listfilesDownloadbandswait(@PathVariable("idquery") Integer id, Model interfazConPantalla,HttpSession session) {
+    public String listfilesDownloadbandswait(@PathVariable("idquery") Integer id,
+                                             Model interfazConPantalla,HttpSession session) {
         //Objeto para guardar el filtro de la consulta
         Optional<SentinelQueryFiles> sentinelQueryFiles = sentinelQueryFilesService.getRepo().findById(id);
         SentinelQueryFiles sentinelQueryFiles1 = new SentinelQueryFiles();
@@ -591,122 +592,118 @@ public class AppCallApiSenc4farmingAsync extends AbstractController <GrupoTrabaj
 
 
             //Obtenemos el id del usuario y el grupo
-            try {
-                JSONObject requestParam = new JSONObject();
-                requestParam.put(STR_USERID, superCustomerUserDetails.getUserID());
-                requestParam.put(STR_QUERYID, sentinelQueryFiles.get().getId());
-                requestParam.put(STR_OFFSET, 0.1);
-                requestParam.put(STR_REFERENCE, sentinelQueryFiles.get().getFiltroListarArchivos().getReference());
-                requestParam.put(STR_DATE, sentinelQueryFiles.get().getPublicationDate());
-                requestParam.put(STR_POLYGON, sentinelQueryFiles.get().getFiltroListarArchivos().getPolygon());
-                requestParam.put(STR_GEOFOOTPRINT, sentinelQueryFiles.get().getGeofootprint());
-                requestParam.put(STR_CLOUDCOVER, sentinelQueryFiles.get().getFiltroListarArchivos().getCloudCover());
-                requestParam.put(STR_SENTINELFILENAME, sentinelQueryFiles.get().getName());
-                requestParam.put(STR_SENTINELFILEID, sentinelQueryFiles.get().getSentinelId());
-                requestParam.put(STRCLIENTID, copernicuscredentials.getClientid());
-                requestParam.put(STRSECRET, copernicuscredentials.getSecret());
-                requestParam.put(STRTOKEN,  token);
-                //Comprobamos el patron
-                //Se invoca a la URL asincronamente
-                logger.info("Post pantalla de busqueda 50");
-                //Lanzamos la peticioon asincrona
-                byte[] request = requestParam.toString().getBytes();
 
-                HttpRequest postRequest = HttpRequest.newBuilder()
-                        .uri(URI.create(urltext))
-                        .version(HttpClient.Version.HTTP_2)
-                        .header(STR_CONTENT_TYPE, STR_APPLICATION_JSON)
-                        .POST(HttpRequest.BodyPublishers.ofByteArray(request))
-                        .build();
-                CompletableFuture<HttpResponse<String>> asyncResponse = null;
+            JSONObject requestParam = new JSONObject();
+            requestParam.put(STR_USERID, superCustomerUserDetails.getUserID());
+            requestParam.put(STR_QUERYID, sentinelQueryFiles.get().getId());
+            requestParam.put(STR_OFFSET, 0.1);
+            requestParam.put(STR_REFERENCE, sentinelQueryFiles.get().getFiltroListarArchivos().getReference());
+            requestParam.put(STR_DATE, sentinelQueryFiles.get().getPublicationDate());
+            requestParam.put(STR_POLYGON, sentinelQueryFiles.get().getFiltroListarArchivos().getPolygon());
+            requestParam.put(STR_GEOFOOTPRINT, sentinelQueryFiles.get().getGeofootprint());
+            requestParam.put(STR_CLOUDCOVER, sentinelQueryFiles.get().getFiltroListarArchivos().getCloudCover());
+            requestParam.put(STR_SENTINELFILENAME, sentinelQueryFiles.get().getName());
+            requestParam.put(STR_SENTINELFILEID, sentinelQueryFiles.get().getSentinelId());
+            requestParam.put(STRCLIENTID, copernicuscredentials.getClientid());
+            requestParam.put(STRSECRET, copernicuscredentials.getSecret());
+            requestParam.put(STRTOKEN,  token);
+            //Comprobamos el patron
+            //Se invoca a la URL asincronamente
+            logger.info("Post pantalla de busqueda 50");
+            //Lanzamos la peticioon asincrona
+            byte[] request = requestParam.toString().getBytes();
 
-                // sendAsync(): Sends the given request asynchronously using this client with the given response body handler.
-                //Equivalent to: sendAsync(request, responseBodyHandler, null).
-                asyncResponse = AsymcHttpClient.sendAsync(postRequest, HttpResponse.BodyHandlers.ofString());
+            HttpRequest postRequest = HttpRequest.newBuilder()
+                    .uri(URI.create(urltext))
+                    .version(HttpClient.Version.HTTP_2)
+                    .header(STR_CONTENT_TYPE, STR_APPLICATION_JSON)
+                    .POST(HttpRequest.BodyPublishers.ofByteArray(request))
+                    .build();
+            CompletableFuture<HttpResponse<String>> asyncResponse = null;
 
-                String strAsyncResultBody = null;
-                int intAsyncResultStatusCode = 0;
+            // sendAsync(): Sends the given request asynchronously using this client with the given response body handler.
+            //Equivalent to: sendAsync(request, responseBodyHandler, null).
+            asyncResponse = AsymcHttpClient.sendAsync(postRequest, HttpResponse.BodyHandlers.ofString());
 
-                strAsyncResultBody = asyncResponse.thenApply(HttpResponse::body).get(5, TimeUnit.SECONDS);
+            String strAsyncResultBody = null;
+            int intAsyncResultStatusCode = 0;
 
-                // OR:
+            strAsyncResultBody = asyncResponse.thenApply(HttpResponse::body).get(5, TimeUnit.SECONDS);
 
-                // join(): Returns the result value when complete, or throws an (unchecked) exception if completed exceptionally.
-                // To better conform with the use of common functional forms,
-                // if a computation involved in the completion of this CompletableFuture threw an exception,
-                // this method throws an (unchecked) CompletionException with the underlying exception as its cause.
+            // OR:
 
-                HttpResponse<String> response = asyncResponse.join();
-                intAsyncResultStatusCode = asyncResponse.thenApply(HttpResponse::statusCode).get(5, TimeUnit.SECONDS);
-                logger.info("=============== asyncResponse :===============  %s " , response);
-                logger.info("=============== AsyncHTTPClient Body:===============  %s " , strAsyncResultBody);
-                logger.info("=============== AsyncHTTPClient Status Code:===============  %s " , intAsyncResultStatusCode);
+            // join(): Returns the result value when complete, or throws an (unchecked) exception if completed exceptionally.
+            // To better conform with the use of common functional forms,
+            // if a computation involved in the completion of this CompletableFuture threw an exception,
+            // this method throws an (unchecked) CompletionException with the underlying exception as its cause.
 
-
-                String jsonArray = strAsyncResultBody;
-
-                JSONObject jsonObject = new JSONObject(jsonArray);
-                Iterator<String> keys = jsonObject.keys();
-
-                while (keys.hasNext()) {
-                    String key = keys.next();
-                    if (jsonObject.get(key) instanceof JSONObject) {
-                        // do something with jsonObject here
-                        JSONObject jsonObject1 = ( jsonObject.getJSONObject(key));
-                        Iterator<String> keysint = jsonObject1.keys();
-                        while (keysint.hasNext()) {
-                            String keyint = keysint.next();
-
-                            Listfilestiff itemlistfilesCheck = findfiletiffrecord(keyint);
-
-                            if (itemlistfilesCheck.getKey().equals(-1)) {
-                                logger.info("valores para el json no existe indice");
-                                Listfilestiff itmlistfilesnew = new Listfilestiff();
-                                setlistfilestifffield(key, jsonObject1, keyint, itmlistfilesnew, 0);
-                            } else {
-                                // You use this ".get()" method to actually get your Listfiles from the Optional object
-                                logger.info(" /api/listfiles/downloadbands get valores para el json existe indice");
-
-                                objlistfilestiff.remove(itemlistfilesCheck);
-                                setlistfilestifffield(key, jsonObject1, keyint, itemlistfilesCheck, 1);
-                            }
-                        }
-                    }
-                }
-                if (objlistfilestiff.isEmpty())
-                    sentinelQueryFiles1.setNunberOfTiff(0);
-                else
-                    sentinelQueryFiles1.setNunberOfTiff(objlistfilestiff.size());
-
-                //Eliminamos los resultados de la consulta anterior por referencia
-                logger.info("sentinelQueryFilesTiffService borramos para el id de files");
-                logger.info(sentinelQueryFiles1.getId());
-                sentinelQueryFilesTiffService.getRepo().deleteSentinelQueryFilesTiffBySentinelQueryFilesfortiff_Id(sentinelQueryFiles1.getId());
-
-                if (!objlistfilestiff.isEmpty()) {
-                    //Guardamos los datos
-                    sentinelQueryFilesService.getRepo().save(sentinelQueryFiles1);
+            HttpResponse<String> response = asyncResponse.join();
+            intAsyncResultStatusCode = asyncResponse.thenApply(HttpResponse::statusCode).get(5, TimeUnit.SECONDS);
+            logger.info("=============== asyncResponse :===============  %s " , response);
+            logger.info("=============== AsyncHTTPClient Body:===============  %s " , strAsyncResultBody);
+            logger.info("=============== AsyncHTTPClient Status Code:===============  %s " , intAsyncResultStatusCode);
 
 
-                    //Guardamos desde la lista
-                    sentinelQueryFilesTiffService.guardarDesdeConsulta(objlistfilestiff, sentinelQueryFiles1.getId());
+           handlelistfilesDownloadbandswait(strAsyncResultBody);
 
-                    return String.format("redirect:/sentinelqueryfiles/filter/%s" , sentinelQueryFiles.get().getId());
 
-                } else {
-                    //Mostrar página usuario no existe
-                    return STR_SENTINELQUERYFILES_DETALLES_NO_ENCONTRADO;
-                }
-            } catch (Exception e) {
-                logger.info(STR_ERRORMSG);
-                logger.info(e.getClass().getSimpleName());
-                logger.info(e.getMessage());
-                interfazConPantalla.addAttribute(STR_RESULTADO, STR_ERRORMSG + e.getClass().getSimpleName() + e.getMessage());
-                return STR_REDIRECT_SENTINELQUERYFILES;
+
+            if (objlistfilestiff.isEmpty())
+                sentinelQueryFiles1.setNunberOfTiff(0);
+            else
+                sentinelQueryFiles1.setNunberOfTiff(objlistfilestiff.size());
+
+            //Eliminamos los resultados de la consulta anterior por referencia
+            logger.info("sentinelQueryFilesTiffService borramos para el id de files");
+            logger.info(sentinelQueryFiles1.getId());
+            sentinelQueryFilesTiffService.getRepo().deleteSentinelQueryFilesTiffBySentinelQueryFilesfortiff_Id(sentinelQueryFiles1.getId());
+
+            if (!objlistfilestiff.isEmpty()) {
+                //Guardamos los datos
+                sentinelQueryFilesService.getRepo().save(sentinelQueryFiles1);
+
+
+                //Guardamos desde la lista
+                sentinelQueryFilesTiffService.guardarDesdeConsulta(objlistfilestiff, sentinelQueryFiles1.getId());
+
+                return String.format("redirect:/sentinelqueryfiles/filter/%s" , sentinelQueryFiles.get().getId());
+
+            } else {
+                //Mostrar página usuario no existe
+                return STR_SENTINELQUERYFILES_DETALLES_NO_ENCONTRADO;
             }
         } else {
             interfazConPantalla.addAttribute(STR_CONSULTA, copernicuscredentials);
             return STR_REDIRECT_API_CREDENTIALS;
+        }
+    }
+    private void handlelistfilesDownloadbandswait(String jsonArray){
+        JSONObject jsonObject = new JSONObject(jsonArray);
+        Iterator<String> keys = jsonObject.keys();
+        while (keys.hasNext()) {
+            String key = keys.next();
+            if (jsonObject.get(key) instanceof JSONObject) {
+                // do something with jsonObject here
+                JSONObject jsonObject1 = ( jsonObject.getJSONObject(key));
+                Iterator<String> keysint = jsonObject1.keys();
+                while (keysint.hasNext()) {
+                    String keyint = keysint.next();
+
+                    Listfilestiff itemlistfilesCheck = findfiletiffrecord(keyint);
+
+                    if (itemlistfilesCheck.getKey().equals(-1)) {
+                        logger.info("valores para el json no existe indice");
+                        Listfilestiff itmlistfilesnew = new Listfilestiff();
+                        setlistfilestifffield(key, jsonObject1, keyint, itmlistfilesnew, 0);
+                    } else {
+                        // You use this ".get()" method to actually get your Listfiles from the Optional object
+                        logger.info(" /api/listfiles/downloadbands get valores para el json existe indice");
+
+                        objlistfilestiff.remove(itemlistfilesCheck);
+                        setlistfilestifffield(key, jsonObject1, keyint, itemlistfilesCheck, 1);
+                    }
+                }
+            }
         }
     }
     private  Listfilestiff findfiletiffrecord( String key){

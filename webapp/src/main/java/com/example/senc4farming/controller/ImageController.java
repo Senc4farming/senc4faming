@@ -113,27 +113,12 @@ public class ImageController extends AbstractController <SentinelQueryFilesTiffD
 
         return "/visor/images";
     }
-
-    @GetMapping("/visor/image/{id}")
-    public String getListImages(@PathVariable("id") Integer id,Model model) throws IOException, ParseException {
-        SentinelQueryFilesTiffDto sentinelQueryFilesTiffDto = service.buscarDtoSinOpt(id);
-        String pathcompleto =  sentinelQueryFilesTiffDto.getPath();
-        SentinelQueryFilesTiffDto sentinelQueryFilesTiffDto1 = sentinelQueryFilesTiffDto;
-        String polygon = sentinelQueryFilesTiffDto1.getSentinelQueryFilesfortiff().getFiltroListarArchivos().getPolygon();
-        String nombredirinterno =  pathcompleto.substring(pathcompleto.lastIndexOf(STR_USERFILES),(pathcompleto.lastIndexOf("/")));
-        String uploadDir = STR_F_SRC + nombredirinterno ;
-        String internalpath = uploadDir + STR_RESPONSETIFF;
-        String internalpathjson =  STR_API +uploadDir + STR_REQUESTJSON;
-        logger.info("Path:");
-        logger.info(internalpath);
-        logger.info(polygon);
-        //Falta leer el json
-        Object o = new JSONParser().parse(new FileReader(internalpathjson));
-        JSONObject jsonObject = (JSONObject) o;
+    public Number[] getMinMaxCoordsArr(JSONObject jsonObject){
         Number minlong = 0;
         Number minlat = 0;
         Number maxlong = 0;
         Number maxlat = 0;
+
         if ( jsonObject.get(STR_REQUESTS) instanceof JSONObject ) {
             logger.info("lvl0");
             Object jsonrequest = jsonObject.get(STR_REQUESTS);
@@ -165,6 +150,36 @@ public class ImageController extends AbstractController <SentinelQueryFilesTiffD
                 }
             }
         }
+        Number[] numArr = new Number[4];
+        numArr[0] = minlong;
+        numArr[1] = minlat;
+        numArr[2] = maxlong;
+        numArr[3] = maxlat;
+
+        return  numArr;
+
+    }
+
+    @GetMapping("/visor/image/{id}")
+    public String getListImages(@PathVariable("id") Integer id,Model model) throws IOException, ParseException {
+        SentinelQueryFilesTiffDto sentinelQueryFilesTiffDto = service.buscarDtoSinOpt(id);
+        String pathcompleto =  sentinelQueryFilesTiffDto.getPath();
+        SentinelQueryFilesTiffDto sentinelQueryFilesTiffDto1 = sentinelQueryFilesTiffDto;
+        String polygon = sentinelQueryFilesTiffDto1.getSentinelQueryFilesfortiff().getFiltroListarArchivos().getPolygon();
+        String nombredirinterno =  pathcompleto.substring(pathcompleto.lastIndexOf(STR_USERFILES),(pathcompleto.lastIndexOf("/")));
+        String uploadDir = STR_F_SRC + nombredirinterno ;
+        String internalpath = uploadDir + STR_RESPONSETIFF;
+        String internalpathjson =  STR_API +uploadDir + STR_REQUESTJSON;
+        logger.info("Path:");
+        logger.info(internalpath);
+        logger.info(polygon);
+        //Falta leer el json
+        Object o = new JSONParser().parse(new FileReader(internalpathjson));
+        JSONObject jsonObject = (JSONObject) o;
+        Number minlong = getMinMaxCoordsArr(jsonObject)[0];
+        Number minlat = getMinMaxCoordsArr(jsonObject)[1];
+        Number maxlong = getMinMaxCoordsArr(jsonObject)[2];
+        Number maxlat = getMinMaxCoordsArr(jsonObject)[3];
 
         logsLongLat( minlong,  minlat,  maxlong,  maxlat  );
 
@@ -204,41 +219,10 @@ public class ImageController extends AbstractController <SentinelQueryFilesTiffD
         //Falta leer el json
         Object o = new JSONParser().parse(new FileReader(internalpathjson));
         JSONObject jsonObject = (JSONObject) o;
-        Number minlong = 0;
-        Number minlat = 0;
-        Number maxlong = 0;
-        Number maxlat = 0;
-        if ( jsonObject.get(STR_REQUESTS) instanceof JSONObject ) {
-            logger.info("lvl0");
-            Object jsonrequest = jsonObject.get(STR_REQUESTS);
-            JSONObject lvl1 = new JSONObject((Map) jsonrequest);
-            if ( lvl1.get(STR_PAYLOAD) instanceof JSONObject ) {
-                logger.info("lvl1");
-                Object jsonpayload = lvl1.get(STR_PAYLOAD);
-                JSONObject lvl2 = new JSONObject((Map) jsonpayload);
-                if (  lvl2.get(STR_INPUT) instanceof JSONObject ) {
-                    logger.info("lvl2");
-                    Object jsoninput = lvl2.get(STR_INPUT);
-                    JSONObject lvl3 = new JSONObject((Map) jsoninput);
-                    if (lvl3.get(STR_BOUNDS) instanceof JSONObject) {
-                        logger.info("lvl3");
-                        Object jsonbounds = lvl3.get(STR_BOUNDS);
-                        JSONObject lvl4 = new JSONObject((Map) jsonbounds);
-                        if (lvl3.get(STR_BOUNDS) instanceof JSONObject) {
-                            logger.info("lvl4");
-                            Object cc =  lvl4.get("bbox");
-                            if (cc instanceof JSONArray last ) {
-                                minlong = getMinMaxCoords(last,0);
-                                minlat = getMinMaxCoords(last,1);
-                                maxlong = getMinMaxCoords(last,2);
-                                maxlat = getMinMaxCoords(last,3);
-                            }
-
-                        }
-                    }
-                }
-            }
-        }
+        Number minlong = getMinMaxCoordsArr(jsonObject)[0];
+        Number minlat = getMinMaxCoordsArr(jsonObject)[1];
+        Number maxlong = getMinMaxCoordsArr(jsonObject)[2];
+        Number maxlat = getMinMaxCoordsArr(jsonObject)[3];
 
         logsLongLat( minlong,  minlat,  maxlong,  maxlat  );
 
@@ -273,41 +257,10 @@ public class ImageController extends AbstractController <SentinelQueryFilesTiffD
         //Falta leer el json
         Object o = new JSONParser().parse(new FileReader(internalpathjson));
         JSONObject jsonObject = (JSONObject) o;
-        Number minlong = 0;
-        Number minlat = 0;
-        Number maxlong = 0;
-        Number maxlat = 0;
-        if ( jsonObject.get(STR_REQUESTS) instanceof JSONObject ) {
-            logger.info("lvl0");
-            Object jsonrequest = jsonObject.get(STR_REQUESTS);
-            JSONObject lvl1 = new JSONObject((Map) jsonrequest);
-            if ( lvl1.get(STR_PAYLOAD) instanceof JSONObject ) {
-                logger.info("lvl1");
-                Object jsonpayload = lvl1.get(STR_PAYLOAD);
-                JSONObject lvl2 = new JSONObject((Map) jsonpayload);
-                if (  lvl2.get(STR_INPUT) instanceof JSONObject ) {
-                    logger.info("lvl2");
-                    Object jsoninput = lvl2.get(STR_INPUT);
-                    JSONObject lvl3 = new JSONObject((Map) jsoninput);
-                    if (lvl3.get(STR_BOUNDS) instanceof JSONObject) {
-                        logger.info("lvl3");
-                        Object jsonbounds = lvl3.get(STR_BOUNDS);
-                        JSONObject lvl4 = new JSONObject((Map) jsonbounds);
-                        if (lvl3.get(STR_BOUNDS) instanceof JSONObject) {
-                            logger.info("lvl4");
-                            Object cc =  lvl4.get("bbox");
-                            if (cc instanceof JSONArray last ) {
-                                minlong = getMinMaxCoords(last,0);
-                                minlat = getMinMaxCoords(last,1);
-                                maxlong = getMinMaxCoords(last,2);
-                                maxlat = getMinMaxCoords(last,3);
-                            }
-
-                        }
-                    }
-                }
-            }
-        }
+        Number minlong = getMinMaxCoordsArr(jsonObject)[0];
+        Number minlat = getMinMaxCoordsArr(jsonObject)[1];
+        Number maxlong = getMinMaxCoordsArr(jsonObject)[2];
+        Number maxlat = getMinMaxCoordsArr(jsonObject)[3];
 
         logsLongLat( minlong,  minlat,  maxlong,  maxlat  );
 
@@ -342,41 +295,10 @@ public class ImageController extends AbstractController <SentinelQueryFilesTiffD
         //Falta leer el json
         Object o = new JSONParser().parse(new FileReader(internalpathjson));
         JSONObject jsonObject = (JSONObject) o;
-        Number minlong = 0;
-        Number minlat = 0;
-        Number maxlong = 0;
-        Number maxlat = 0;
-        if ( jsonObject.get(STR_REQUESTS) instanceof JSONObject ) {
-            logger.info("lvl0");
-            Object jsonrequest = jsonObject.get(STR_REQUESTS);
-            JSONObject lvl1 = new JSONObject((Map) jsonrequest);
-            if ( lvl1.get(STR_PAYLOAD) instanceof JSONObject ) {
-                logger.info("lvl1");
-                Object jsonpayload = lvl1.get(STR_PAYLOAD);
-                JSONObject lvl2 = new JSONObject((Map) jsonpayload);
-                if (  lvl2.get(STR_INPUT) instanceof JSONObject ) {
-                    logger.info("lvl2");
-                    Object jsoninput = lvl2.get(STR_INPUT);
-                    JSONObject lvl3 = new JSONObject((Map) jsoninput);
-                    if (lvl3.get(STR_BOUNDS) instanceof JSONObject) {
-                        logger.info("lvl3");
-                        Object jsonbounds = lvl3.get(STR_BOUNDS);
-                        JSONObject lvl4 = new JSONObject((Map) jsonbounds);
-                        if (lvl3.get(STR_BOUNDS) instanceof JSONObject) {
-                            logger.info("lvl4");
-                            Object cc =  lvl4.get("bbox");
-                            if (cc instanceof JSONArray last ) {
-                                minlong = getMinMaxCoords(last,0);
-                                minlat = getMinMaxCoords(last,1);
-                                maxlong = getMinMaxCoords(last,2);
-                                maxlat = getMinMaxCoords(last,3);
-                            }
-
-                        }
-                    }
-                }
-            }
-        }
+        Number minlong = getMinMaxCoordsArr(jsonObject)[0];
+        Number minlat = getMinMaxCoordsArr(jsonObject)[1];
+        Number maxlong = getMinMaxCoordsArr(jsonObject)[2];
+        Number maxlat = getMinMaxCoordsArr(jsonObject)[3];
 
         logsLongLat( minlong,  minlat,  maxlong,  maxlat  );
 
@@ -438,42 +360,10 @@ public class ImageController extends AbstractController <SentinelQueryFilesTiffD
         //Falta leer el json
         Object o = new JSONParser().parse(new FileReader(internaltifffloat32path));
         JSONObject jsonObject = (JSONObject) o;
-        Number minlong = 0;
-        Number minlat = 0;
-        Number maxlong = 0;
-        Number maxlat = 0;
-        if ( jsonObject.get(STR_REQUESTS) instanceof JSONObject ) {
-            logger.info("lvl0");
-            Object jsonrequest = jsonObject.get(STR_REQUESTS);
-            JSONObject lvl1 = new JSONObject((Map) jsonrequest);
-            if ( lvl1.get(STR_PAYLOAD) instanceof JSONObject ) {
-                logger.info("lvl1");
-                Object jsonpayload = lvl1.get(STR_PAYLOAD);
-                JSONObject lvl2 = new JSONObject((Map) jsonpayload);
-                if (  lvl2.get(STR_INPUT) instanceof JSONObject ) {
-                    logger.info("lvl2");
-                    Object jsoninput = lvl2.get(STR_INPUT);
-                    JSONObject lvl3 = new JSONObject((Map) jsoninput);
-                    if (lvl3.get(STR_BOUNDS) instanceof JSONObject) {
-                        logger.info("lvl3");
-                        Object jsonbounds = lvl3.get(STR_BOUNDS);
-                        JSONObject lvl4 = new JSONObject((Map) jsonbounds);
-                        if (lvl3.get(STR_BOUNDS) instanceof JSONObject) {
-                            logger.info("lvl4");
-                            Object cc =  lvl4.get("bbox");
-                            if (cc instanceof JSONArray last ) {
-                                minlong = getMinMaxCoords(last,0);
-                                minlat = getMinMaxCoords(last,1);
-                                maxlong = getMinMaxCoords(last,2);
-                                maxlat = getMinMaxCoords(last,3);
-                            }
-
-                        }
-                    }
-                }
-            }
-        }
-
+        Number minlong = getMinMaxCoordsArr(jsonObject)[0];
+        Number minlat = getMinMaxCoordsArr(jsonObject)[1];
+        Number maxlong = getMinMaxCoordsArr(jsonObject)[2];
+        Number maxlat = getMinMaxCoordsArr(jsonObject)[3];
 
         logsLongLat( minlong,  minlat,  maxlong,  maxlat  );
 
@@ -521,41 +411,11 @@ public class ImageController extends AbstractController <SentinelQueryFilesTiffD
         //Falta leer el json
         Object o = new JSONParser().parse(new FileReader(internaljsonfloat32path));
         JSONObject jsonObject = (JSONObject) o;
-        Number minlong = 0;
-        Number minlat = 0;
-        Number maxlong = 0;
-        Number maxlat = 0;
-        if ( jsonObject.get(STR_REQUESTS) instanceof JSONObject ) {
-            logger.info("lvl0");
-            Object jsonrequest = jsonObject.get(STR_REQUESTS);
-            JSONObject lvl1 = new JSONObject((Map) jsonrequest);
-            if ( lvl1.get(STR_PAYLOAD) instanceof JSONObject ) {
-                logger.info("lvl1");
-                Object jsonpayload = lvl1.get(STR_PAYLOAD);
-                JSONObject lvl2 = new JSONObject((Map) jsonpayload);
-                if (  lvl2.get(STR_INPUT) instanceof JSONObject ) {
-                    logger.info("lvl2");
-                    Object jsoninput = lvl2.get(STR_INPUT);
-                    JSONObject lvl3 = new JSONObject((Map) jsoninput);
-                    if (lvl3.get(STR_BOUNDS) instanceof JSONObject) {
-                        logger.info("lvl3");
-                        Object jsonbounds = lvl3.get(STR_BOUNDS);
-                        JSONObject lvl4 = new JSONObject((Map) jsonbounds);
-                        if (lvl3.get(STR_BOUNDS) instanceof JSONObject) {
-                            logger.info("lvl4");
-                            Object cc =  lvl4.get("bbox");
-                            if (cc instanceof JSONArray last ) {
-                                minlong = getMinMaxCoords(last,0);
-                                minlat = getMinMaxCoords(last,1);
-                                maxlong = getMinMaxCoords(last,2);
-                                maxlat = getMinMaxCoords(last,3);
-                            }
+        Number minlong = getMinMaxCoordsArr(jsonObject)[0];
+        Number minlat = getMinMaxCoordsArr(jsonObject)[1];
+        Number maxlong = getMinMaxCoordsArr(jsonObject)[2];
+        Number maxlat = getMinMaxCoordsArr(jsonObject)[3];
 
-                        }
-                    }
-                }
-            }
-        }
         logsLongLat( minlong,  minlat,  maxlong,  maxlat  );
 
         model.addAttribute(STR_POLYGON, "0");
